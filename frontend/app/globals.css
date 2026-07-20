@@ -1,26 +1,236 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /*
+   * Sri Lanka Government website design tokens.
+   * Fisheries sector accent: #388E3C.
+   */
+
+  --color-government-green: #388e3c;
+  --color-government-green-dark: #256b29;
+  --color-government-green-darker: #17451a;
+  --color-government-green-light: #e8f5e9;
+  --color-government-green-lighter: #f4faf4;
+
+  --color-background: #ffffff;
+  --color-surface: #f8fafc;
+  --color-surface-muted: #f1f5f9;
+
+  --color-foreground: #0f172a;
+  --color-muted-foreground: #475569;
+
+  --color-border: #cbd5e1;
+  --color-border-light: #e2e8f0;
+
+  --color-link: #1d4ed8;
+  --color-link-hover: #1e3a8a;
+
+  --color-success: #167443;
+  --color-success-background: #ecfdf3;
+
+  --color-warning: #92400e;
+  --color-warning-background: #fffbeb;
+
+  --color-error: #b42318;
+  --color-error-background: #fef3f2;
+
+  --color-info: #175cd3;
+  --color-info-background: #eff8ff;
+
+  --focus-color: #1d4ed8;
+
+  --content-width: 1200px;
+  --reading-width: 760px;
+
+  --radius-small: 0.25rem;
+  --radius-medium: 0.5rem;
+  --radius-large: 0.75rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+  text-size-adjust: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-size: 1rem;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+main {
+  display: block;
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+}
+
+p,
+li {
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-foreground);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--color-government-green-light);
+  color: var(--color-government-green-darker);
+}
+
+/*
+ * Consistent keyboard focus.
+ * Do not remove outlines without providing an equivalent focus indicator.
+ */
+:focus-visible {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 3px;
+}
+
+/*
+ * Skip link remains visually hidden until focused by a keyboard user.
+ */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 9999;
+  transform: translateY(-200%);
+  border-radius: var(--radius-small);
+  background: var(--color-foreground);
+  color: #ffffff;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 150ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/*
+ * Utility for content that should be hidden visually but remain
+ * available to screen readers.
+ */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/*
+ * Prevent long filenames, URLs and document titles from causing
+ * horizontal overflow on small screens.
+ */
+.break-content {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/*
+ * Default readable article width.
+ */
+.reading-content {
+  max-width: var(--reading-width);
+}
+
+/*
+ * High-contrast preference. This class will later be controlled
+ * from the accessibility menu.
+ */
+html.high-contrast {
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f3f4f6;
+  --color-foreground: #000000;
+  --color-muted-foreground: #111827;
+  --color-border: #000000;
+  --color-border-light: #374151;
+  --color-government-green: #14532d;
+  --focus-color: #0000ff;
+}
+
+/*
+ * Text-size preferences. These will later be controlled from
+ * the accessibility menu.
+ */
+html.text-size-large {
+  font-size: 112.5%;
+}
+
+html.text-size-larger {
+  font-size: 125%;
 }

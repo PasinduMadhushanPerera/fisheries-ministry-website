@@ -1,65 +1,150 @@
-import Image from "next/image";
+import {
+  ArrowRight,
+  ExternalLink,
+} from "lucide-react"
 
-export default function Home() {
+import {
+  Button,
+  LinkButton,
+} from "@/components/ui/button"
+import { Container } from "@/components/ui/container"
+
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
+      <header className="border-b border-slate-200 bg-white">
+        <Container className="flex min-h-20 items-center">
+          <div>
+            <p className="text-sm font-semibold text-[#256B29]">
+              Government of Sri Lanka
+            </p>
+
+            <p className="font-bold text-slate-950">
+              Ministry of Fisheries, Aquatic and Ocean
+              Resources
+            </p>
+          </div>
+        </Container>
+      </header>
+
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="outline-none"
+      >
+        <section className="border-b border-slate-200 bg-slate-50 py-12 sm:py-16 lg:py-20">
+          <Container>
+            <div className="max-w-3xl">
+              <p className="font-semibold text-[#256B29]">
+                Frontend foundation
+              </p>
+
+              <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
+                Fisheries services and information for
+                Sri Lanka
+              </h1>
+
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-700">
+                This temporary page confirms that the
+                government design system, responsive container,
+                typography and reusable buttons are working.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <LinkButton href="/services">
+                  View services
+                  <ArrowRight
+                    aria-hidden="true"
+                    className="h-5 w-5"
+                  />
+                </LinkButton>
+
+                <LinkButton
+                  href="/about"
+                  variant="outline"
+                >
+                  About the Ministry
+                </LinkButton>
+
+                <LinkButton
+                  href="https://www.gov.lk/"
+                  variant="secondary"
+                  external
+                >
+                  Visit Gov.lk
+                  <ExternalLink
+                    aria-hidden="true"
+                    className="h-4 w-4"
+                  />
+                </LinkButton>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        <section
+          className="py-12 sm:py-16"
+          aria-labelledby="foundation-heading"
+        >
+          <Container>
+            <div className="max-w-3xl">
+              <h2
+                id="foundation-heading"
+                className="text-2xl font-bold text-slate-950 sm:text-3xl"
+              >
+                Foundation test
+              </h2>
+
+              <p className="mt-4 leading-7 text-slate-700">
+                Check this page on desktop and mobile. The
+                content should remain readable without horizontal
+                scrolling, and each control should have a visible
+                keyboard focus indicator.
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Button>Primary button</Button>
+
+                <Button variant="outline">
+                  Outline button
+                </Button>
+
+                <Button variant="secondary">
+                  Secondary button
+                </Button>
+
+                <Button disabled>
+                  Disabled button
+                </Button>
+              </div>
+
+              <div className="mt-8 rounded-lg border-l-4 border-amber-500 bg-amber-50 p-4 text-amber-950">
+                <h3 className="font-bold">
+                  Development notice
+                </h3>
+
+                <p className="mt-1 leading-7">
+                  Placeholder content must be verified and
+                  approved by the Ministry before publication.
+                </p>
+              </div>
+            </div>
+          </Container>
+        </section>
       </main>
-    </div>
-  );
+
+      <footer className="border-t border-slate-300 bg-slate-950 py-8 text-white">
+        <Container>
+          <p className="text-sm">
+            Temporary footer — the complete government footer
+            will be created in the next stage.
+          </p>
+        </Container>
+      </footer>
+    </>
+  )
 }
