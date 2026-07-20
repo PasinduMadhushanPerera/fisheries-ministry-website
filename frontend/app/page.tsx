@@ -3,6 +3,7 @@ import {
   ExternalLink,
 } from "lucide-react"
 
+import { SiteHeader } from "@/components/layout/site-header"
 import {
   Button,
   LinkButton,
@@ -12,24 +13,7 @@ import { Container } from "@/components/ui/container"
 export default function HomePage() {
   return (
     <>
-      <a href="#main-content" className="skip-link">
-        Skip to main content
-      </a>
-
-      <header className="border-b border-slate-200 bg-white">
-        <Container className="flex min-h-20 items-center">
-          <div>
-            <p className="text-sm font-semibold text-[#256B29]">
-              Government of Sri Lanka
-            </p>
-
-            <p className="font-bold text-slate-950">
-              Ministry of Fisheries, Aquatic and Ocean
-              Resources
-            </p>
-          </div>
-        </Container>
-      </header>
+      <SiteHeader />
 
       <main
         id="main-content"
@@ -40,7 +24,7 @@ export default function HomePage() {
           <Container>
             <div className="max-w-3xl">
               <p className="font-semibold text-[#256B29]">
-                Frontend foundation
+                Government of Sri Lanka
               </p>
 
               <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl lg:text-5xl">
@@ -49,14 +33,14 @@ export default function HomePage() {
               </h1>
 
               <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-700">
-                This temporary page confirms that the
-                government design system, responsive container,
-                typography and reusable buttons are working.
+                Access fisheries services, application
+                information, public notices, programmes and
+                official Ministry resources.
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <LinkButton href="/services">
-                  View services
+                  Explore services
                   <ArrowRight
                     aria-hidden="true"
                     className="h-5 w-5"
@@ -88,63 +72,34 @@ export default function HomePage() {
 
         <section
           className="py-12 sm:py-16"
-          aria-labelledby="foundation-heading"
+          aria-labelledby="header-complete-heading"
         >
           <Container>
             <div className="max-w-3xl">
               <h2
-                id="foundation-heading"
+                id="header-complete-heading"
                 className="text-2xl font-bold text-slate-950 sm:text-3xl"
               >
-                Foundation test
+                Government header completed
               </h2>
 
               <p className="mt-4 leading-7 text-slate-700">
-                Check this page on desktop and mobile. The
-                content should remain readable without horizontal
-                scrolling, and each control should have a visible
-                keyboard focus indicator.
+                The website now includes responsive navigation,
+                website search, language controls, accessibility
+                preferences and mobile assistance links.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button>Primary button</Button>
+                <Button>Primary action</Button>
 
                 <Button variant="outline">
-                  Outline button
+                  Secondary action
                 </Button>
-
-                <Button variant="secondary">
-                  Secondary button
-                </Button>
-
-                <Button disabled>
-                  Disabled button
-                </Button>
-              </div>
-
-              <div className="mt-8 rounded-lg border-l-4 border-amber-500 bg-amber-50 p-4 text-amber-950">
-                <h3 className="font-bold">
-                  Development notice
-                </h3>
-
-                <p className="mt-1 leading-7">
-                  Placeholder content must be verified and
-                  approved by the Ministry before publication.
-                </p>
               </div>
             </div>
           </Container>
         </section>
       </main>
-
-      <footer className="border-t border-slate-300 bg-slate-950 py-8 text-white">
-        <Container>
-          <p className="text-sm">
-            Temporary footer — the complete government footer
-            will be created in the next stage.
-          </p>
-        </Container>
-      </footer>
     </>
   )
 }
