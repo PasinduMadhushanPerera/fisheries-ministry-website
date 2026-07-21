@@ -4,7 +4,15 @@ import {
   Search,
 } from "lucide-react"
 
+import { CitizenHelp } from "@/components/home/citizen-help"
+import { DocumentsSection } from "@/components/home/documents-section"
+import { FeaturedProgrammes } from "@/components/home/featured-programmes"
+import { InstitutionsSection } from "@/components/home/institutions-section"
+import { LatestNews } from "@/components/home/latest-news"
+import { LatestNotices } from "@/components/home/latest-notices"
 import { PopularServices } from "@/components/home/popular-services"
+import { SectorOverview } from "@/components/home/sector-overview"
+import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { LinkButton } from "@/components/ui/button"
 import { Container } from "@/components/ui/container"
@@ -116,7 +124,16 @@ export default function HomePage() {
         </section>
 
         <PopularServices />
+        <LatestNotices />
+        <LatestNews />
+        <FeaturedProgrammes />
+        <SectorOverview />
+        <InstitutionsSection />
+        <DocumentsSection />
+        <CitizenHelp />
       </main>
+
+      <SiteFooter />
     </>
   )
 }
