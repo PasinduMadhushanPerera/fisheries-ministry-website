@@ -11,6 +11,7 @@ import { QuickActions } from "@/components/home/quick-actions"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 
+
 export default function HomePage() {
   return (
     <>

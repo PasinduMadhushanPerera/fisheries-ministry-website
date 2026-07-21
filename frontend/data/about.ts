@@ -14,6 +14,10 @@ import {
   Target,
   Users,
   Waves,
+  Compass,
+  Globe,
+  Lightbulb,
+  Star,
 } from "lucide-react"
 
 export const aboutHighlights = [
@@ -152,5 +156,115 @@ export const institutionalFeatures = [
     description:
       "Coverage of marine fisheries, inland fisheries, aquaculture and related resources.",
     icon: Anchor,
+  },
+]
+
+
+
+
+
+export const strategicPriorities = [
+  {
+    title: "Sustainable Fisheries",
+    description:
+      "Promote responsible fisheries management while protecting aquatic ecosystems.",
+    icon: Leaf,
+  },
+  {
+    title: "Digital Public Services",
+    description:
+      "Improve online services and accessibility for citizens.",
+    icon: Globe,
+  },
+  {
+    title: "Community Development",
+    description:
+      "Strengthen fisheries communities through inclusive programmes.",
+    icon: Users,
+  },
+  {
+    title: "Research & Innovation",
+    description:
+      "Support evidence-based policy making and technological innovation.",
+    icon: Lightbulb,
+  },
+]
+
+export const ministryValues = [
+  {
+    title: "Integrity",
+    description:
+      "Act honestly, ethically and responsibly in every public service and decision.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Transparency",
+    description:
+      "Promote openness, accountability and public confidence in Ministry activities.",
+    icon: Compass,
+  },
+  {
+    title: "Collaboration",
+    description:
+      "Work together with citizens, institutions and stakeholders to achieve shared goals.",
+    icon: Handshake,
+  },
+  {
+    title: "Service Excellence",
+    description:
+      "Deliver professional, accessible and citizen-focused public services.",
+    icon: Star,
+  },
+]
+
+export const departments = [
+  {
+    title: "Department of Fisheries and Aquatic Resources",
+    description:
+      "Supports fisheries administration, licensing, regulatory functions and public-sector services.",
+    href: "/institutions/department-of-fisheries-and-aquatic-resources",
+  },
+  {
+    title: "National Aquaculture Development Authority",
+    description:
+      "Promotes sustainable aquaculture development and inland fisheries initiatives.",
+    href: "/institutions/naqda",
+  },
+  {
+    title: "National Aquatic Resources Research and Development Agency",
+    description:
+      "Conducts scientific research and provides technical expertise for fisheries and aquatic resources.",
+    href: "/institutions/nara",
+  },
+]
+
+export const timeline = [
+  {
+    period: "Foundation",
+    title: "Institutional development",
+    description:
+      "Add the officially verified establishment history and early institutional milestones of the Ministry.",
+    status: "Historical milestone",
+  },
+  {
+    period: "Sector growth",
+    title: "Expansion of fisheries services",
+    description:
+      "Add confirmed developments related to fisheries administration, aquaculture, research and community services.",
+    status: "Development milestone",
+  },
+  {
+    period: "Present",
+    title: "Serving citizens and fisheries communities",
+    description:
+      "The Ministry continues to coordinate public services, policies and institutional activities across the sector.",
+    status: "Current role",
+  },
+  {
+    period: "Future",
+    title: "Digital and sustainable transformation",
+    description:
+      "Strengthening accessible digital services, institutional coordination and responsible resource management.",
+    status: "Strategic direction",
   },
 ]
