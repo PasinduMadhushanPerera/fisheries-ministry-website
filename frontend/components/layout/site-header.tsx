@@ -24,7 +24,7 @@ export function SiteHeader() {
             <Link
               href="/"
               aria-label={`${siteConfig.shortName} homepage`}
-              className="flex min-w-0 items-center gap-4 rounded-md"
+              className="flex min-w-0 items-center gap-4 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
             >
               <div className="relative flex h-20 w-16 shrink-0 items-center justify-center">
                 <Image
@@ -43,13 +43,11 @@ export function SiteHeader() {
                 </p>
 
                 <p className="mt-1 max-w-2xl text-base font-bold leading-tight text-slate-950 sm:text-xl lg:text-2xl">
-                  Ministry of Fisheries, Aquatic and Ocean
-                  Resources
+                  Ministry of Fisheries, Aquatic and Ocean Resources
                 </p>
 
                 <p className="mt-1 hidden text-sm text-slate-600 sm:block">
-                  Sustainable fisheries, aquatic resources and
-                  public services
+                  Sustainable fisheries, aquatic resources and public services
                 </p>
               </div>
             </Link>
@@ -58,6 +56,7 @@ export function SiteHeader() {
               <form
                 role="search"
                 action="/search"
+                method="get"
                 className="hidden w-72 overflow-hidden rounded-lg border border-slate-300 bg-white focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-200 xl:flex"
               >
                 <label
@@ -71,14 +70,16 @@ export function SiteHeader() {
                   id="desktop-site-search"
                   name="q"
                   type="search"
+                  maxLength={100}
+                  autoComplete="off"
                   placeholder="Search this website"
-                  className="min-h-12 min-w-0 flex-1 border-0 px-4 text-base outline-none"
+                  className="min-h-12 min-w-0 flex-1 border-0 px-4 text-base text-slate-950 outline-none"
                 />
 
                 <button
                   type="submit"
                   aria-label="Submit website search"
-                  className="inline-flex min-h-12 min-w-12 items-center justify-center bg-[#388E3C] text-white hover:bg-[#256B29]"
+                  className="inline-flex min-h-12 min-w-12 items-center justify-center bg-[#388E3C] text-white transition hover:bg-[#256B29] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-emerald-200"
                 >
                   <Search
                     aria-hidden="true"
@@ -90,7 +91,7 @@ export function SiteHeader() {
               <Link
                 href="/search"
                 aria-label="Search the website"
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-slate-300 text-slate-800 hover:bg-slate-50 xl:hidden"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-slate-300 text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 xl:hidden"
               >
                 <Search
                   aria-hidden="true"
@@ -111,4 +112,4 @@ export function SiteHeader() {
       </header>
     </>
   )
-}   
+}

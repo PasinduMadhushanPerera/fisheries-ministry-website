@@ -222,19 +222,19 @@ export const departments = [
     title: "Department of Fisheries and Aquatic Resources",
     description:
       "Supports fisheries administration, licensing, regulatory functions and public-sector services.",
-    href: "/institutions/department-of-fisheries-and-aquatic-resources",
+    href: "https://www.fisheriesdept.gov.lk/",
   },
   {
     title: "National Aquaculture Development Authority",
     description:
       "Promotes sustainable aquaculture development and inland fisheries initiatives.",
-    href: "/institutions/naqda",
+    href: "https://naqda.gov.lk/",
   },
   {
     title: "National Aquatic Resources Research and Development Agency",
     description:
       "Conducts scientific research and provides technical expertise for fisheries and aquatic resources.",
-    href: "/institutions/nara",
+    href: "http://www.nara.ac.lk/",
   },
 ]
 
