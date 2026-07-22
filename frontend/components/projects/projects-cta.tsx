@@ -33,7 +33,7 @@ export function ProjectsCTA() {
                 <p className="mt-6 text-lg leading-8 text-slate-300">
                   Contact the Ministry of Fisheries to obtain more information
                   about ongoing initiatives, completed projects and development
-                  programmes supporting Sri Lanka's fisheries sector.
+                  programmes supporting Sri Lanka&apos;s fisheries sector.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-4">

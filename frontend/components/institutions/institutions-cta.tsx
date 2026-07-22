@@ -33,7 +33,7 @@ export function InstitutionsCTA() {
               </h2>
 
               <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-                If you require additional information regarding the Ministry's
+                If you require additional information regarding the Ministry&apos;s
                 departments, affiliated institutions, public services or
                 organizational responsibilities, our team is ready to assist
                 you.

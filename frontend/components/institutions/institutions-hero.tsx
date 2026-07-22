@@ -131,7 +131,7 @@ export function InstitutionsHero() {
               </p>
 
               <h2 className="mt-3 text-3xl font-bold">
-                Supporting Sri Lanka's Fisheries Sector
+                Supporting Sri Lanka&apos;s Fisheries Sector
               </h2>
 
               <p className="mt-5 leading-8 text-slate-300">

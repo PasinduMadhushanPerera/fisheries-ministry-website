@@ -64,7 +64,7 @@ export function ProjectsHero() {
             </h1>
 
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">
-              Explore the Ministry's key development projects aimed at
+              Explore the Ministry&apos;s key development projects aimed at
               strengthening fisheries infrastructure, marine conservation,
               aquaculture, digital transformation and sustainable growth across
               Sri Lanka.

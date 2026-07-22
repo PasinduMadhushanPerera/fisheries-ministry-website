@@ -25,7 +25,7 @@ export function FeaturedInstitutions() {
           <p className="mt-6 text-lg leading-8 text-slate-600">
             These organizations play a significant role in research,
             infrastructure development, education, aquaculture and the
-            sustainable management of Sri Lanka's fisheries and aquatic
+            sustainable management of Sri Lanka&apos;s fisheries and aquatic
             resources.
           </p>
         </div>

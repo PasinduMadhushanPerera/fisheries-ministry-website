@@ -26,7 +26,7 @@ export function FeaturedProjects() {
           </h2>
 
           <p className="mt-5 text-lg leading-8 text-slate-600">
-            Discover some of the Ministry's flagship projects that contribute
+            Discover some of the Ministry&apos;s flagship projects that contribute
             to sustainable fisheries, marine conservation and community
             development.
           </p>

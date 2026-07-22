@@ -35,7 +35,7 @@ export function MediaCategories() {
           </h2>
 
           <p className="mt-5 text-lg leading-8 text-slate-600">
-            Explore the Ministry's latest news, announcements, official
+            Explore the Ministry&apos;s latest news, announcements, official
             publications, photo galleries and videos from one place.
           </p>
         </div>

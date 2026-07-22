@@ -129,7 +129,7 @@ export function MediaHero() {
               </p>
 
               <h2 className="mt-3 text-3xl font-bold">
-                Follow the Ministry's Latest Activities
+                Follow the Ministry&apos;s Latest Activities
               </h2>
 
               <p className="mt-5 leading-8 text-slate-300">
