@@ -22,13 +22,19 @@ export function SiteHeader() {
    * to another route.
    */
   useEffect(() => {
-    setScrolled(false)
-
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: "instant",
+      behavior: "auto",
     })
+
+    const frame = window.requestAnimationFrame(() => {
+      setScrolled(window.scrollY > 80)
+    })
+
+    return () => {
+      window.cancelAnimationFrame(frame)
+    }
   }, [pathname])
 
   /*
@@ -58,15 +64,13 @@ export function SiteHeader() {
 
       <header
         id="site-header"
-        className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${
-          scrolled ? "shadow-lg" : "shadow-sm"
-        }`}
+        className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md transition-shadow duration-300 ${scrolled ? "shadow-lg" : "shadow-sm"
+          }`}
       >
         {/* Utility bar */}
         <div
-          className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${
-            scrolled ? "max-h-8" : "max-h-12"
-          }`}
+          className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${scrolled ? "max-h-8" : "max-h-12"
+            }`}
         >
           <UtilityBar />
         </div>
@@ -157,9 +161,8 @@ export function SiteHeader() {
           className="border-b border-slate-200 bg-white/95 backdrop-blur-md"
         >
           <Container
-            className={`flex items-center transition-[min-height] duration-300 ease-in-out ${
-              scrolled ? "min-h-[52px]" : "min-h-16"
-            }`}
+            className={`flex items-center transition-[min-height] duration-300 ease-in-out ${scrolled ? "min-h-[52px]" : "min-h-16"
+              }`}
           >
             <DesktopNavigation />
           </Container>

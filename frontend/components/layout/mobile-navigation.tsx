@@ -21,20 +21,20 @@ export function MobileNavigation() {
   const pathname = usePathname()
   const navigationId = useId()
 
-  const [isMounted, setIsMounted] = useState(false)
+  // const [isMounted, setIsMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  // useEffect(() => {
+  //   setIsMounted(true)
+  // }, [])
 
-  useEffect(() => {
-    setIsOpen(false)
-  }, [pathname])
+  // useEffect(() => {
+  //   setIsOpen(false)
+  // }, [pathname])
 
   useEffect(() => {
     if (!isOpen) {
@@ -137,7 +137,7 @@ export function MobileNavigation() {
   }
 
   const mobileMenu =
-    isMounted && isOpen
+    isOpen && typeof document !== "undefined"
       ? createPortal(
           <div
             className="fixed inset-0 z-[9999] lg:hidden"

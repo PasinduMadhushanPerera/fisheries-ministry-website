@@ -4,7 +4,6 @@ import {
   Briefcase,
   Building2,
   FolderKanban,
-  MapPinned,
   Target,
 } from "lucide-react"
 

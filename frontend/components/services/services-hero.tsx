@@ -138,7 +138,7 @@ export function ServicesHero() {
               </h2>
 
               <p className="mt-5 leading-8 text-slate-300">
-                Access the Ministry's most requested public services, licensing
+                Access the Ministry&apos;s most requested public services, licensing
                 information, downloadable forms and guidance from one place.
               </p>
 

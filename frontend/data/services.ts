@@ -13,7 +13,6 @@ import {
   ClipboardList,
   FileSearch,
   Send,
-  Download,
   ScrollText,
   BookOpen,
   
