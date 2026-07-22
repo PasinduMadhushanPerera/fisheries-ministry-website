@@ -18,32 +18,20 @@ export const mainNavigation: NavigationItem[] = [
     href: "/services",
     children: [
       {
-        label: "Citizen Services",
-        href: "/services/citizen",
+        label: "Services for Citizens",
+        href: "/services/citizens",
       },
       {
-        label: "Business Services",
+        label: "Services for Businesses",
         href: "/services/business",
       },
       {
-        label: "Licensing & Permits",
+        label: "Licences & Registrations",
         href: "/services/licensing",
       },
       {
-        label: "Registration Services",
+        label: "All Services",
         href: "/services/registration",
-      },
-      {
-        label: "Fisheries Development",
-        href: "/services/fisheries-development",
-      },
-      {
-        label: "Aquatic Resources",
-        href: "/services/aquatic-resources",
-      },
-      {
-        label: "View All Services",
-        href: "/services/all",
       },
     ],
   },
