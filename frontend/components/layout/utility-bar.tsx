@@ -13,7 +13,7 @@ import { LanguageSwitcher } from "./language-switcher"
 export function UtilityBar() {
   return (
     <div className="border-b border-slate-200 bg-slate-50">
-      <Container className="flex min-h-12 items-center justify-between gap-3">
+      <Container className="flex h-10 items-center justify-between transition-all duration-300">
         <div className="hidden items-center gap-5 text-sm text-slate-700 lg:flex">
           <a
             href="tel:+94000000000"
