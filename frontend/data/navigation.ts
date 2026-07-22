@@ -23,7 +23,7 @@ export const mainNavigation: NavigationItem[] = [
       },
       {
         label: "Services for Businesses",
-        href: "/services/business",
+        href: "/services/businesses",
       },
       {
         label: "Licences & Registrations",
