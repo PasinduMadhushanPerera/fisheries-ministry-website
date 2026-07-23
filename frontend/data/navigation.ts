@@ -57,7 +57,7 @@ export const mainNavigation: NavigationItem[] = [
       },
       {
         label: "Press Releases",
-        href: "/press-releases",
+        href: "/media-centre/press-releases",
       },
       {
         label: "Notices",
