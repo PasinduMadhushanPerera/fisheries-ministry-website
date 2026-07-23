@@ -68,8 +68,15 @@ export function SiteHeader() {
           }`}
       >
         {/* Utility bar */}
-        <div
+        {/* <div
           className={`overflow-hidden transition-[max-height] duration-300 ease-in-out ${scrolled ? "max-h-8" : "max-h-12"
+            }`}
+        >
+          <UtilityBar />
+        </div> */}
+
+        <div
+          className={`relative overflow-visible transition-[max-height] duration-300 ease-in-out ${scrolled ? "max-h-11" : "max-h-12"
             }`}
         >
           <UtilityBar />
