@@ -38,7 +38,7 @@ export function FeaturedPressRelease() {
             </h2>
 
             <p className="mt-4 max-w-2xl leading-7 text-slate-600">
-              Read the Ministry's latest official press release and public
+              Read the Ministry&apos;s latest official press release and public
               announcement.
             </p>
           </div>

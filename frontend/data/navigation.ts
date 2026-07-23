@@ -61,7 +61,7 @@ export const mainNavigation: NavigationItem[] = [
       },
       {
         label: "Notices",
-        href: "/notices",
+        href: "/media-centre/notices",
       },
     ],
   },
