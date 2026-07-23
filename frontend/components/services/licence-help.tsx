@@ -26,11 +26,11 @@ export function LicenceHelp() {
               </p>
 
               <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                We're here to help with your application
+                We&apos;re here to help with your application
               </h2>
 
               <p className="mt-6 text-lg leading-8 text-slate-200">
-                Whether you're applying for a new licence, renewing an existing
+                Whether you&apos;re applying for a new licence, renewing an existing
                 registration or looking for the correct permit, our ministry can
                 help you understand the requirements, required documents and
                 application procedures.

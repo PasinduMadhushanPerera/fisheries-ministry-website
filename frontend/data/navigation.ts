@@ -49,7 +49,7 @@ export const mainNavigation: NavigationItem[] = [
       },
       {
         label: "Gallery",
-        href: "/gallery",
+        href: "/media-centre/gallery",
       },
       {
         label: "Videos",
