@@ -45,7 +45,7 @@ export const mainNavigation: NavigationItem[] = [
     children: [
       {
         label: "News",
-        href: "/news",
+        href: " /media-centre/news",
       },
       {
         label: "Gallery",
