@@ -53,7 +53,7 @@ export const mainNavigation: NavigationItem[] = [
       },
       {
         label: "Videos",
-        href: "/videos",
+        href: "/media-centre/videos",
       },
       {
         label: "Press Releases",
