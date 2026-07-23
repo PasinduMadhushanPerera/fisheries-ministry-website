@@ -27,12 +27,12 @@ export const mainNavigation: NavigationItem[] = [
       },
       {
         label: "Licences & Registrations",
-        href: "/services/licensing",
+        href: "/services/licences-and-registrations",
       },
-      {
-        label: "All Services",
-        href: "/services/registration",
-      },
+      // {
+      //   label: "All Services",
+      //   href: "/services/registration",
+      // },
     ],
   },
   {
