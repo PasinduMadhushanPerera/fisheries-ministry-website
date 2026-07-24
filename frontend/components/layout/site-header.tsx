@@ -75,12 +75,42 @@ export function SiteHeader() {
           <UtilityBar />
         </div> */}
 
-        <div
+
+
+
+
+        {/* <div
           className={`relative overflow-visible transition-[max-height] duration-300 ease-in-out ${scrolled ? "max-h-11" : "max-h-12"
             }`}
         >
           <UtilityBar />
-        </div>
+        </div> */}
+
+{/* Utility bar */}
+
+
+
+
+{/* smooth animation */}
+
+<div
+  className={`relative z-[60] overflow-visible transition-all duration-300 ease-in-out ${
+    scrolled
+      ? "h-0 -translate-y-full opacity-0"
+      : "h-11 translate-y-0 opacity-100"
+  }`}
+>
+  <UtilityBar />
+</div>
+
+
+
+
+
+
+
+
+
 
         {/* Logo and search section — height remains unchanged */}
         <div className="border-b border-slate-200 bg-white/95">

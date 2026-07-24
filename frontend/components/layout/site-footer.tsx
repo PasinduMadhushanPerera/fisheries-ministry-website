@@ -185,7 +185,7 @@ export function SiteFooter() {
 
               <li>
                 <Link
-                  href="/terms"
+                  href="/terms-of-use"
                   className="rounded-sm transition hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"
                 >
                   Terms of use
