@@ -35,7 +35,7 @@ export function HomeHero() {
               Official website of the Ministry of Fisheries
             </div>
 
-            <h1
+            {/* <h1
               id="homepage-heading"
               className="mt-7 max-w-4xl text-4xl font-bold tracking-[-0.035em] text-white sm:text-5xl lg:text-6xl xl:text-7xl"
             >
@@ -43,7 +43,25 @@ export function HomeHero() {
               <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
                 for every community
               </span>
+            </h1> */}
+
+            <h1
+              id="about-page-heading"
+              className="mt-7 max-w-4xl text-4xl font-bold tracking-[-0.035em] sm:text-5xl lg:text-6xl"
+            >
+              {/* Pink text color applied here */}
+              {/* <span className="bg-teal-500 bg-clip-text text-transparent"> */}
+              <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
+                Fisheries services and information
+              </span>
+
+              <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
+                for every community
+              </span>
             </h1>
+
+
+
 
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200 sm:text-xl">
               Access public services, official notices,

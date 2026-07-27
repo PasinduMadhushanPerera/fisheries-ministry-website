@@ -53,11 +53,26 @@ export function AboutHero() {
               About the Ministry
             </div>
 
-            <h1
+            {/* <h1
               id="about-page-heading"
               className="mt-7 max-w-4xl text-4xl font-bold tracking-[-0.035em] sm:text-5xl lg:text-6xl"
             >
               Leadership for Sri Lanka&apos;s
+              <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
+                fisheries and aquatic resources
+              </span>
+            </h1> */}
+
+            <h1
+              id="about-page-heading"
+              className="mt-7 max-w-4xl text-4xl font-bold tracking-[-0.035em] sm:text-5xl lg:text-6xl"
+            >
+              {/* Pink text color applied here */}
+              {/* <span className="bg-teal-500 bg-clip-text text-transparent"> */}
+              <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
+                Leadership for Sri Lanka&apos;s
+              </span>
+
               <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
                 fisheries and aquatic resources
               </span>
