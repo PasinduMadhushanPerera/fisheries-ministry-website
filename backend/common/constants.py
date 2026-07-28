@@ -1,0 +1,11 @@
+SUPPORTED_LANGUAGES = (
+    "en",
+    "si",
+    "ta",
+)
+
+DEFAULT_LANGUAGE = "en"
+
+REQUIRED_TRANSLATIONS = 3
+
+MAX_UPLOAD_SIZE = 20 * 1024 * 1024

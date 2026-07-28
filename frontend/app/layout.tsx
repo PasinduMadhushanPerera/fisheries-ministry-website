@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Noto_Sans } from "next/font/google"
 
 import { siteConfig } from "@/config/site"
+import { LanguageProvider } from "@/src/contexts/LanguageContext"
 
 import "./globals.css"
 
@@ -67,7 +68,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={notoSans.variable}>
       <body className="font-[var(--font-noto-sans)] antialiased">
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   )
