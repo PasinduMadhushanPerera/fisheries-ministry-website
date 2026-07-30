@@ -3,19 +3,17 @@
 import { Search, X } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
-import {
-  noticeCategories,
-  type NoticeCategory,
-} from "@/data/notices"
 
 type NoticeFilterProps = {
-  activeCategory: NoticeCategory
+  categories: string[]
+  activeCategory: string
   searchQuery: string
-  onCategoryChange: (category: NoticeCategory) => void
+  onCategoryChange: (category: string) => void
   onSearchChange: (query: string) => void
 }
 
 export function NoticeFilter({
+  categories,
   activeCategory,
   searchQuery,
   onCategoryChange,
@@ -49,7 +47,7 @@ export function NoticeFilter({
                 onChange={(event) =>
                   onSearchChange(event.target.value)
                 }
-                placeholder="Search by title, department, reference number or location"
+                placeholder="Search by title, category, content or priority"
                 autoComplete="off"
                 className="h-12 w-full rounded-xl border border-slate-300 bg-white pl-12 pr-12 text-slate-950 outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-green-700 focus:ring-4 focus:ring-green-100"
               />
@@ -83,15 +81,18 @@ export function NoticeFilter({
               aria-labelledby="notice-category-label"
               className="mt-3 flex flex-wrap gap-2"
             >
-              {noticeCategories.map((category) => {
-                const isActive = activeCategory === category
+              {categories.map((category) => {
+                const isActive =
+                  activeCategory === category
 
                 return (
                   <button
                     key={category}
                     type="button"
                     aria-pressed={isActive}
-                    onClick={() => onCategoryChange(category)}
+                    onClick={() =>
+                      onCategoryChange(category)
+                    }
                     className={[
                       "rounded-full border px-4 py-2 text-sm font-semibold transition",
                       "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200",

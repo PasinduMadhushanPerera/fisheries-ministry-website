@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 
-import { FeaturedNotice } from "@/components/media/featured-notice"
 import { NoticeList } from "@/components/media/notices-list"
 import { NoticesHero } from "@/components/media/notices-hero"
 import { SiteFooter } from "@/components/layout/site-footer"
@@ -36,8 +35,6 @@ export default function NoticesPage() {
         <Breadcrumb items={breadcrumbItems} />
 
         <NoticesHero />
-
-        <FeaturedNotice />
 
         <NoticeList />
       </main>

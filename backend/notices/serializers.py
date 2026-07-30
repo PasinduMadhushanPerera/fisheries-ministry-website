@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from rest_framework import serializers
 
 from common.choices import Language
@@ -17,6 +19,7 @@ class NoticeCategorySerializer(serializers.ModelSerializer):
 
 class NoticeAttachmentSerializer(serializers.ModelSerializer):
     file_url = serializers.SerializerMethodField()
+    file_type = serializers.SerializerMethodField()
 
     class Meta:
         model = NoticeAttachment
@@ -25,6 +28,7 @@ class NoticeAttachmentSerializer(serializers.ModelSerializer):
             "title",
             "file",
             "file_url",
+            "file_type",
         ]
 
     def get_file_url(self, obj):
@@ -38,6 +42,12 @@ class NoticeAttachmentSerializer(serializers.ModelSerializer):
 
         return obj.file.url
 
+    def get_file_type(self, obj):
+        if not obj.file:
+            return None
+
+        return Path(obj.file.name).suffix.upper().lstrip(".")
+
 
 class NoticeSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
@@ -48,7 +58,10 @@ class NoticeSerializer(serializers.ModelSerializer):
     seo_description = serializers.SerializerMethodField()
 
     category = NoticeCategorySerializer(read_only=True)
-    attachments = NoticeAttachmentSerializer(many=True, read_only=True)
+    attachments = NoticeAttachmentSerializer(
+        many=True,
+        read_only=True,
+    )
 
     class Meta:
         model = Notice
@@ -57,6 +70,7 @@ class NoticeSerializer(serializers.ModelSerializer):
             "category",
             "status",
             "priority",
+            "is_featured",
             "published_at",
             "expires_at",
             "title",
@@ -100,14 +114,28 @@ class NoticeSerializer(serializers.ModelSerializer):
         )
 
         if translations is not None:
+            # First try the requested language.
             for translation in translations:
                 if translation.language == language:
                     return translation
 
-            return None
+            # Fall back to English.
+            for translation in translations:
+                if translation.language == Language.ENGLISH:
+                    return translation
+
+            # Use any available translation as the final fallback.
+            return translations[0] if translations else None
+
+        translation = obj.translations.filter(
+            language=language,
+        ).first()
+
+        if translation:
+            return translation
 
         return obj.translations.filter(
-            language=language,
+            language=Language.ENGLISH,
         ).first()
 
     def get_title(self, obj):
@@ -132,11 +160,13 @@ class NoticeSerializer(serializers.ModelSerializer):
 
     def get_seo_description(self, obj):
         translation = self.get_translation(obj)
+
         return (
             translation.seo_description
             if translation
             else None
         )
+
 
 class NoticeListSerializer(NoticeSerializer):
     """Serializer used for the notice list endpoint."""

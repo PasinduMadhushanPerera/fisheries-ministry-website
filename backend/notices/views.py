@@ -1,9 +1,13 @@
+from django.db.models import Prefetch, Q
+from django.utils import timezone
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
-from django.utils import timezone
-from django.db.models import Q, Prefetch
 
-from .models import Notice, NoticeTranslation
+from .models import (
+    Notice,
+    NoticeAttachment,
+    NoticeTranslation,
+)
 from .serializers import (
     NoticeDetailSerializer,
     NoticeListSerializer,
@@ -12,7 +16,7 @@ from .serializers import (
 
 class NoticeViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Public Notice API
+    Public read-only Notice API.
     """
 
     permission_classes = [AllowAny]
@@ -21,26 +25,61 @@ class NoticeViewSet(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         now = timezone.now()
 
-        return (
-        Notice.objects.filter(
-            status="published",
-            published_at__lte=now,
+        queryset = (
+            Notice.objects.filter(
+                status="published",
+                published_at__lte=now,
+            )
+            .filter(
+                Q(expires_at__isnull=True)
+                | Q(expires_at__gte=now)
+            )
+            .select_related("category")
+            .prefetch_related(
+                Prefetch(
+                    "translations",
+                    queryset=NoticeTranslation.objects.all(),
+                    to_attr="prefetched_translations",
+                ),
+                Prefetch(
+                    "attachments",
+                    queryset=NoticeAttachment.objects.filter(
+                        is_public=True,
+                    ).order_by(
+                        "sort_order",
+                        "created_at",
+                    ),
+                ),
+            )
+            .order_by(
+                "-is_featured",
+                "-priority",
+                "-published_at",
+                "-created_at",
+            )
         )
-        .filter(
-            Q(expires_at__isnull=True) |
-            Q(expires_at__gte=now)
-        )
-        .select_related("category")
-        .prefetch_related(
-            Prefetch(
-                "translations",
-                queryset=NoticeTranslation.objects.all(),
-                to_attr="prefetched_translations",
-            ),
-            "attachments",
-        )
-        .order_by("-published_at", "-created_at")
-    )
+
+        category = self.request.query_params.get("category")
+        search = self.request.query_params.get("search")
+        featured = self.request.query_params.get("featured")
+
+        if category and category != "all":
+            queryset = queryset.filter(
+                category__slug=category,
+            )
+
+        if featured in {"true", "1"}:
+            queryset = queryset.filter(is_featured=True)
+
+        if search:
+            queryset = queryset.filter(
+                Q(translations__title__icontains=search)
+                | Q(translations__summary__icontains=search)
+                | Q(translations__content__icontains=search)
+                | Q(category__name__icontains=search)
+            ).distinct()
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "retrieve":

@@ -603,7 +603,7 @@ export function LatestNotices({
                 Close
               </button>
 
-              <Link
+              {/* <Link
                 href={getNoticeUrl(
                   selectedNotice.slug,
                 )}
@@ -615,7 +615,7 @@ export function LatestNotices({
                   aria-hidden="true"
                   className="h-4 w-4"
                 />
-              </Link>
+              </Link> */}
             </footer>
           </section>
         </div>
