@@ -168,7 +168,7 @@ export function LatestNotices({
 
     try {
       const response = await fetch(
-        `${API_BASE_URL}/notices/?lang=${language}`,
+        `${API_BASE_URL}/notices/notices/?lang=${language}`,
         {
           method: "GET",
           headers: {

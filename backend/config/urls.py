@@ -6,12 +6,20 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/", include("notices.urls")),
-]
 
+    path(
+        "api/v1/notices/",
+        include("notices.urls"),
+    ),
+
+    path(
+        "api/v1/news/",
+        include("news.urls"),
+    ),
+]
 
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT,  
+        document_root=settings.MEDIA_ROOT,
     )
