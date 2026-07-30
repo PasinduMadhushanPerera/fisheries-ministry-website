@@ -130,9 +130,9 @@ export function MinistryTimeline() {
       </div>
 
       <div className="mt-12 rounded-3xl border border-amber-200 bg-amber-50 p-6 sm:p-7">
-        <p className="font-bold text-amber-950">
+        {/* <p className="font-bold text-amber-950">
           Historical-content review required
-        </p>
+        </p> */}
 
         {/* <p className="mt-2 max-w-4xl text-sm leading-6 text-amber-900">
           Dates, previous Ministry names, legal changes and institutional
@@ -140,7 +140,7 @@ export function MinistryTimeline() {
           before this website is published.
         </p> */}
 
-        <LinkButton
+        {/* <LinkButton
           href="/documents"
           variant="outline"
           className="mt-5 border-amber-300 bg-white text-amber-950 hover:bg-amber-100"
@@ -150,7 +150,7 @@ export function MinistryTimeline() {
             aria-hidden="true"
             className="h-4 w-4"
           />
-        </LinkButton>
+        </LinkButton> */}
       </div>
     </Section>
   )

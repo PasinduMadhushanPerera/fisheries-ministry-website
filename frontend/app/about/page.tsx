@@ -42,12 +42,12 @@ export default function AboutPage() {
         <AboutHero />
         <MinistryOverview />
         <VisionMission />
-        <CoreResponsibilities />
+        {/* <CoreResponsibilities /> */}
         <MinistryLeadership />
         <OrganizationalStructure />
         <DepartmentsSection />
-        <StrategicPriorities />
-        <CoreValues/>
+        {/* <StrategicPriorities /> */}
+        {/* <CoreValues/> */}
         <MinistryTimeline />
         <AboutCTA />
       </main>

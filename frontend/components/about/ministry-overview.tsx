@@ -23,21 +23,26 @@ export function MinistryOverview() {
       <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
         <div>
           <SectionTitle
+            className="text-justify"
             id="ministry-overview-heading"
             eyebrow="Ministry overview"
             title="Serving the fisheries sector and the nation"
-            description="The Ministry coordinates national priorities, public services and institutional activities connected with fisheries, aquaculture and aquatic resources."
+            description="Fishing has a long tradition in Sri Lanka that goes back to over two thousand years. It was one of the primary economic activities of the coastal communities. Marine fishing has gradually developed from a livelihood activity to a multibillion rupee industry over the years, particularly since Sri Lanka obtained Independence from the British rule in 1948. Inland fishing and aquaculture are recent developments not older than 75 years. Coastal aquaculture commenced in early 1980s with the establishment of shrimp farms in the North-western Province. Marine aquaculture commenced much later, i.e. around 2010.
+
+The fisheries resource base of the country comprises the exclusive economic zone (EEZ) of 517,000 sq km, the territorial sea of 21,500 sq km, and internal waters that include lagoons and estuaries of 1580 sq km, and man-made reservoirs of 5200 sq km. The bays, lagoons, reservoirs and certain lands located in coastal and reservoir areas create conducive environment for the resource base for development of aquaculture.
+
+The sector contributes around 1.4 % to the Gross Domestic Product (GDP) at current market prices. It provides direct and indirect employment to around 575,000 persons (3.7 % of the workforce of the country). The current (2017) annual fish production amounts to over 530,000 metric tons with a value addition of over USD 1300 million. The sector also supports an export industry that exports about 5 % of the production comprising tuna, shrimp, lobster, crab, sea-cucumber ornamental fish, etc. and earning over USD 250 million. Fish is the main source of animal protein of the masses. Currently the local fish production fulfills around 65 % of the total amount of fish required for the consumption of the country and the balance requirement is imported. The Government intends to meet the total requirement from the local fisheries and aquaculture production or alternatively meet the cost of fish imports from part of the income of fish exports."
           />
 
           <div className="mt-8 space-y-5 text-base leading-8 text-slate-600">
-            <p>
+            <p className="text-justify">
               Its responsibilities extend across policy development,
               public administration, resource sustainability,
               community support and coordination with organisations
               operating throughout the sector.
             </p>
 
-            <p>
+            <p className="text-justify">
               Through its departments, authorities and associated
               institutions, the Ministry supports citizens,
               fisheries communities, industry participants,
@@ -45,7 +50,7 @@ export function MinistryOverview() {
             </p>
           </div>
 
-          <ul className="mt-8 grid gap-3">
+          {/* <ul className="mt-8 grid gap-3">
             {institutionalFeatures.map((item) => {
               const Icon = item.icon
 
@@ -73,7 +78,7 @@ export function MinistryOverview() {
                 </li>
               )
             })}
-          </ul>
+          </ul> */}
 
           <LinkButton
             href="/institutions"

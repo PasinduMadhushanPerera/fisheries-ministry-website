@@ -61,7 +61,7 @@ export const visionMissionItems = [
     type: "Vision",
     title: "A sustainable and prosperous fisheries sector",
     description:
-      "To support a productive, inclusive and environmentally responsible fisheries sector that contributes to national development and community wellbeing.",
+      "Sri Lanka to be the leader of conservation and sustainable utilization of Fisheries and Aquatic Resources in the South Asian Region.",
     icon: Eye,
     accent: "green" as const,
   },
@@ -69,7 +69,7 @@ export const visionMissionItems = [
     type: "Mission",
     title: "Deliver effective leadership, services and coordination",
     description:
-      "To guide fisheries and aquatic-resource development through sound policies, accessible public services, institutional cooperation and responsible resource management.",
+      "Managing the utilization of Fisheries and Aquatic Resources for the benefit of the present and future generation.",
     icon: Target,
     accent: "blue" as const,
   },
@@ -139,24 +139,24 @@ export const leadershipRoles = [
 ]
 
 export const institutionalFeatures = [
-  {
-    title: "Government leadership",
-    description:
-      "Policy direction and national coordination for fisheries and aquatic resources.",
-    icon: Building2,
-  },
-  {
-    title: "Island-wide responsibility",
-    description:
-      "Services and institutional support for communities throughout Sri Lanka.",
-    icon: Globe2,
-  },
-  {
-    title: "Maritime and inland focus",
-    description:
-      "Coverage of marine fisheries, inland fisheries, aquaculture and related resources.",
-    icon: Anchor,
-  },
+  // {
+  //   title: "Government leadership",
+  //   description:
+  //     "Policy direction and national coordination for fisheries and aquatic resources.",
+  //   icon: Building2,
+  // },
+  // {
+  //   title: "Island-wide responsibility",
+  //   description:
+  //     "Services and institutional support for communities throughout Sri Lanka.",
+  //   icon: Globe2,
+  // },
+  // {
+  //   title: "Maritime and inland focus",
+  //   description:
+  //     "Coverage of marine fisheries, inland fisheries, aquaculture and related resources.",
+  //   icon: Anchor,
+  // },
 ]
 
 

@@ -92,12 +92,13 @@ export function VisionMission() {
                     <CheckCircle2
                       aria-hidden="true"
                       className="mt-0.5 h-5 w-5 shrink-0"
+                      
                     />
 
-                    <p>
+                    {/* <p>
                       Final wording must be reviewed and approved by
                       the authorised Ministry officer.
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </div>

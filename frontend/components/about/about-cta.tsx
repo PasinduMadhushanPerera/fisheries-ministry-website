@@ -10,7 +10,7 @@ export function AboutCTA() {
       background="white"
       spacing="lg"
     >
-      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0B4F2A] via-[#256B29] to-[#1B75BC] px-8 py-16 text-white shadow-2xl sm:px-12 lg:px-16">
+      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#37ab6b] via-[#45a64a] to-[#1B75BC] px-8 py-16 text-white shadow-2xl sm:px-12 lg:px-16">
         {/* Decorative background */}
         <div
           aria-hidden="true"
@@ -40,7 +40,7 @@ export function AboutCTA() {
           <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
             <Link
               href="/services"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 font-semibold text-[#256B29] transition hover:scale-105 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-7 py-4 font-semibold text-[#256B29] transition hover:scale-105 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
             >
               Explore Services
 

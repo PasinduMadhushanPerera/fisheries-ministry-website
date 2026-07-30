@@ -10,10 +10,6 @@ export const mainNavigation: NavigationItem[] = [
     href: "/",
   },
   {
-    label: "About Us",
-    href: "/about",
-  },
-  {
     label: "Services",
     href: "/services",
     children: [
@@ -102,6 +98,10 @@ export const mainNavigation: NavigationItem[] = [
   {
     label: "Institutions",
     href: "/institutions",
+  },
+    {
+    label: "About Us",
+    href: "/about",
   },
   {
     label: "Contact Us",

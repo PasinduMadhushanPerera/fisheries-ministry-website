@@ -68,7 +68,7 @@ export async function getNotices(
   language: LanguageCode = "en",
 ): Promise<NoticeApiResponse> {
   const response = await fetch(
-    buildApiUrl("/notices/", {
+    buildApiUrl("/notices/notices/", {
       lang: language,
     }),
     {
@@ -105,7 +105,7 @@ export async function getNoticeById(
   language: LanguageCode = "en",
 ): Promise<Notice> {
   const response = await fetch(
-    buildApiUrl(`/notices/${id}/`, {
+    buildApiUrl(`/notices/notices/${id}/`, {
       lang: language,
     }),
     {
