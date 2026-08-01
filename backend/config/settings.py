@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     "common",
     "notices",
     "news",
+    "about",
     
 ]
 

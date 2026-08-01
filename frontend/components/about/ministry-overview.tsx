@@ -35,7 +35,7 @@ The sector contributes around 1.4 % to the Gross Domestic Product (GDP) at curre
           />
 
           <div className="mt-8 space-y-5 text-base leading-8 text-slate-600">
-            <p className="text-justify">
+            {/* <p className="text-justify">
               Its responsibilities extend across policy development,
               public administration, resource sustainability,
               community support and coordination with organisations
@@ -47,7 +47,7 @@ The sector contributes around 1.4 % to the Gross Domestic Product (GDP) at curre
               institutions, the Ministry supports citizens,
               fisheries communities, industry participants,
               researchers and public-sector stakeholders.
-            </p>
+            </p> */}
           </div>
 
           {/* <ul className="mt-8 grid gap-3">

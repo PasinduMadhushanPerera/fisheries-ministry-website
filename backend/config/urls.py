@@ -16,6 +16,11 @@ urlpatterns = [
         "api/v1/news/",
         include("news.urls"),
     ),
+    
+    path(
+        "api/v1/about/",
+        include("about.urls"),
+    ),
 ]
 
 if settings.DEBUG:
