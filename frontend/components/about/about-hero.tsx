@@ -69,7 +69,11 @@ export function AboutHero() {
             >
               {/* Pink text color applied here */}
               {/* <span className="bg-teal-500 bg-clip-text text-transparent"> */}
-              <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
+              {/* <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
+                Leadership for Sri Lanka&apos;s
+              </span> */}
+
+              <span className="block text-white"> 
                 Leadership for Sri Lanka&apos;s
               </span>
 

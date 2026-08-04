@@ -10,30 +10,34 @@ export const mainNavigation: NavigationItem[] = [
     href: "/",
   },
   {
-    label: "Services",
-    href: "/services",
+    label: "About Us",
+    href: "/about",
     children: [
       {
-        label: "Services for Citizens",
-        href: "/services/citizens",
+        label: "Overview",
+        href: "/about/overview",
       },
       {
-        label: "Services for Businesses",
-        href: "/services/businesses",
+        label: "Hon. Minister",
+        href: "/about/minister",
       },
       {
-        label: "Licences & Registrations",
-        href: "/services/licences-and-registrations",
+        label: "Hon. Deputy Minister",
+        href: "/about/deputy-minister",
       },
-      // {
-      //   label: "All Services",
-      //   href: "/services/registration",
-      // },
+      {
+        label: "Secretary",
+        href: "/about/secretary",
+      },
+      {
+        label: "Divisions",
+        href: "/about/divisions",
+      },
+      {
+        label: "Organization Structure",
+        href: "/about/organization-structure",
+      },
     ],
-  },
-  {
-    label: "Laws & Policies",
-    href: "/laws-and-policies",
   },
   {
     label: "Media Centre",
@@ -41,67 +45,67 @@ export const mainNavigation: NavigationItem[] = [
     children: [
       {
         label: "News",
-        href: " /media-centre/news",
+        href: "/media-centre/news",
       },
       {
-        label: "Gallery",
-        href: "/media-centre/gallery",
-      },
-      {
-        label: "Videos",
-        href: "/media-centre/videos",
+        label: "Notices",
+        href: "/media-centre/notices",
       },
       {
         label: "Press Releases",
         href: "/media-centre/press-releases",
       },
       {
-        label: "Notices",
-        href: "/media-centre/notices",
+        label: "Events",
+        href: "/news-and-events",
+      },
+      {
+        label: "Photo Gallery",
+        href: "/media-centre/gallery",
+      },
+      {
+        label: "Videos",
+        href: "/media-centre/videos",
       },
     ],
   },
   {
-    label: "Resources",
-    href: "/resources",
+    label: "Statistics",
+    href: "/statistics",
     children: [
       {
-        label: "Documents & Downloads",
-        href: "/resources/documents",
+        label: "Fisheries at a Glance",
+        href: "/statistics/at-a-glance",
       },
       {
-        label: "Publications",
-        href: "/resources/publications",
+        label: "Weekly Fish Prices",
+        href: "/statistics/weekly-fish-prices",
       },
       {
-        label: "Annual Reports",
-        href: "/resources/annual-reports",
+        label: "Monthly Fish Production",
+        href: "/statistics/monthly-fish-production",
       },
       {
-        label: "Circulars",
-        href: "/resources/circulars",
+        label: "Annual Statistics Reports",
+        href: "/statistics/annual-reports",
       },
       {
-        label: "Forms",
-        href: "/resources/forms",
+        label: "Export and Import",
+        href: "/statistics/export-and-import",
       },
       {
-        label: "Tenders",
-        href: "/resources/tenders",
+        label: "Fishery Related Information",
+        href: "/statistics/related-information",
       },
     ],
   },
   {
-    label: "Projects & Programmes",
-    href: "/projects",
+    label: "RTI",
+    href: "/rti",
   },
   {
-    label: "Institutions",
-    href: "/institutions",
-  },
-    {
-    label: "About Us",
-    href: "/about",
+    label: "Downloads",
+    href: "/downloads",
   },
   {
     label: "Contact Us",

@@ -230,14 +230,14 @@ export function SiteHeader() {
           </Container>
         </div>
 
-        {/* Primary navigation */}
+        {/* Primary navigation bar (Light Black / Dark Charcoal Background) */}
         <nav
           aria-label="Primary navigation"
-          className="relative z-[105] border-b border-slate-200 bg-white/95 backdrop-blur-md"
+          className="relative z-[105] border-b border-slate-800 bg-[#150c39] text-white shadow-md"
         >
           <Container
-            className={`flex items-center transition-[min-height] duration-300 ease-in-out ${
-              scrolled ? "min-h-[52px]" : "min-h-16"
+            className={`flex items-center justify-center transition-[min-height] duration-300 ease-in-out ${
+              scrolled ? "min-h-[48px]" : "min-h-14"
             }`}
           >
             <DesktopNavigation />

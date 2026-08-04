@@ -1,16 +1,12 @@
-import { CapabilityStats } from "@/components/home/capability-stats"
-import { CitizenHelp } from "@/components/home/citizen-help"
 import { DocumentsSection } from "@/components/home/documents-section"
-import { FeaturedProgrammes } from "@/components/home/featured-programmes"
 import { HomeHero } from "@/components/home/home-hero"
 import { InstitutionsSection } from "@/components/home/institutions-section"
 import { LatestNews } from "@/components/home/latest-news"
 import { LatestNotices } from "@/components/home/latest-notices"
 import { PopularServices } from "@/components/home/popular-services"
-import { QuickActions } from "@/components/home/quick-actions"
+import { QuickAccess } from "@/components/home/quick-access"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
-
 
 export default function HomePage() {
   return (
@@ -22,18 +18,29 @@ export default function HomePage() {
         tabIndex={-1}
         className="outline-none"
       >
+        {/* 1. Hero */}
         <HomeHero />
-        <QuickActions />
-        <LatestNotices />
-        <LatestNews />
+
+        {/* 2. Quick Access */}
+        <QuickAccess />
+
+        {/* 3. Services and Opportunities */}
         <PopularServices />
-        <FeaturedProgrammes />
-        <CapabilityStats />
+
+        {/* 4. Latest News */}
+        <LatestNews />
+
+        {/* 5. Latest Notices */}
+        <LatestNotices />
+
+        {/* 6. Government Network */}
         <InstitutionsSection />
+
+        {/* 7. Resources */}
         <DocumentsSection />
-        <CitizenHelp />
       </main>
 
+      {/* 8. Footer */}
       <SiteFooter />
     </>
   )

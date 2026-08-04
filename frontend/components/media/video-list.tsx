@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from "react"
 import Image from "next/image"
-import Link from "next/link"
 import {
-  ArrowRight,
   CalendarDays,
   Clock3,
   MapPin,
   Play,
   SearchX,
+  X,
+  ExternalLink,
+  Share2,
 } from "lucide-react"
 
 import { VideoFilter } from "@/components/media/video-filter"
@@ -17,21 +18,22 @@ import { Container } from "@/components/ui/container"
 import {
   videos,
   type VideoCategory,
+  type VideoItem,
 } from "@/data/videos"
 
 export function VideoList() {
-  const [activeCategory, setActiveCategory] =
-    useState<VideoCategory>("All")
-
+  const [activeCategory, setActiveCategory] = useState<VideoCategory>("All")
   const [searchQuery, setSearchQuery] = useState("")
+
+  // Same-page Modal Preview state
+  const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null)
 
   const filteredVideos = useMemo(() => {
     const keyword = searchQuery.trim().toLowerCase()
 
     return videos.filter((video) => {
       const matchesCategory =
-        activeCategory === "All" ||
-        video.category === activeCategory
+        activeCategory === "All" || video.category === activeCategory
 
       const matchesSearch =
         keyword.length === 0 ||
@@ -56,170 +58,136 @@ export function VideoList() {
       <section
         id="video-library"
         aria-labelledby="video-library-heading"
-        className="scroll-mt-24 bg-slate-50 py-16 sm:py-20"
+        className="scroll-mt-24 bg-slate-50 py-12 sm:py-16"
       >
         <Container>
-          <div className="flex flex-col gap-4 border-b border-slate-200 pb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-3 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-green-700">
-                Video library
-              </p>
-
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-[#256B29] border border-emerald-200">
+                <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
+                <span>Video Directory</span>
+              </span>
               <h2
                 id="video-library-heading"
-                className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl"
+                className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900"
               >
-                {activeCategory === "All"
-                  ? "All Official Videos"
-                  : activeCategory}
+                {activeCategory === "All" ? "All Official Videos" : activeCategory}
               </h2>
-
-              <p className="mt-4 max-w-2xl leading-7 text-slate-600">
-                Browse Ministry programmes, official events, fisheries
-                development activities, community initiatives and marine
-                conservation videos.
-              </p>
             </div>
 
-            <p
-              aria-live="polite"
-              className="text-sm font-semibold text-slate-600"
-            >
-              {filteredVideos.length}{" "}
-              {filteredVideos.length === 1 ? "video" : "videos"}
+            <p aria-live="polite" className="text-xs font-bold text-slate-600">
+              Showing {filteredVideos.length} {filteredVideos.length === 1 ? "video" : "videos"}
             </p>
           </div>
 
+          {/* Clean 3-Column Video Card Grid */}
           {filteredVideos.length > 0 ? (
-            <div className="mt-10 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {filteredVideos.map((video) => (
                 <article
                   key={video.slug}
-                  className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-xl"
+                  className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition-all duration-300 hover:border-slate-300 hover:shadow-md"
                 >
-                  <Link
-                    href={`/media-centre/videos/${video.slug}`}
-                    className="relative block aspect-video overflow-hidden"
-                    aria-label={`Watch ${video.title}`}
-                  >
-                    <Image
-                      src={video.thumbnail}
-                      alt={video.thumbnailAlt}
-                      fill
-                      sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                    />
+                  <div>
+                    {/* Clickable Thumbnail triggering same-page Modal */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedVideo(video)}
+                      className="relative block w-full aspect-video overflow-hidden bg-slate-900 text-left cursor-pointer group-hover:opacity-95"
+                      aria-label={`Watch ${video.title} in preview popup`}
+                    >
+                      <Image
+                        src={video.thumbnail}
+                        alt={video.thumbnailAlt}
+                        fill
+                        sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                        className="object-cover transition duration-500 group-hover:scale-105"
+                      />
 
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-950/10 to-transparent"
-                    />
+                      <div
+                        aria-hidden="true"
+                        className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"
+                      />
 
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="flex h-16 w-16 items-center justify-center rounded-full border border-white/30 bg-white/90 text-green-800 shadow-xl backdrop-blur transition duration-300 group-hover:scale-110">
-                        <Play
-                          aria-hidden="true"
-                          className="ml-1 h-7 w-7 fill-current"
-                        />
-                      </span>
-                    </div>
-
-                    <div className="absolute left-4 top-4">
-                      <span className="rounded-full bg-green-700 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white">
-                        {video.category}
-                      </span>
-                    </div>
-
-                    <div className="absolute bottom-4 right-4">
-                      <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-slate-950/70 px-3 py-2 text-sm font-semibold text-white backdrop-blur-md">
-                        <Clock3
-                          aria-hidden="true"
-                          className="h-4 w-4 text-green-200"
-                        />
-
-                        {video.duration}
-                      </span>
-                    </div>
-                  </Link>
-
-                  <div className="p-6">
-                    <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500">
-                      <div className="flex items-center gap-2">
-                        <CalendarDays
-                          aria-hidden="true"
-                          className="h-4 w-4 text-green-700"
-                        />
-
-                        <time dateTime={video.publishedDate}>
-                          {video.displayDate}
-                        </time>
+                      {/* Centered Play Button Badge */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/90 text-[#256B29] shadow-lg backdrop-blur transition duration-300 group-hover:scale-110">
+                          <Play aria-hidden="true" className="ml-0.5 h-6 w-6 fill-current" />
+                        </span>
                       </div>
 
-                      {video.location ? (
-                        <div className="flex items-center gap-2">
-                          <MapPin
-                            aria-hidden="true"
-                            className="h-4 w-4 text-green-700"
-                          />
+                      {/* Category Badge */}
+                      <div className="absolute left-3 top-3">
+                        <span className="rounded-md bg-[#256B29] px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide text-white shadow-xs">
+                          {video.category}
+                        </span>
+                      </div>
 
-                          <span>{video.location}</span>
+                      {/* Duration Pill */}
+                      <div className="absolute bottom-3 right-3">
+                        <span className="inline-flex items-center gap-1.5 rounded-md bg-slate-950/80 px-2.5 py-1 text-xs font-bold text-white backdrop-blur-md">
+                          <Clock3 aria-hidden="true" className="h-3.5 w-3.5 text-emerald-300" />
+                          <span>{video.duration}</span>
+                        </span>
+                      </div>
+                    </button>
+
+                    <div className="p-5">
+                      <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+                        <div className="flex items-center gap-1.5">
+                          <CalendarDays aria-hidden="true" className="h-3.5 w-3.5 text-slate-400" />
+                          <time dateTime={video.publishedDate}>{video.displayDate}</time>
                         </div>
-                      ) : null}
+
+                        {video.location && (
+                          <div className="flex items-center gap-1.5">
+                            <MapPin aria-hidden="true" className="h-3.5 w-3.5 text-slate-400" />
+                            <span>{video.location}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <h3 className="mt-3 text-base font-extrabold text-slate-900 leading-snug">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedVideo(video)}
+                          className="text-left hover:text-[#388E3C] transition-colors cursor-pointer"
+                        >
+                          {video.title}
+                        </button>
+                      </h3>
+
+                      <p className="mt-2 line-clamp-2 text-xs text-slate-600 leading-relaxed">
+                        {video.description}
+                      </p>
                     </div>
+                  </div>
 
-                    <h3 className="mt-5 text-xl font-bold leading-8 text-slate-950">
-                      <Link
-                        href={`/media-centre/videos/${video.slug}`}
-                        className="transition hover:text-green-700 focus-visible:rounded focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
-                      >
-                        {video.title}
-                      </Link>
-                    </h3>
-
-                    <p className="mt-4 line-clamp-3 leading-7 text-slate-600">
-                      {video.description}
-                    </p>
-
-                    <Link
-                      href={`/media-centre/videos/${video.slug}`}
-                      className="mt-6 inline-flex items-center gap-2 font-semibold text-green-700 transition hover:text-green-900 focus-visible:rounded focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+                  <div className="p-5 pt-0">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedVideo(video)}
+                      className="inline-flex min-h-[38px] w-full items-center justify-center gap-2 rounded-xl bg-emerald-50 px-4 text-xs font-extrabold text-[#256B29] transition hover:bg-[#388E3C] hover:text-white cursor-pointer border border-emerald-200"
                     >
-                      Watch video
-
-                      <ArrowRight
-                        aria-hidden="true"
-                        className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                      />
-                    </Link>
+                      <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
+                      <span>Watch Video</span>
+                    </button>
                   </div>
                 </article>
               ))}
             </div>
           ) : (
-            <div className="mt-10 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-20 text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-                <SearchX
-                  aria-hidden="true"
-                  className="h-8 w-8"
-                />
-              </div>
-
-              <h3 className="mt-6 text-2xl font-bold text-slate-950">
-                No videos found
-              </h3>
-
-              <p className="mx-auto mt-4 max-w-lg leading-7 text-slate-600">
-                Try another search term or select a different category to
-                explore more Ministry videos.
-              </p>
-
+            <div className="mt-8 rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
+              <SearchX className="mx-auto h-10 w-10 text-slate-400" aria-hidden="true" />
+              <h3 className="mt-4 text-lg font-bold text-slate-900">No videos found</h3>
+              <p className="mt-1 text-xs text-slate-600">Try adjusting your search query or selected category.</p>
               <button
                 type="button"
                 onClick={() => {
                   setActiveCategory("All")
                   setSearchQuery("")
                 }}
-                className="mt-7 inline-flex items-center rounded-lg bg-green-700 px-6 py-3 font-semibold text-white transition hover:bg-green-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+                className="mt-4 rounded-xl bg-[#388E3C] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#256B29] cursor-pointer"
               >
                 Clear filters
               </button>
@@ -227,6 +195,106 @@ export function VideoList() {
           )}
         </Container>
       </section>
+
+      {/* SAME-PAGE VIDEO DETAIL PREVIEW MODAL */}
+      {selectedVideo && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="video-modal-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
+        >
+          <div className="relative w-full max-w-4xl rounded-3xl border border-slate-200 bg-white shadow-2xl overflow-hidden my-8">
+            {/* Top Bar with Close Button */}
+            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50">
+              <div className="flex items-center gap-2">
+                <span className="rounded-md bg-[#256B29] px-2.5 py-1 text-xs font-extrabold text-white">
+                  {selectedVideo.category}
+                </span>
+                <span className="text-xs font-bold text-slate-500">Official Video</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedVideo(null)}
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-200 text-slate-600 hover:bg-slate-300 transition-colors cursor-pointer"
+                aria-label="Close video preview"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            </div>
+
+            {/* Video Player Container */}
+            <div className="relative aspect-video w-full bg-slate-950 overflow-hidden flex items-center justify-center">
+              <Image
+                src={selectedVideo.thumbnail}
+                alt={selectedVideo.thumbnailAlt}
+                fill
+                className="object-cover opacity-60"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+              <div className="relative z-10 text-center p-6 space-y-3">
+                <span className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#388E3C] text-white shadow-2xl animate-pulse">
+                  <Play className="h-10 w-10 fill-current ml-1" aria-hidden="true" />
+                </span>
+                <p className="text-sm font-bold text-white">Playing: {selectedVideo.title}</p>
+              </div>
+            </div>
+
+            {/* Video Content Details */}
+            <div className="p-6 sm:p-8 space-y-4">
+              <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-1.5">
+                  <CalendarDays className="h-4 w-4 text-[#256B29]" aria-hidden="true" />
+                  <span>Published: {selectedVideo.displayDate}</span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <Clock3 className="h-4 w-4 text-[#256B29]" aria-hidden="true" />
+                  <span>Duration: {selectedVideo.duration}</span>
+                </div>
+
+                {selectedVideo.location && (
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4 text-[#256B29]" aria-hidden="true" />
+                    <span>Location: {selectedVideo.location}</span>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <h3 id="video-modal-title" className="text-xl font-extrabold text-slate-900">
+                  {selectedVideo.title}
+                </h3>
+                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                  {selectedVideo.description}
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                <a
+                  href={selectedVideo.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-[40px] items-center gap-2 rounded-xl bg-[#388E3C] px-5 text-xs font-bold text-white hover:bg-[#256B29] transition"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                  <span>Watch on YouTube</span>
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedVideo(null)}
+                  className="inline-flex min-h-[40px] items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
+                >
+                  <span>Close Preview</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

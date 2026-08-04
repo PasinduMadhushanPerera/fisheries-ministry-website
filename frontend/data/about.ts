@@ -116,25 +116,31 @@ export const responsibilities = [
 
 export const leadershipRoles = [
   {
-    role: "Minister",
-    title: "Hon. Minister",
+    role: "Hon. Minister",
+    title: "Hon. Ramalingam Chandrasekara",
+    ministry: "Ministry of Fisheries, Aquatic and Ocean Resources",
     description:
-      "Provides political leadership and policy direction for the Ministry and its national development responsibilities.",
-    image: "/images/leadership/minister-placeholder.jpg",
+      "Provides cabinet leadership, strategic direction, and policy formulation for Sri Lanka's fisheries, marine conservation, and ocean economy.",
+    image: "/images/leadership/minister.jpg",
+    href: "/about/minister",
   },
   {
-    role: "Deputy Minister",
-    title: "Hon. Deputy Minister",
+    role: "Hon. Deputy Minister",
+    title: "Hon. Rathna Gamage",
+    ministry: "Ministry of Fisheries, Aquatic and Ocean Resources",
     description:
-      "Supports the implementation of Ministry priorities, programmes and public-sector responsibilities.",
-    image: "/images/leadership/deputy-minister-placeholder.jpg",
+      "Assists in political leadership, regional development initiatives, harbor infrastructure enhancements, and community welfare programs.",
+    image: "/images/leadership/deputy-minister.jpg",
+    href: "/about/deputy-minister",
   },
   {
     role: "Secretary",
-    title: "Secretary to the Ministry",
+    title: "Mr. B.K. Kolitha Kamal Jinadasa (PHD)",
+    ministry: "Ministry of Fisheries, Aquatic and Ocean Resources",
     description:
-      "Leads the Ministry’s administration, institutional coordination and implementation of approved policies and programmes.",
-    image: "/images/leadership/secretary-placeholder.jpg",
+      "Leads Ministry administration, financial oversight, institutional coordination, and policy execution.",
+    image: "/images/leadership/secretary.jpg",
+    href: "/about/secretary",
   },
 ]
 

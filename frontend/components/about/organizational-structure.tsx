@@ -77,8 +77,9 @@ export function OrganizationalStructure() {
               alt="Official organizational structure chart of the Ministry of Fisheries, Aquatic and Ocean Resources"
               width={1600}
               height={1100}
+              unoptimized
+              priority
               className="h-auto w-full object-contain"
-              priority={false}
             />
           </div>
         </div>

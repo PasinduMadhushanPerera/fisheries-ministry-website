@@ -79,7 +79,7 @@ export function TenderCard({ tender }: TenderCardProps) {
           </h2>
 
           <p className="mt-4 max-w-3xl leading-7 text-slate-600">
-            {tender.description}
+            {tender.description}  
           </p>
 
           <div className="mt-6 grid gap-3 border-t border-slate-100 pt-5 text-sm text-slate-500 sm:grid-cols-2">

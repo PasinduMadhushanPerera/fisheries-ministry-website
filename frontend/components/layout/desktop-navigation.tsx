@@ -34,10 +34,7 @@ export function DesktopNavigation() {
     document.addEventListener("keydown", handleEscape)
 
     return () => {
-      document.removeEventListener(
-        "pointerdown",
-        handlePointerDown,
-      )
+      document.removeEventListener("pointerdown", handlePointerDown)
       document.removeEventListener("keydown", handleEscape)
     }
   }, [])
@@ -71,9 +68,9 @@ export function DesktopNavigation() {
     <nav
       ref={navigationRef}
       aria-label="Main navigation"
-      className="hidden lg:block"
+      className="hidden lg:block w-full"
     >
-      <ul className="flex flex-wrap items-center gap-1">
+      <ul className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
         {mainNavigation.map((item) => {
           const hasChildren =
             item.children && item.children.length > 0
@@ -107,10 +104,10 @@ export function DesktopNavigation() {
               {hasChildren ? (
                 <div
                   className={cn(
-                    "relative flex min-h-12 items-center rounded-md transition-colors",
+                    "relative flex min-h-11 items-center rounded-lg transition-colors",
                     active
-                      ? "bg-green-50 text-[#256B29]"
-                      : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",
+                      ? "bg-[#256B29] text-white font-bold"
+                      : "text-slate-200 hover:bg-white/10 hover:text-white",
                   )}
                 >
                   <Link
@@ -119,7 +116,7 @@ export function DesktopNavigation() {
                       isActive(item.href) ? "page" : undefined
                     }
                     onClick={() => setOpenMenu(null)}
-                    className="inline-flex min-h-12 items-center rounded-l-md px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 xl:px-4"
+                    className="inline-flex min-h-11 items-center rounded-l-lg px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 xl:px-4"
                   >
                     {item.label}
                   </Link>
@@ -132,7 +129,7 @@ export function DesktopNavigation() {
                     aria-expanded={expanded}
                     aria-controls={submenuId}
                     onClick={() => toggleMenu(item.label)}
-                    className="inline-flex min-h-12 min-w-10 items-center justify-center rounded-r-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+                    className="inline-flex min-h-11 min-w-8 items-center justify-center rounded-r-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 text-slate-300 hover:text-white"
                   >
                     <ChevronDown
                       aria-hidden="true"
@@ -146,7 +143,7 @@ export function DesktopNavigation() {
                   {active && (
                     <span
                       aria-hidden="true"
-                      className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[#388E3C]"
+                      className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-green-300"
                     />
                   )}
                 </div>
@@ -156,10 +153,10 @@ export function DesktopNavigation() {
                   aria-current={active ? "page" : undefined}
                   onClick={() => setOpenMenu(null)}
                   className={cn(
-                    "relative inline-flex min-h-12 items-center rounded-md px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 xl:px-4",
+                    "relative inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 xl:px-4",
                     active
-                      ? "bg-green-50 text-[#256B29]"
-                      : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",
+                      ? "bg-[#256B29] text-white font-bold"
+                      : "text-slate-200 hover:bg-white/10 hover:text-white",
                   )}
                 >
                   {item.label}
@@ -167,7 +164,7 @@ export function DesktopNavigation() {
                   {active && (
                     <span
                       aria-hidden="true"
-                      className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[#388E3C]"
+                      className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-green-300"
                     />
                   )}
                 </Link>
@@ -177,13 +174,13 @@ export function DesktopNavigation() {
                 <div
                   id={submenuId}
                   className={cn(
-                    "absolute left-0 top-full z-[60] w-72 pt-2 transition-all duration-200",
+                    "absolute left-1/2 -translate-x-1/2 top-full z-[60] w-72 pt-2 transition-all duration-200",
                     expanded
                       ? "visible translate-y-0 opacity-100"
                       : "invisible translate-y-2 opacity-0",
                   )}
                 >
-                  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                  <div className="overflow-hidden rounded-2xl border border-slate-700 bg-[#182228] p-2 shadow-2xl">
                     <ul>
                       {item.children?.map((child) => {
                         const childActive = isActive(child.href)
@@ -197,10 +194,10 @@ export function DesktopNavigation() {
                               }
                               onClick={() => setOpenMenu(null)}
                               className={cn(
-                                "flex min-h-11 items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200",
+                                "flex min-h-10 items-center rounded-xl px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400",
                                 childActive
-                                  ? "bg-green-50 text-[#256B29]"
-                                  : "text-slate-700 hover:bg-slate-50 hover:text-[#256B29]",
+                                  ? "bg-[#256B29] text-white font-bold"
+                                  : "text-slate-200 hover:bg-white/10 hover:text-green-300",
                               )}
                             >
                               {child.label}
