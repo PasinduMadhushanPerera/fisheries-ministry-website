@@ -10,9 +10,12 @@ type BreadcrumbProps = {
   items: BreadcrumbItem[]
 }
 
-export function Breadcrumb({
-  items,
-}: BreadcrumbProps) {
+export function Breadcrumb({ items }: BreadcrumbProps) {
+  // Filter out any duplicate "Home" entry from passed items array
+  const sanitizedItems = items.filter(
+    (item) => item.label.toLowerCase() !== "home" && item.href !== "/"
+  )
+
   return (
     <nav
       aria-label="Breadcrumb"
@@ -20,23 +23,20 @@ export function Breadcrumb({
     >
       <div className="mx-auto flex min-h-12 max-w-[1200px] items-center px-4 sm:px-6 lg:px-8">
         <ol className="flex flex-wrap items-center gap-2 text-sm">
+          {/* Always single Home root item */}
           <li>
             <Link
               href="/"
               aria-label="Home"
               className="inline-flex min-h-10 items-center gap-2 rounded-md px-2 font-medium text-slate-600 hover:bg-white hover:text-[#256B29]"
             >
-              <Home
-                aria-hidden="true"
-                className="h-4 w-4"
-              />
+              <Home aria-hidden="true" className="h-4 w-4" />
               Home
             </Link>
           </li>
 
-          {items.map((item, index) => {
-            const isLast =
-              index === items.length - 1
+          {sanitizedItems.map((item, index) => {
+            const isLast = index === sanitizedItems.length - 1
 
             return (
               <li

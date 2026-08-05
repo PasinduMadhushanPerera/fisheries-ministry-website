@@ -73,10 +73,10 @@ export function InstitutionsHero() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="#institutions"
-                className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-slate-900 transition hover:bg-slate-100"
+                className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold text-slate-900 transition hover:bg-slate-100 !text-black"
               >
                 Explore Institutions
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-5 w-5 text-black" />
               </Link>
 
               <Link

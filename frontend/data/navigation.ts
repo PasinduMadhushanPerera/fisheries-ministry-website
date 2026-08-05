@@ -40,6 +40,28 @@ export const mainNavigation: NavigationItem[] = [
     ],
   },
   {
+    label: "Opportunities & Portals",
+    href: "/#popular-services",
+    children: [
+      {
+        label: "Local Fisheries Training",
+        href: "/local-training",
+      },
+      {
+        label: "Foreign Training & Fellowships",
+        href: "/foreign-training",
+      },
+      {
+        label: "Procurement & Tenders Portal",
+        href: "/procurement",
+      },
+      {
+        label: "Recruitment & Vacancies Portal",
+        href: "/recruitment",
+      },
+    ],
+  },
+  {
     label: "Media Centre",
     href: "/media-centre",
     children: [
@@ -57,7 +79,7 @@ export const mainNavigation: NavigationItem[] = [
       },
       {
         label: "Events",
-        href: "/news-and-events",
+        href: "/media-centre/events",
       },
       {
         label: "Photo Gallery",

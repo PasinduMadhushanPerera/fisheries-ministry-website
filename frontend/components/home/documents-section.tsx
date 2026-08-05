@@ -49,7 +49,7 @@ const resourceCards: ResourceCardItem[] = [
   {
     title: "Policies and Regulations",
     description: "Read policies, laws, regulations and sector guidelines.",
-    href: "/laws-and-policies",
+    href: "/downloads",
     icon: Scale,
   },
   {

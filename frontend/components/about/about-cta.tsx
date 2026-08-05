@@ -39,10 +39,10 @@ export function AboutCTA() {
 
           <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
             <Link
-              href="/services"
+              href="/downloads"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-7 py-4 font-semibold text-[#256B29] transition hover:scale-105 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
             >
-              Explore Services
+              Explore Downloads Centre
 
               <ArrowRight
                 className="h-5 w-5"

@@ -76,7 +76,7 @@ export const mediaCategories: MediaCategory[] = [
     title: "Events",
     description:
       "Upcoming conferences, awareness programmes and ministry events.",
-    href: "/news-and-events",
+    href: "/media-centre/events",
     icon: "calendar",
   },
   {

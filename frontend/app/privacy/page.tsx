@@ -21,64 +21,30 @@ import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { Container } from "@/components/ui/container"
+import { PageHero } from "@/components/ui/page-hero"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
+  title: "Privacy Policy - Ministry of Fisheries",
   description:
     "Learn how the Ministry of Fisheries, Aquatic and Ocean Resources collects, uses, protects and manages personal information through this website.",
 }
 
 const breadcrumbItems = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "Privacy Policy",
-  },
+  { label: "Home", href: "/" },
+  { label: "Privacy Policy" },
 ]
 
 const sections = [
-  {
-    id: "overview",
-    label: "Overview",
-  },
-  {
-    id: "information",
-    label: "Information We Collect",
-  },
-  {
-    id: "usage",
-    label: "How Information is Used",
-  },
-  {
-    id: "sharing",
-    label: "Information Sharing",
-  },
-  {
-    id: "security",
-    label: "Security",
-  },
-  {
-    id: "cookies",
-    label: "Cookies",
-  },
-  {
-    id: "retention",
-    label: "Data Retention",
-  },
-  {
-    id: "rights",
-    label: "Your Rights",
-  },
-  {
-    id: "changes",
-    label: "Policy Changes",
-  },
-  {
-    id: "contact",
-    label: "Contact",
-  },
+  { id: "overview", label: "1. Overview" },
+  { id: "information", label: "2. Information We Collect" },
+  { id: "usage", label: "3. How Information is Used" },
+  { id: "sharing", label: "4. Information Sharing" },
+  { id: "security", label: "5. Information Security" },
+  { id: "cookies", label: "6. Cookies Policy" },
+  { id: "retention", label: "7. Data Retention" },
+  { id: "rights", label: "8. Your Privacy Rights" },
+  { id: "changes", label: "9. Policy Revisions" },
+  { id: "contact", label: "10. Contact Us" },
 ]
 
 type InformationType = {
@@ -89,60 +55,52 @@ type InformationType = {
 
 const informationTypes: InformationType[] = [
   {
-    title: "Personal information",
-    description:
-      "Names, identification details or other personal information provided through Ministry services.",
+    title: "Personal Information",
+    description: "Names, NIC numbers, or contact details provided through Ministry service applications.",
     icon: UserCheck,
   },
   {
-    title: "Contact information",
-    description:
-      "Email addresses, telephone numbers, postal addresses and preferred communication details.",
+    title: "Contact Details",
+    description: "Email addresses, telephone numbers, postal addresses and preferred communication channels.",
     icon: Mail,
   },
   {
-    title: "Website usage information",
-    description:
-      "Technical information such as browser type, device details, pages visited and website activity.",
+    title: "Technical Usage Data",
+    description: "Browser type, device IP, page views, and analytical session data to optimize website performance.",
     icon: Globe,
   },
   {
-    title: "Application information",
-    description:
-      "Information submitted through applications, registrations, enquiries and other digital services.",
+    title: "Application Submissions",
+    description: "Registration forms, permit applications, public inquiries, and online service submissions.",
     icon: Database,
   },
 ]
 
 const informationUses = [
-  "Provide government information and public services",
-  "Process applications, registrations and requests",
-  "Respond to enquiries, complaints and feedback",
-  "Improve website functionality and user experience",
-  "Maintain website security and prevent misuse",
-  "Meet legal, administrative and regulatory obligations",
+  "Provide official government information and public services",
+  "Process licensing applications, vessel registrations and permits",
+  "Respond to public inquiries, grievances and feedback",
+  "Improve website usability, performance and accessibility",
+  "Maintain system security and prevent unauthorized activity",
+  "Fulfill statutory, administrative and legal obligations",
 ]
 
 const userRights = [
   {
-    title: "Request information",
-    description:
-      "Ask what personal information may be held about you, subject to applicable laws and procedures.",
+    title: "Access Records",
+    description: "Request details regarding personal data held by the Ministry under RTI and privacy frameworks.",
   },
   {
-    title: "Request corrections",
-    description:
-      "Request correction of personal information that is inaccurate, incomplete or outdated.",
+    title: "Request Corrections",
+    description: "Submit correction requests for inaccurate, outdated, or incomplete personal details.",
   },
   {
-    title: "Contact the Ministry",
-    description:
-      "Ask questions about how your information is collected, used, stored or protected.",
+    title: "Inquire on Usage",
+    description: "Contact our data protection desk regarding how personal information is handled.",
   },
   {
-    title: "Submit feedback",
-    description:
-      "Report privacy concerns or provide feedback about Ministry digital services.",
+    title: "Submit Grievances",
+    description: "Report privacy concerns or provide feedback regarding digital service data practices.",
   },
 ]
 
@@ -151,139 +109,54 @@ export default function PrivacyPolicyPage() {
     <>
       <SiteHeader />
 
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1} className="outline-none">
         <Breadcrumb items={breadcrumbItems} />
 
-        <section
-          aria-labelledby="privacy-heading"
-          className="relative isolate overflow-hidden bg-[#061d24] text-white"
+        {/* Standardized Hero Section */}
+        <PageHero
+          badgeIcon={ShieldCheck}
+          badgeText="Data Protection"
+          title="Privacy & Data"
+          highlightTitle="Protection Policy"
+          description="The Ministry is committed to protecting personal information, maintaining public trust, and safeguarding privacy when delivering digital information and government services."
+          cardIcon={FileLock2}
+          cardEyebrow="Privacy Guarantee"
+          cardTitle="Responsible Data Handling"
+          cardDescription="This policy explains how personal information is collected, used, shared, retained and protected across all official Ministry web services."
         >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(34,197,94,0.18),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(14,165,233,0.18),transparent_40%),linear-gradient(135deg,#061d24_0%,#0a322f_50%,#0a4350_100%)]"
-          />
-
-          <div
-            aria-hidden="true"
-            className="absolute -right-40 -top-40 h-[34rem] w-[34rem] rounded-full border border-white/10 bg-white/[0.03]"
-          />
-
-          <div
-            aria-hidden="true"
-            className="absolute -bottom-52 -left-24 h-[32rem] w-[32rem] rounded-full border border-green-200/10 bg-green-300/[0.03]"
-          />
-
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 1440 320"
-            preserveAspectRatio="none"
-            className="absolute inset-x-0 bottom-0 h-40 w-full text-white/[0.05]"
-          >
-            <path
-              fill="currentColor"
-              d="M0,192L60,186.7C120,181,240,171,360,170.7C480,171,600,181,720,186.7C840,192,960,192,1080,176C1200,160,1320,128,1380,112L1440,96L1440,320L0,320Z"
-            />
-          </svg>
-
-          <Container className="relative z-10 py-16 sm:py-20 lg:py-24">
-            <div className="grid gap-10 lg:grid-cols-[1fr_22rem] lg:items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur-md">
-                  <ShieldCheck
-                    aria-hidden="true"
-                    className="h-4 w-4 text-green-200"
-                  />
-
-                  Privacy and Data Protection
-                </div>
-
-                <h1
-                  id="privacy-heading"
-                  className="mt-7 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
-                >
-                  Privacy
-                  <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
-                    Policy
-                  </span>
-                </h1>
-
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">
-                  The Ministry is committed to protecting personal information
-                  and maintaining public trust when delivering digital
-                  information and government services.
-                </p>
-
-                <div className="mt-8 flex flex-wrap gap-4 text-sm text-slate-300">
-                  <div className="flex items-center gap-2">
-                    <Lock
-                      aria-hidden="true"
-                      className="h-5 w-5 text-green-200"
-                    />
-
-                    Responsible data handling
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Landmark
-                      aria-hidden="true"
-                      className="h-5 w-5 text-green-200"
-                    />
-
-                    Government of Sri Lanka
-                  </div>
-                </div>
-              </div>
-
-              <aside className="rounded-3xl border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
-                <FileLock2
-                  aria-hidden="true"
-                  className="h-10 w-10 text-green-200"
-                />
-
-                <p className="mt-5 text-sm font-bold uppercase tracking-[0.15em] text-green-200">
-                  Privacy commitment
-                </p>
-
-                <p className="mt-3 leading-7 text-slate-200">
-                  This policy explains how information is collected, used,
-                  shared, retained and protected when you use this website.
-                </p>
-
-                <div className="mt-6 border-t border-white/10 pt-5">
-                  <p className="text-sm text-slate-300">Last updated</p>
-
-                  <p className="mt-1 font-semibold text-white">
-                    24 July 2026
-                  </p>
-                </div>
-              </aside>
+          <div className="mt-6 flex flex-wrap gap-4 text-xs font-semibold text-slate-300 border-t border-white/10 pt-4">
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4 text-emerald-300" aria-hidden="true" />
+              <span>Secure Government Data</span>
             </div>
-          </Container>
-        </section>
+            <div className="flex items-center gap-2">
+              <Landmark className="h-4 w-4 text-[#388E3C]" aria-hidden="true" />
+              <span>Government of Sri Lanka</span>
+            </div>
+          </div>
+        </PageHero>
 
-        <section className="bg-white py-16 sm:py-20">
+        {/* Main Content Section */}
+        <section className="bg-white py-12 sm:py-16">
           <Container>
-            <div className="grid gap-12 lg:grid-cols-[18rem_minmax(0,1fr)]">
-              <aside>
+            <div className="grid gap-10 lg:grid-cols-[18rem_minmax(0,1fr)]">
+              {/* Left Sticky Navigation */}
+              <aside className="hidden lg:block">
                 <nav
                   aria-label="Privacy Policy sections"
-                  className="sticky top-28 rounded-3xl border border-slate-200 bg-slate-50 p-6"
+                  className="sticky top-24 rounded-2xl border border-slate-200 bg-slate-50/70 p-5 shadow-2xs"
                 >
-                  <p className="text-sm font-bold uppercase tracking-[0.15em] text-green-700">
-                    On this page
+                  <p className="text-xs font-extrabold uppercase tracking-wider text-[#256B29]">
+                    On This Page
                   </p>
 
-                  <ol className="mt-5 space-y-1">
-                    {sections.map((section, index) => (
+                  <ol className="mt-4 space-y-1">
+                    {sections.map((section) => (
                       <li key={section.id}>
                         <a
                           href={`#${section.id}`}
-                          className="group flex items-start gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white hover:text-green-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+                          className="flex items-center rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 transition hover:bg-white hover:text-[#256B29]"
                         >
-                          <span className="mt-0.5 text-xs font-bold text-slate-400 group-hover:text-green-700">
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
-
                           <span>{section.label}</span>
                         </a>
                       </li>
@@ -292,416 +165,142 @@ export default function PrivacyPolicyPage() {
                 </nav>
               </aside>
 
+              {/* Right Content Stream */}
               <div className="min-w-0">
-                <div className="rounded-3xl border border-blue-200 bg-blue-50 p-6">
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6">
                   <div className="flex items-start gap-4">
-                    <Info
-                      aria-hidden="true"
-                      className="mt-0.5 h-6 w-6 shrink-0 text-blue-700"
-                    />
-
+                    <Info aria-hidden="true" className="mt-0.5 h-6 w-6 shrink-0 text-[#256B29]" />
                     <div>
-                      <h2 className="text-lg font-bold text-slate-950">
-                        About this policy
+                      <h2 className="text-base font-extrabold text-slate-900">
+                        About this Privacy Policy
                       </h2>
-
-                      <p className="mt-2 leading-7 text-slate-700">
-                        This policy applies to information collected through
-                        this website and Ministry-operated digital services.
-                        Separate privacy notices may apply to particular
-                        applications, programmes or online systems.
+                      <p className="mt-1 text-xs sm:text-sm leading-relaxed text-slate-700">
+                        This policy applies to all personal information collected through this website and Ministry-operated digital portals. Specific additional privacy notices may apply to specialized portal systems.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-12 space-y-14">
-                  <section
-                    id="overview"
-                    aria-labelledby="overview-heading"
-                    className="scroll-mt-32"
-                  >
-                    <h2
-                      id="overview-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
+                <div className="mt-10 space-y-12">
+                  <section id="overview" aria-labelledby="overview-heading" className="scroll-mt-28">
+                    <h2 id="overview-heading" className="text-2xl font-extrabold tracking-tight text-slate-900">
                       1. Overview
                     </h2>
-
-                    <div className="mt-5 space-y-4 leading-8 text-slate-700">
+                    <div className="mt-4 space-y-3 text-xs sm:text-sm leading-relaxed text-slate-700">
                       <p>
-                        This Privacy Policy explains how personal information
-                        may be collected and managed when you access this
-                        website, contact the Ministry or use a Ministry digital
-                        service.
+                        This Privacy Policy outlines how personal information is gathered, managed, and protected when you visit this website, communicate with the Ministry, or utilize online services.
                       </p>
-
                       <p>
-                        The Ministry aims to collect only the information
-                        reasonably required to provide services, respond to
-                        requests, maintain security and meet applicable legal
-                        and administrative obligations.
+                        The Ministry adheres to strict data minimisation principles, collecting only information reasonably required to deliver public services and satisfy statutory obligations.
                       </p>
                     </div>
                   </section>
 
-                  <section
-                    id="information"
-                    aria-labelledby="information-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <h2
-                      id="information-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
+                  <section id="information" aria-labelledby="information-heading" className="scroll-mt-28 border-t border-slate-200 pt-10">
+                    <h2 id="information-heading" className="text-2xl font-extrabold tracking-tight text-slate-900">
                       2. Information We Collect
                     </h2>
-
-                    <p className="mt-5 leading-8 text-slate-700">
-                      The type of information collected depends on how you
-                      interact with the website and which services you use.
+                    <p className="mt-3 text-xs sm:text-sm text-slate-700">
+                      The type of data collected depends on your specific interaction with our digital services:
                     </p>
 
-                    <div className="mt-8 grid gap-5 md:grid-cols-2">
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
                       {informationTypes.map((item) => {
                         const Icon = item.icon
-
                         return (
-                          <article
-                            key={item.title}
-                            className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
-                          >
-                            <Icon
-                              aria-hidden="true"
-                              className="h-8 w-8 text-green-700"
-                            />
-
-                            <h3 className="mt-5 text-xl font-bold text-slate-950">
-                              {item.title}
-                            </h3>
-
-                            <p className="mt-3 leading-7 text-slate-600">
-                              {item.description}
-                            </p>
-                          </article>
+                          <div key={item.title} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                            <Icon aria-hidden="true" className="h-6 w-6 text-[#256B29]" />
+                            <h3 className="mt-2 text-sm font-extrabold text-slate-900">{item.title}</h3>
+                            <p className="mt-1 text-xs text-slate-600 leading-relaxed">{item.description}</p>
+                          </div>
                         )
                       })}
                     </div>
-
-                    <p className="mt-6 leading-8 text-slate-700">
-                      You should provide only accurate, relevant and lawful
-                      information when completing forms, submitting
-                      applications or contacting the Ministry.
-                    </p>
                   </section>
 
-                  <section
-                    id="usage"
-                    aria-labelledby="usage-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <h2
-                      id="usage-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
+                  <section id="usage" aria-labelledby="usage-heading" className="scroll-mt-28 border-t border-slate-200 pt-10">
+                    <h2 id="usage-heading" className="text-2xl font-extrabold tracking-tight text-slate-900">
                       3. How Information is Used
                     </h2>
-
-                    <p className="mt-5 leading-8 text-slate-700">
-                      Information may be used for legitimate government,
-                      administrative, operational and public-service purposes.
+                    <p className="mt-3 text-xs sm:text-sm text-slate-700">
+                      Information gathered by the Ministry is utilized exclusively for legitimate administrative, public-service, and regulatory purposes:
                     </p>
 
-                    <ul className="mt-8 space-y-4">
+                    <ul className="mt-4 space-y-2.5">
                       {informationUses.map((item) => (
-                        <li
-                          key={item}
-                          className="flex items-start gap-3"
-                        >
-                          <CheckCircle2
-                            aria-hidden="true"
-                            className="mt-1 h-5 w-5 shrink-0 text-green-700"
-                          />
-
-                          <span className="leading-7 text-slate-700">
-                            {item}
-                          </span>
+                        <li key={item} className="flex items-start gap-3 text-xs sm:text-sm text-slate-700">
+                          <CheckCircle2 aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-[#256B29]" />
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>
                   </section>
 
-                  <section
-                    id="sharing"
-                    aria-labelledby="sharing-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <h2
-                      id="sharing-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
-                      4. Information Sharing
-                    </h2>
-
-                    <div className="mt-5 space-y-4 leading-8 text-slate-700">
-                      <p>
-                        Personal information is not sold or rented for
-                        commercial purposes.
-                      </p>
-
-                      <p>
-                        Information may be shared with authorised Ministry
-                        divisions, government institutions, statutory bodies,
-                        service providers or law-enforcement authorities where
-                        this is required to deliver a service, perform an
-                        official function, protect public systems or comply
-                        with applicable law.
-                      </p>
-
-                      <p>
-                        Where third-party service providers process information
-                        on behalf of the Ministry, reasonable measures should be
-                        used to ensure that the information is handled securely
-                        and only for authorised purposes.
-                      </p>
-                    </div>
-                  </section>
-
-                  <section
-                    id="security"
-                    aria-labelledby="security-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <h2
-                      id="security-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
+                  <section id="security" aria-labelledby="security-heading" className="scroll-mt-28 border-t border-slate-200 pt-10">
+                    <h2 id="security-heading" className="text-2xl font-extrabold tracking-tight text-slate-900">
                       5. Information Security
                     </h2>
-
-                    <div className="mt-6 rounded-3xl bg-[linear-gradient(145deg,#071d24_0%,#0a322f_55%,#0a4350_100%)] p-7 text-white shadow-xl sm:p-8">
-                      <FileLock2
-                        aria-hidden="true"
-                        className="h-10 w-10 text-green-200"
-                      />
-
-                      <p className="mt-5 leading-8 text-slate-200">
-                        Appropriate technical and organisational safeguards are
-                        used to help protect information against unauthorised
-                        access, alteration, disclosure, loss, misuse or
-                        destruction.
+                    <div className="mt-4 rounded-2xl bg-gradient-to-br from-[#061d24] via-[#0a322f] to-[#0a4350] p-6 text-white shadow-lg">
+                      <FileLock2 aria-hidden="true" className="h-8 w-8 text-emerald-300" />
+                      <p className="mt-3 text-xs sm:text-sm leading-relaxed text-slate-200">
+                        Appropriate technical and organizational safeguards—including SSL encryption, secure data hosting, role-based access control, and vulnerability monitoring—are deployed to safeguard information against unauthorized access, loss, or disclosure.
                       </p>
                     </div>
-
-                    <p className="mt-6 leading-8 text-slate-700">
-                      Although reasonable security measures are used, no
-                      internet transmission or information system can be
-                      guaranteed to be completely secure. Users should avoid
-                      sending sensitive information through unsecured channels.
-                    </p>
                   </section>
 
-                  <section
-                    id="cookies"
-                    aria-labelledby="cookies-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <h2
-                      id="cookies-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
-                      6. Cookies and Similar Technologies
+                  <section id="cookies" aria-labelledby="cookies-heading" className="scroll-mt-28 border-t border-slate-200 pt-10">
+                    <h2 id="cookies-heading" className="text-2xl font-extrabold tracking-tight text-slate-900">
+                      6. Cookies & Similar Technologies
                     </h2>
-
-                    <div className="mt-6 flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                      <Cookie
-                        aria-hidden="true"
-                        className="mt-1 h-8 w-8 shrink-0 text-green-700"
-                      />
-
+                    <div className="mt-4 flex items-start gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-5">
+                      <Cookie className="h-6 w-6 text-[#256B29] shrink-0 mt-0.5" aria-hidden="true" />
                       <div>
-                        <h3 className="text-xl font-bold text-slate-950">
-                          Website cookies
-                        </h3>
-
-                        <p className="mt-3 leading-8 text-slate-700">
-                          Cookies may be used to support essential website
-                          functionality, remember user preferences, improve
-                          usability, maintain security and understand general
-                          website usage.
+                        <h3 className="text-sm font-extrabold text-slate-900">Essential & Functional Cookies</h3>
+                        <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                          This portal uses essential cookies to preserve user preferences (such as text size, high contrast mode, and language selection). No tracking cookies are stored for commercial advertising purposes.
                         </p>
                       </div>
                     </div>
-
-                    <p className="mt-5 leading-8 text-slate-700">
-                      You may control or disable cookies through your browser
-                      settings. Some website functions may not operate
-                      correctly when essential cookies are disabled.
-                    </p>
                   </section>
 
-                  <section
-                    id="retention"
-                    aria-labelledby="retention-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <h2
-                      id="retention-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
-                      7. Data Retention
-                    </h2>
-
-                    <p className="mt-5 leading-8 text-slate-700">
-                      Information is retained only for as long as reasonably
-                      necessary to provide services, maintain official records,
-                      resolve disputes, meet administrative requirements and
-                      comply with applicable laws.
-                    </p>
-
-                    <p className="mt-4 leading-8 text-slate-700">
-                      Retention periods may vary depending on the type of
-                      information, the service involved and applicable
-                      government record-management requirements.
-                    </p>
-                  </section>
-
-                  <section
-                    id="rights"
-                    aria-labelledby="rights-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <h2
-                      id="rights-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
+                  <section id="rights" aria-labelledby="rights-heading" className="scroll-mt-28 border-t border-slate-200 pt-10">
+                    <h2 id="rights-heading" className="text-2xl font-extrabold tracking-tight text-slate-900">
                       8. Your Privacy Rights
                     </h2>
-
-                    <p className="mt-5 leading-8 text-slate-700">
-                      Subject to applicable laws, official procedures and
-                      necessary identity verification, you may contact the
-                      Ministry regarding your personal information.
-                    </p>
-
-                    <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
                       {userRights.map((item) => (
-                        <article
-                          key={item.title}
-                          className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
-                        >
-                          <Eye
-                            aria-hidden="true"
-                            className="h-6 w-6 text-green-700"
-                          />
-
-                          <h3 className="mt-4 text-lg font-bold text-slate-950">
-                            {item.title}
-                          </h3>
-
-                          <p className="mt-2 leading-7 text-slate-600">
-                            {item.description}
-                          </p>
-                        </article>
+                        <div key={item.title} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
+                          <Eye aria-hidden="true" className="h-5 w-5 text-[#256B29]" />
+                          <h3 className="mt-2 text-sm font-extrabold text-slate-900">{item.title}</h3>
+                          <p className="mt-1 text-xs text-slate-600 leading-relaxed">{item.description}</p>
+                        </div>
                       ))}
                     </div>
                   </section>
 
-                  <section
-                    id="changes"
-                    aria-labelledby="changes-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <h2
-                      id="changes-heading"
-                      className="text-3xl font-bold tracking-tight text-slate-950"
-                    >
-                      9. Changes to This Policy
-                    </h2>
-
-                    <p className="mt-5 leading-8 text-slate-700">
-                      This Privacy Policy may be updated to reflect changes to
-                      legislation, government policy, technology, website
-                      functions or Ministry services.
-                    </p>
-
-                    <p className="mt-4 leading-8 text-slate-700">
-                      The revised policy will be published on this page with an
-                      updated revision date.
-                    </p>
-                  </section>
-
-                  <section
-                    id="contact"
-                    aria-labelledby="contact-heading"
-                    className="scroll-mt-32 border-t border-slate-200 pt-12"
-                  >
-                    <p className="text-sm font-bold uppercase tracking-[0.15em] text-green-700">
-                      Privacy assistance
-                    </p>
-
-                    <h2
-                      id="contact-heading"
-                      className="mt-3 text-3xl font-bold tracking-tight text-slate-950"
-                    >
+                  <section id="contact" aria-labelledby="contact-heading" className="scroll-mt-28 border-t border-slate-200 pt-10">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-[#256B29]">
+                      Privacy Assistance
+                    </span>
+                    <h2 id="contact-heading" className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900">
                       10. Contact the Ministry
                     </h2>
-
-                    <p className="mt-5 max-w-3xl leading-8 text-slate-700">
-                      Contact the Ministry if you have questions about this
-                      policy, require assistance or wish to report a concern
-                      about the handling of personal information.
+                    <p className="mt-2 text-xs sm:text-sm text-slate-600">
+                      For privacy inquiries, data access requests, or to report a data protection concern, please contact our team:
                     </p>
 
-                    <div className="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
-                      <div className="grid md:grid-cols-[0.8fr_1.2fr]">
-                        <div className="bg-[linear-gradient(145deg,#071d24_0%,#0a322f_55%,#0a4350_100%)] p-7 text-white sm:p-8">
-                          <Landmark
-                            aria-hidden="true"
-                            className="h-10 w-10 text-green-200"
-                          />
-
-                          <h3 className="mt-5 text-2xl font-bold">
-                            Ministry of Fisheries, Aquatic and Ocean Resources
-                          </h3>
-
-                          <p className="mt-4 leading-7 text-slate-300">
-                            Government of Sri Lanka
-                          </p>
-                        </div>
-
-                        <div className="p-7 sm:p-8">
-                          <div className="flex items-start gap-4">
-                            <Mail
-                              aria-hidden="true"
-                              className="mt-0.5 h-6 w-6 shrink-0 text-green-700"
-                            />
-
-                            <div>
-                              <p className="font-bold text-slate-950">
-                                Privacy enquiries
-                              </p>
-
-                              <p className="mt-2 leading-7 text-slate-600">
-                                Use the official contact page for privacy
-                                questions, requests, concerns and feedback.
-                              </p>
-
-                              <Link
-                                href="/contact"
-                                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-green-700 px-5 py-3 font-semibold text-white transition hover:bg-green-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
-                              >
-                                Contact the Ministry
-
-                                <ArrowRight
-                                  aria-hidden="true"
-                                  className="h-5 w-5"
-                                />
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
+                    <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="text-base font-extrabold text-[#0B3D3A]">Ministry Privacy Desk</h3>
+                        <p className="text-xs text-slate-600 mt-1">Email: info@fisheries.gov.lk • Tel: +94 112 327 060</p>
                       </div>
+                      <Link
+                        href="/contact"
+                        className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-5 text-xs font-extrabold text-white transition hover:bg-[#256B29]"
+                      >
+                        <Mail className="h-4 w-4" aria-hidden="true" />
+                        <span>Go to Contact Page</span>
+                      </Link>
                     </div>
                   </section>
                 </div>
@@ -710,78 +309,50 @@ export default function PrivacyPolicyPage() {
           </Container>
         </section>
 
-        <section
-          aria-labelledby="related-policy-pages-heading"
-          className="border-t border-slate-200 bg-slate-50 py-16"
-        >
+        {/* Related Policies */}
+        <section aria-labelledby="related-policy-pages-heading" className="border-t border-slate-200 bg-slate-50 py-12">
           <Container>
             <div className="max-w-3xl">
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-green-700">
-                Related information
-              </p>
-
-              <h2
-                id="related-policy-pages-heading"
-                className="mt-3 text-3xl font-bold tracking-tight text-slate-950"
-              >
+              <span className="text-xs font-extrabold uppercase tracking-wider text-[#256B29]">
+                Related Policies
+              </span>
+              <h2 id="related-policy-pages-heading" className="mt-1 text-2xl font-extrabold text-slate-900">
                 Website Policies and Standards
               </h2>
             </div>
 
-            <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
               <Link
                 href="/terms-of-use"
-                className="group rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:border-green-200 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+                className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs transition hover:border-slate-300 hover:shadow-md"
               >
-                <Landmark
-                  aria-hidden="true"
-                  className="h-8 w-8 text-green-700"
-                />
-
-                <h3 className="mt-5 text-2xl font-bold text-slate-950 group-hover:text-green-800">
+                <Landmark className="h-7 w-7 text-[#256B29]" aria-hidden="true" />
+                <h3 className="mt-3 text-lg font-extrabold text-slate-900 group-hover:text-[#388E3C]">
                   Terms of Use
                 </h3>
-
-                <p className="mt-3 leading-7 text-slate-600">
-                  Read the conditions governing access to and use of this
-                  website.
+                <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                  Read the conditions governing access to and use of this website.
                 </p>
-
-                <span className="mt-5 inline-flex items-center gap-2 font-semibold text-green-700">
-                  Read terms of use
-
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  />
+                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-extrabold text-[#256B29]">
+                  <span>Read Terms of Use</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </span>
               </Link>
 
               <Link
                 href="/accessibility"
-                className="group rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:border-green-200 hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+                className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs transition hover:border-slate-300 hover:shadow-md"
               >
-                <ShieldCheck
-                  aria-hidden="true"
-                  className="h-8 w-8 text-green-700"
-                />
-
-                <h3 className="mt-5 text-2xl font-bold text-slate-950 group-hover:text-green-800">
+                <ShieldCheck className="h-7 w-7 text-[#256B29]" aria-hidden="true" />
+                <h3 className="mt-3 text-lg font-extrabold text-slate-900 group-hover:text-[#388E3C]">
                   Accessibility Statement
                 </h3>
-
-                <p className="mt-3 leading-7 text-slate-600">
-                  Learn about the Ministry&apos;s commitment to accessible and
-                  inclusive digital services.
+                <p className="mt-1 text-xs text-slate-600 leading-relaxed">
+                  Learn about the Ministry&apos;s commitment to accessible and inclusive digital services.
                 </p>
-
-                <span className="mt-5 inline-flex items-center gap-2 font-semibold text-green-700">
-                  Read accessibility statement
-
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  />
+                <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-extrabold text-[#256B29]">
+                  <span>Read Accessibility Statement</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </span>
               </Link>
             </div>

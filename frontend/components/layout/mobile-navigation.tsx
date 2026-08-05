@@ -320,9 +320,9 @@ export function MobileNavigation() {
                                               setIsOpen(false)
                                             }
                                             className={cn(
-                                              "flex min-h-11 items-center justify-between gap-3 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                                              "flex min-h-11 items-center justify-between gap-3 rounded-lg px-4 py-2 text-sm font-normal transition-colors",
                                               childActive
-                                                ? "bg-green-50 text-[#256B29]"
+                                                ? "bg-green-50 text-[#256B29] font-semibold"
                                                 : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",
                                             )}
                                           >

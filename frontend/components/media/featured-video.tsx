@@ -132,16 +132,16 @@ export function FeaturedVideo() {
         </Container>
       </section>
 
-      {/* MODAL */}
+      {/* MODAL WITH Z-[9999] */}
       {modalVideo && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="featured-video-modal-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/80 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
         >
-          <div className="relative w-full max-w-4xl rounded-3xl border border-slate-200 bg-white shadow-2xl overflow-hidden my-8">
-            <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50">
+          <div className="relative w-full max-w-3xl max-h-[88vh] flex flex-col rounded-3xl border border-slate-200 bg-white shadow-2xl overflow-hidden my-auto">
+            <div className="flex shrink-0 items-center justify-between border-b border-slate-200 px-6 py-4 bg-slate-50">
               <div className="flex items-center gap-2">
                 <span className="rounded-md bg-[#256B29] px-2.5 py-1 text-xs font-extrabold text-white">
                   {modalVideo.category}
@@ -157,43 +157,45 @@ export function FeaturedVideo() {
               </button>
             </div>
 
-            <div className="relative aspect-video w-full bg-slate-950 overflow-hidden flex items-center justify-center">
-              <Image src={modalVideo.thumbnail} alt={modalVideo.thumbnailAlt} fill className="object-cover opacity-60" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-              <div className="relative z-10 text-center p-6 space-y-3">
-                <span className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#388E3C] text-white shadow-2xl animate-pulse">
-                  <Play className="h-10 w-10 fill-current ml-1" aria-hidden="true" />
-                </span>
-                <p className="text-sm font-bold text-white">Playing: {modalVideo.title}</p>
+            <div className="flex-1 overflow-y-auto">
+              <div className="relative aspect-video w-full bg-slate-950 overflow-hidden flex items-center justify-center">
+                <Image src={modalVideo.thumbnail} alt={modalVideo.thumbnailAlt} fill className="object-cover opacity-60" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                <div className="relative z-10 text-center p-6 space-y-3">
+                  <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-[#388E3C] text-white shadow-2xl">
+                    <Play className="h-8 w-8 fill-current ml-1" aria-hidden="true" />
+                  </span>
+                  <p className="text-xs sm:text-sm font-bold text-white">Playing: {modalVideo.title}</p>
+                </div>
+              </div>
+
+              <div className="p-6 sm:p-8 space-y-4">
+                <div>
+                  <h3 id="featured-video-modal-title" className="text-xl font-extrabold text-slate-900">
+                    {modalVideo.title}
+                  </h3>
+                  <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">{modalVideo.description}</p>
+                </div>
               </div>
             </div>
 
-            <div className="p-6 sm:p-8 space-y-4">
-              <div>
-                <h3 id="featured-video-modal-title" className="text-xl font-extrabold text-slate-900">
-                  {modalVideo.title}
-                </h3>
-                <p className="mt-2 text-sm text-slate-600 leading-relaxed">{modalVideo.description}</p>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
-                <a
-                  href={modalVideo.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-[40px] items-center gap-2 rounded-xl bg-[#388E3C] px-5 text-xs font-bold text-white hover:bg-[#256B29] transition"
-                >
-                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                  <span>Watch on YouTube</span>
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setModalVideo(null)}
-                  className="inline-flex min-h-[40px] items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
-                >
-                  <span>Close Preview</span>
-                </button>
-              </div>
+            <div className="flex shrink-0 items-center justify-between border-t border-slate-200 px-6 py-4 bg-slate-50">
+              <a
+                href={modalVideo.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-[38px] items-center gap-2 rounded-xl bg-[#388E3C] px-4 text-xs font-bold text-white hover:bg-[#256B29] transition"
+              >
+                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Watch on YouTube</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => setModalVideo(null)}
+                className="inline-flex min-h-[38px] items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+              >
+                <span>Close Preview</span>
+              </button>
             </div>
           </div>
         </div>

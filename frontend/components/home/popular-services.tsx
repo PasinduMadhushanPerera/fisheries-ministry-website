@@ -3,54 +3,76 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, GraduationCap, Globe, ShoppingBag, UserPlus } from "lucide-react"
+import {
+  ArrowRight,
+  GraduationCap,
+  Globe,
+  ShoppingBag,
+  UserPlus,
+  Sparkles,
+} from "lucide-react"
 
 import { Container } from "@/components/ui/container"
 
 type ServiceCardItem = {
+  id: string
   title: string
+  category: string
   description: string
+  btnText: string
+  href: string
   image: string
   alt: string
-  href: string
   fallbackIcon: React.ElementType
 }
 
 const serviceCards: ServiceCardItem[] = [
   {
-    title: "Local Training",
+    id: "local-training",
+    title: "Local Fisheries Training",
+    category: "Capacity Development",
     description:
-      "Connect people with local courses, workshops and programmes that support career development, knowledge and professional growth.",
+      "Browse local training courses, seamanship workshops and technical development programmes for Ministry staff and sector stakeholders.",
+    btnText: "Explore Local Training",
+    href: "/local-training",
     image: "/images/services/local-training.jpg",
     alt: "Local fisheries training workshop in Sri Lanka",
-    href: "/services/local-training",
     fallbackIcon: GraduationCap,
   },
   {
-    title: "Foreign Training",
+    id: "foreign-training",
+    title: "Foreign & Overseas Training",
+    category: "International Exchange",
     description:
-      "Discover international courses and programmes that develop global skills, professional knowledge, cultural experience and career opportunities.",
+      "Discover international oceanography courses, technology exposure seminars and overseas training opportunities in partner maritime nations.",
+    btnText: "Explore Foreign Training",
+    href: "/foreign-training",
     image: "/images/services/foreign-training.jpg",
     alt: "International ocean science and foreign training seminar",
-    href: "/services/foreign-training",
     fallbackIcon: Globe,
   },
   {
-    title: "Procurement",
+    id: "procurement",
+    title: "Procurement & Tenders",
+    category: "Ministry Bidding",
     description:
-      "Access procurement opportunities, purchasing information and official notices relating to goods and services.",
+      "Access official procurement opportunities, purchasing tenders, harbour construction bids and supply contracts published by the Ministry.",
+    btnText: "Explore Procurement Portal",
+    href: "/procurement",
     image: "/images/services/procurement.jpg",
     alt: "Official government procurement documents and tenders",
-    href: "/resources/procurement",
     fallbackIcon: ShoppingBag,
   },
   {
-    title: "Recruitment",
+    id: "recruitment",
+    title: "Recruitment & Vacancies",
+    category: "Career Opportunities",
     description:
-      "View current job opportunities, vacancies, internship announcements and recruitment information published by the Ministry.",
+      "View current job opportunities, public sector vacancies, research internships and career announcements across Ministry institutions.",
+    btnText: "Explore Career Vacancies",
+    href: "/recruitment",
     image: "/images/services/recruitment.jpg",
     alt: "Fisheries ministry career recruitment and job vacancies",
-    href: "/resources/recruitment",
     fallbackIcon: UserPlus,
   },
 ]
@@ -60,29 +82,30 @@ export function PopularServices() {
     <section
       id="popular-services"
       aria-labelledby="popular-services-heading"
-      className="py-16 bg-white border-b border-slate-200"
+      className="py-16 sm:py-20 bg-white border-b border-slate-200"
     >
       <Container>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-[#256B29]">
-              Ministry Services
+            <p className="text-xs font-extrabold uppercase tracking-wider text-[#256B29] flex items-center gap-1.5 mb-1">
+              <Sparkles className="h-4 w-4 text-[#256B29]" />
+              <span>Ministry Portals</span>
             </p>
             <h2
               id="popular-services-heading"
-              className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl"
+              className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
             >
               Services and Opportunities
             </h2>
           </div>
-          <p className="max-w-xl text-base text-slate-600">
-            Explore training programmes, procurement information, recruitment updates and other key Ministry opportunities.
+          <p className="max-w-xl text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
+            Explore local training programmes, foreign technical exchange, procurement notices, career recruitment, and key public opportunities provided by the Ministry of Fisheries.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
           {serviceCards.map((card) => (
-            <ServiceCardItemComponent key={card.title} card={card} />
+            <ServiceCardItemComponent key={card.id} card={card} />
           ))}
         </div>
       </Container>
@@ -95,16 +118,19 @@ function ServiceCardItemComponent({ card }: { card: ServiceCardItem }) {
   const FallbackIcon = card.fallbackIcon
 
   return (
-    <article className="flex flex-col h-full bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+    <article className="flex flex-col h-full bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:border-emerald-300 hover:-translate-y-1 transition-all duration-300 group">
       {/* Card Image Header */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 shrink-0">
+      <Link
+        href={card.href}
+        className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 shrink-0 text-left block"
+      >
         {!imageError ? (
           <Image
             src={card.image}
             alt={card.alt}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover transition-transform duration-300 hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             onError={() => setImageError(true)}
           />
         ) : (
@@ -112,27 +138,35 @@ function ServiceCardItemComponent({ card }: { card: ServiceCardItem }) {
             <FallbackIcon className="h-12 w-12 stroke-[1.5]" aria-hidden="true" />
           </div>
         )}
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
+        <div className="absolute bottom-3 left-3">
+          <span className="rounded-md bg-white/90 px-2.5 py-1 text-[11px] font-extrabold text-slate-900 backdrop-blur-xs shadow-2xs">
+            {card.category}
+          </span>
+        </div>
+      </Link>
 
       {/* Card Content Body */}
       <div className="flex flex-col flex-1 p-6 justify-between">
         <div>
-          <h3 className="text-xl font-bold text-slate-900 tracking-tight">
-            {card.title}
-          </h3>
-          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+          <Link href={card.href} className="group/title block">
+            <h3 className="text-lg font-extrabold text-slate-900 tracking-tight group-hover/title:text-[#256B29] transition-colors leading-snug">
+              {card.title}
+            </h3>
+          </Link>
+          <p className="mt-2.5 text-xs leading-relaxed text-slate-600 text-justify font-normal line-clamp-3">
             {card.description}
           </p>
         </div>
 
-        {/* View Details Button */}
-        <div className="mt-6 pt-2">
+        {/* Direct Link Action Button */}
+        <div className="mt-6 pt-3 border-t border-slate-100">
           <Link
             href={card.href}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#256B29] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#256B29] px-4 py-2.5 text-xs font-extrabold !text-white transition-colors hover:bg-[#1b4d1d] shadow-2xs group/btn"
           >
-            <span>View details</span>
-            <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>{card.btnText}</span>
+            <ArrowRight className="h-3.5 w-3.5 shrink-0 group-hover/btn:translate-x-1 transition-transform" aria-hidden="true" />
           </Link>
         </div>
       </div>

@@ -68,7 +68,7 @@ export function DesktopNavigation() {
     <nav
       ref={navigationRef}
       aria-label="Main navigation"
-      className="hidden lg:block w-full"
+      className="hidden lg:block w-full overflow-visible"
     >
       <ul className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
         {mainNavigation.map((item) => {
@@ -89,7 +89,7 @@ export function DesktopNavigation() {
           return (
             <li
               key={item.href}
-              className="relative"
+              className="relative group/nav"
               onMouseEnter={() => {
                 if (hasChildren) {
                   setOpenMenu(item.label)
@@ -104,7 +104,7 @@ export function DesktopNavigation() {
               {hasChildren ? (
                 <div
                   className={cn(
-                    "relative flex min-h-11 items-center rounded-lg transition-colors",
+                    "relative flex min-h-11 items-center rounded-lg transition-colors cursor-pointer",
                     active
                       ? "bg-[#256B29] text-white font-bold"
                       : "text-slate-200 hover:bg-white/10 hover:text-white",
@@ -129,7 +129,7 @@ export function DesktopNavigation() {
                     aria-expanded={expanded}
                     aria-controls={submenuId}
                     onClick={() => toggleMenu(item.label)}
-                    className="inline-flex min-h-11 min-w-8 items-center justify-center rounded-r-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 text-slate-300 hover:text-white"
+                    className="inline-flex min-h-11 min-w-8 items-center justify-center rounded-r-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 text-slate-300 hover:text-white cursor-pointer"
                   >
                     <ChevronDown
                       aria-hidden="true"
@@ -174,14 +174,14 @@ export function DesktopNavigation() {
                 <div
                   id={submenuId}
                   className={cn(
-                    "absolute left-1/2 -translate-x-1/2 top-full z-[60] w-72 pt-2 transition-all duration-200",
+                    "absolute left-1/2 -translate-x-1/2 top-full z-[9999] w-72 pt-1 transition-all duration-200 before:absolute before:inset-x-0 before:-top-3 before:h-3",
                     expanded
-                      ? "visible translate-y-0 opacity-100"
-                      : "invisible translate-y-2 opacity-0",
+                      ? "visible translate-y-0 opacity-100 pointer-events-auto"
+                      : "invisible translate-y-2 opacity-0 pointer-events-none",
                   )}
                 >
-                  <div className="overflow-hidden rounded-2xl border border-slate-700 bg-[#182228] p-2 shadow-2xl">
-                    <ul>
+                  <div className="overflow-hidden rounded-2xl border border-slate-700 bg-[#121c22] p-2 shadow-2xl backdrop-blur-xl">
+                    <ul className="space-y-1">
                       {item.children?.map((child) => {
                         const childActive = isActive(child.href)
 
@@ -194,10 +194,10 @@ export function DesktopNavigation() {
                               }
                               onClick={() => setOpenMenu(null)}
                               className={cn(
-                                "flex min-h-10 items-center rounded-xl px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400",
+                                "flex min-h-10 items-center rounded-xl px-4 py-2.5 text-xs sm:text-sm font-normal transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400",
                                 childActive
-                                  ? "bg-[#256B29] text-white font-bold"
-                                  : "text-slate-200 hover:bg-white/10 hover:text-green-300",
+                                  ? "bg-[#256B29] text-white font-semibold"
+                                  : "text-slate-200 hover:bg-white/10 hover:text-emerald-300",
                               )}
                             >
                               {child.label}

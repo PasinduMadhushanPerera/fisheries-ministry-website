@@ -1,4 +1,6 @@
-import type { Metadata } from "next"
+"use client"
+
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import {
   ArrowRight,
@@ -9,464 +11,319 @@ import {
   Landmark,
   Mail,
   MapPin,
+  Phone,
   Search,
+  SearchX,
   ShieldCheck,
   ShipWheel,
+  Sparkles,
 } from "lucide-react"
 
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { Container } from "@/components/ui/container"
-
-export const metadata: Metadata = {
-  title: "Frequently Asked Questions",
-  description:
-    "Find answers to frequently asked questions about Ministry services, fisheries, licences, applications, public information and website support.",
-}
+import { PageHero } from "@/components/ui/page-hero"
 
 const breadcrumbItems = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "Frequently Asked Questions",
-  },
+  { label: "Home", href: "/" },
+  { label: "Frequently Asked Questions" },
 ]
 
-const faqCategories = [
-  {
-    id: "general",
-    label: "General Information",
-    icon: CircleHelp,
-  },
-  {
-    id: "licensing",
-    label: "Licences and Registration",
-    icon: FileText,
-  },
-  {
-    id: "fisheries",
-    label: "Fisheries and Aquaculture",
-    icon: Fish,
-  },
-  {
-    id: "services",
-    label: "Online and Public Services",
-    icon: Landmark,
-  },
-  {
-    id: "website",
-    label: "Website Support",
-    icon: ShieldCheck,
-  },
-]
+type FaqItem = {
+  question: string
+  answer: string
+  linkText?: string
+  linkHref?: string
+}
 
-const faqGroups = [
+type FaqGroup = {
+  id: string
+  title: string
+  description: string
+  icon: React.ElementType
+  questions: FaqItem[]
+}
+
+const faqGroups: FaqGroup[] = [
   {
     id: "general",
     title: "General Information",
-    description:
-      "Common questions about the Ministry, its responsibilities and public information.",
+    description: "Common questions about the Ministry, its statutory mandates, organizational structure, and public information services.",
     icon: CircleHelp,
     questions: [
       {
-        question:
-          "What is the role of the Ministry of Fisheries, Aquatic and Ocean Resources?",
-        answer:
-          "The Ministry is responsible for developing, coordinating and supporting policies, programmes and public services related to fisheries, aquaculture, aquatic resources and ocean resources in Sri Lanka.",
+        question: "What is the primary role of the Ministry of Fisheries, Aquatic and Ocean Resources?",
+        answer: "The Ministry of Fisheries, Aquatic and Ocean Resources is responsible for formulating, coordinating, and implementing national policies, programmes, and public services related to marine capture fisheries, inland fisheries, aquaculture development, coastal conservation, and ocean resource management in Sri Lanka.",
+        linkText: "Learn more About the Ministry",
+        linkHref: "/about/overview",
       },
       {
-        question:
-          "What information can I find on this website?",
-        answer:
-          "The website provides Ministry news, public notices, press releases, publications, policies, services, project information, contact details, media resources and other official government information.",
+        question: "What public information and official resources can I access on this website?",
+        answer: "The official Ministry web portal provides access to news releases, public notices, tender opportunities, gazettes, fisheries statistics, downloadable application forms, statutory acts and policies, Right to Information (RTI) procedures, and official contact directories.",
+        linkText: "View Public Downloads",
+        linkHref: "/downloads",
       },
       {
-        question:
-          "How can I contact the Ministry?",
-        answer:
-          "You can use the official contact page to find telephone numbers, email addresses, office locations and enquiry information for the Ministry and its relevant divisions.",
+        question: "How can I contact Ministry Headquarters or specific regional offices?",
+        answer: "You can reach the Ministry Headquarters at New Secretariat, Maligawatta, Colombo 10. For phone inquiries call +94 112 327 060, or email info@fisheries.gov.lk. Specific department extension numbers are listed in our Contact Directory.",
+        linkText: "View Full Contact Directory",
+        linkHref: "/contact",
       },
       {
-        question:
-          "Where can I find the latest Ministry notices and announcements?",
-        answer:
-          "Current notices, announcements, vacancies, procurement information and other public updates are published in the Media Centre and Notices sections of this website.",
-      },
-      {
-        question:
-          "Are Ministry publications available online?",
-        answer:
-          "Available reports, policy documents, guidelines, statistical publications and other official documents can be accessed through the Publications or Media Centre sections.",
+        question: "Where can I find the latest Ministry notices, tenders, and announcements?",
+        answer: "Current public notices, tender invitations, procurement opportunities, recruitment advertisements, and official announcements are published under the Public Notices section in our Media Centre.",
+        linkText: "Explore Public Notices",
+        linkHref: "/media-centre/notices",
       },
     ],
   },
   {
-    id: "licensing",
-    title: "Licences and Registration",
-    description:
-      "Information about fisheries-related licences, registrations and application requirements.",
+    id: "applications",
+    title: "Applications & Forms",
+    description: "Information about obtaining official application forms, circulars, and document requirements.",
     icon: FileText,
     questions: [
       {
-        question:
-          "How can I apply for a fisheries-related licence?",
-        answer:
-          "Application procedures depend on the type of licence required. Please review the relevant service page or contact the responsible Ministry division for the applicable form, supporting documents, fees and submission process.",
+        question: "Where can I download official Ministry application forms?",
+        answer: "Commercial vessel registration forms, licensing renewal applications, fingerling request forms, and procurement document guidelines are available for free download in PDF format on our Downloads Portal.",
+        linkText: "Go to Downloads Centre",
+        linkHref: "/downloads",
       },
       {
-        question:
-          "What documents are required for a licence application?",
-        answer:
-          "Required documents vary by licence type. They may include identification documents, vessel or business registration details, ownership records, technical information and other supporting documents specified by the responsible authority.",
+        question: "What general documents are required when submitting official applications?",
+        answer: "Applicants typically need to submit a completed application form, National Identity Card (NIC) copy, vessel registration or land title documents where applicable, and safety/technical certificates.",
+        linkText: "Download Application Forms",
+        linkHref: "/downloads",
       },
       {
-        question:
-          "Can I submit a licence application online?",
-        answer:
-          "Some services may support online applications or downloadable forms. Where an online service is available, instructions will be provided on the relevant service page.",
-      },
-      {
-        question:
-          "How can I check the status of an application?",
-        answer:
-          "Use the contact details or reference information provided when your application was submitted. Application status services may also be available through the relevant digital service.",
-      },
-      {
-        question:
-          "Does submitting an application guarantee approval?",
-        answer:
-          "No. Applications are reviewed according to applicable laws, regulations, eligibility requirements and administrative procedures. Additional documents or inspections may be required before a decision is made.",
+        question: "Where can I check published procurement opportunities and tender guidelines?",
+        answer: "Official tender notices, procurement guidelines, and bidding documents published by the Ministry and Ceylon Fishery Harbours Corporation (CFHC) can be accessed on our Public Notices page.",
+        linkText: "View Procurement Notices",
+        linkHref: "/media-centre/notices",
       },
     ],
   },
   {
     id: "fisheries",
     title: "Fisheries and Aquaculture",
-    description:
-      "General guidance relating to fisheries, aquaculture and aquatic resources.",
+    description: "Guidance relating to coastal fisheries, inland aquaculture support, fingerling supply, and marine research.",
     icon: Fish,
     questions: [
       {
-        question:
-          "Where can I find information about fisheries development programmes?",
-        answer:
-          "Information about current programmes, projects and initiatives is published in the Services, Projects, Programmes or News sections of this website.",
+        question: "Where can I obtain assistance for freshwater fish and shrimp aquaculture projects?",
+        answer: "The National Aquaculture Development Authority (NAQDA) provides fingerling supply, pond construction technical assistance, water quality testing, and aquaculture guidance for registered producers.",
+        linkText: "Explore Institutions",
+        linkHref: "/institutions",
       },
       {
-        question:
-          "How can fishers obtain information about government assistance?",
-        answer:
-          "Available assistance programmes, eligibility conditions and application procedures are announced through official notices, service pages and responsible Ministry divisions.",
+        question: "How can coastal fishers access safety equipment and emergency relief assistance?",
+        answer: "Safety equipment programs (VHF marine radios, VMS distress beacons, lifejackets) and disaster relief schemes are announced via official circulars and coordinated through local Fishermen Co-operative Societies.",
+        linkText: "View Downloads & Circulars",
+        linkHref: "/downloads",
       },
       {
-        question:
-          "Where can I report an issue affecting fisheries or aquatic resources?",
-        answer:
-          "Use the official contact page to identify the appropriate Ministry division or regional office. Provide the location, nature of the issue and any relevant supporting information.",
+        question: "Where can I access official fisheries statistics and fish production data?",
+        answer: "Weekly fish market prices, monthly marine & inland production reports, and annual statistical bulletins are published under the Statistics section.",
+        linkText: "View Fisheries Statistics",
+        linkHref: "/statistics",
       },
       {
-        question:
-          "Where can I obtain fisheries statistics or research information?",
-        answer:
-          "Published statistics, reports and research-related documents may be available through the Publications section or through institutions operating under the Ministry.",
-      },
-      {
-        question:
-          "How can I learn about aquaculture opportunities?",
-        answer:
-          "Information about aquaculture development, technical support, training, investment opportunities and applicable approvals can be obtained from the relevant Ministry division or associated institution.",
+        question: "How can I report illegal fishing (IUU) or marine environmental pollution?",
+        answer: "Illegal fishing, unauthorized gear usage, or coastal environment degradation can be reported directly to the Department of Fisheries MCS Control Room (+94 112 449 175) or via our online contact portal.",
+        linkText: "Report to Ministry Support",
+        linkHref: "/contact",
       },
     ],
   },
   {
-    id: "services",
-    title: "Online and Public Services",
-    description:
-      "Answers about accessing Ministry services, forms and public information.",
+    id: "rti",
+    title: "Right to Information (RTI)",
+    description: "Answers about accessing public information and submitting formal RTI requests.",
     icon: Landmark,
     questions: [
       {
-        question:
-          "Where can I find Ministry application forms?",
-        answer:
-          "Available forms can be found on the relevant service page, publication page or downloads area. Some forms may also be provided directly by the responsible Ministry division.",
+        question: "How do I submit a Right to Information (RTI) request to the Ministry?",
+        answer: "Download RTI Form 01 from our RTI Portal, fill out the required information, and submit it to our designated Information Officer via post, email (rti@fisheries.gov.lk), or in person at HQ.",
+        linkText: "Visit RTI Portal",
+        linkHref: "/rti",
       },
       {
-        question:
-          "Can I make payments through this website?",
-        answer:
-          "Online payment availability depends on the service. Only use payment facilities clearly identified as official Ministry or government services.",
-      },
-      {
-        question:
-          "How will I know whether an online submission was successful?",
-        answer:
-          "A successful service may display a confirmation message, reference number or email acknowledgement. Keep this information for future enquiries.",
-      },
-      {
-        question:
-          "What should I do if I submitted incorrect information?",
-        answer:
-          "Contact the responsible Ministry division as soon as possible and provide your application or reference number. Do not submit a duplicate application unless instructed.",
-      },
-      {
-        question:
-          "Can another person submit an application on my behalf?",
-        answer:
-          "This depends on the service and applicable requirements. Authorisation documents, identification or a formal declaration may be required.",
+        question: "What is the expected response timeframe for public inquiries and RTI requests?",
+        answer: "Inquiries submitted through our website contact form receive an immediate automated confirmation and a response within 3 to 5 business days. Formal RTI requests are processed within statutory timeframes.",
+        linkText: "Contact Information Desk",
+        linkHref: "/contact",
       },
     ],
   },
   {
     id: "website",
-    title: "Website and Accessibility Support",
-    description:
-      "Help with using this website, accessing documents and reporting technical issues.",
+    title: "Website & Accessibility Support",
+    description: "Help with navigating this web portal, adjusting text contrast, and language selection.",
     icon: ShieldCheck,
     questions: [
       {
-        question:
-          "What should I do if a page or online service is not working?",
-        answer:
-          "Refresh the page, check your internet connection and try a current version of a supported browser. If the problem continues, report it through the contact page with the page address, device and browser used.",
+        question: "Is this website available in English, Sinhala, and Tamil?",
+        answer: "Yes. The Ministry website supports all three official languages of Sri Lanka (English, Sinhala, and Tamil). You can switch languages using the language toggle located in the top utility bar.",
       },
       {
-        question:
-          "How can I search for information on the website?",
-        answer:
-          "Use the website search function and enter a service name, document title, subject, programme or other relevant keyword.",
+        question: "How do I customize text size or enable high contrast mode?",
+        answer: "Use the Accessibility Utility Bar fixed at the top of every page to adjust font scale (+ / -), toggle high-contrast mode, or enable screen reader optimizations.",
+        linkText: "Read Accessibility Statement",
+        linkHref: "/accessibility",
       },
       {
-        question:
-          "Can I use the website with a keyboard or screen reader?",
-        answer:
-          "The website is designed to support keyboard navigation, semantic page structure, accessible labels and assistive technologies. More information is available in the Accessibility Statement.",
-      },
-      {
-        question:
-          "What should I do if I cannot access a PDF or document?",
-        answer:
-          "Report the document through the contact page and request an accessible or alternative format. Include the document title and the page where it appears.",
-      },
-      {
-        question:
-          "Is this website available in Sinhala, Tamil and English?",
-        answer:
-          "The Ministry aims to provide important public information in Sinhala, Tamil and English where translations are available. Language availability may vary by page or document.",
+        question: "What should I do if a link or document fails to load?",
+        answer: "Try refreshing the page or clearing browser cache. If a document link remains unavailable, please contact info@fisheries.gov.lk specifying the page and document title.",
       },
     ],
   },
 ]
 
 export default function FrequentlyAskedQuestionsPage() {
+  const [activeTab, setActiveTab] = useState<string>("all")
+  const [searchQuery, setSearchQuery] = useState<string>("")
+
+  const filteredGroups = useMemo(() => {
+    const keyword = searchQuery.trim().toLowerCase()
+
+    return faqGroups
+      .map((group) => {
+        if (activeTab !== "all" && group.id !== activeTab) {
+          return null
+        }
+
+        if (!keyword) {
+          return group
+        }
+
+        const matchingQuestions = group.questions.filter(
+          (q) =>
+            q.question.toLowerCase().includes(keyword) ||
+            q.answer.toLowerCase().includes(keyword)
+        )
+
+        if (matchingQuestions.length === 0) {
+          return null
+        }
+
+        return {
+          ...group,
+          questions: matchingQuestions,
+        }
+      })
+      .filter((group): group is FaqGroup => group !== null)
+  }, [activeTab, searchQuery])
+
   return (
     <>
       <SiteHeader />
 
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1} className="outline-none">
         <Breadcrumb items={breadcrumbItems} />
 
-        <section
-          aria-labelledby="faq-heading"
-          className="relative isolate overflow-hidden bg-[#061d24] text-white"
+        {/* Hero Section */}
+        <PageHero
+          badgeIcon={CircleHelp}
+          badgeText="Public Support Desk"
+          title="Frequently Asked"
+          highlightTitle="Questions (FAQ)"
+          description="Find clear, verified answers to common questions regarding Ministry public information, downloadable application forms, aquaculture support, public notices, and website accessibility."
+          cardIcon={ShipWheel}
+          cardEyebrow="Ministry Help Desk"
+          cardTitle="Here to Support You"
+          cardDescription="Cannot find the specific answer you are looking for? Our public support team is ready to assist you."
         >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(34,197,94,0.2),transparent_35%),radial-gradient(circle_at_85%_10%,rgba(14,165,233,0.22),transparent_40%),linear-gradient(135deg,#061d24_0%,#0a322f_50%,#0a4350_100%)]"
-          />
+          <div className="mt-6 border-t border-white/10 pt-4">
+            <Link
+              href="/contact"
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#256B29] px-6 text-xs font-extrabold text-white transition hover:bg-[#1b4d1d] shadow-md shadow-emerald-900/20"
+            >
+              <span>Contact Ministry Support</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+        </PageHero>
 
-          <div
-            aria-hidden="true"
-            className="absolute -right-44 -top-44 h-[36rem] w-[36rem] rounded-full border border-white/10 bg-white/[0.03]"
-          />
-
-          <div
-            aria-hidden="true"
-            className="absolute -bottom-52 -left-20 h-[32rem] w-[32rem] rounded-full border border-green-200/10 bg-green-300/[0.03]"
-          />
-
-          <svg
-            aria-hidden="true"
-            viewBox="0 0 1440 320"
-            preserveAspectRatio="none"
-            className="absolute inset-x-0 bottom-0 h-40 w-full text-white/[0.05]"
-          >
-            <path
-              fill="currentColor"
-              d="M0,224L60,213.3C120,203,240,181,360,181.3C480,181,600,203,720,202.7C840,203,960,181,1080,165.3C1200,149,1320,139,1380,133.3L1440,128L1440,320L0,320Z"
-            />
-          </svg>
-
-          <Container className="relative z-10 py-16 sm:py-20 lg:py-24">
-            <div className="grid gap-10 lg:grid-cols-[1fr_22rem] lg:items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur-md">
-                  <CircleHelp
-                    aria-hidden="true"
-                    className="h-4 w-4 text-green-200"
-                  />
-
-                  Public Information and Support
-                </div>
-
-                <h1
-                  id="faq-heading"
-                  className="mt-7 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl"
-                >
-                  Frequently Asked
-                  <span className="block bg-gradient-to-r from-green-200 via-cyan-200 to-sky-200 bg-clip-text text-transparent">
-                    Questions
-                  </span>
-                </h1>
-
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">
-                  Find answers to common questions about Ministry information,
-                  fisheries services, applications, licences and website
-                  support.
-                </p>
-
-                <form
-                  role="search"
-                  action="/search"
-                  method="get"
-                  className="mt-8 flex max-w-2xl overflow-hidden rounded-xl border border-white/20 bg-white shadow-2xl"
-                >
-                  <label
-                    htmlFor="faq-search"
-                    className="visually-hidden"
-                  >
-                    Search frequently asked questions
-                  </label>
-
-                  <input
-                    id="faq-search"
-                    name="q"
-                    type="search"
-                    maxLength={100}
-                    autoComplete="off"
-                    placeholder="Search the website for an answer"
-                    className="min-h-14 min-w-0 flex-1 border-0 px-5 text-base text-slate-950 outline-none placeholder:text-slate-500"
-                  />
-
-                  <button
-                    type="submit"
-                    aria-label="Search the website"
-                    className="inline-flex min-h-14 min-w-14 items-center justify-center bg-green-700 px-5 text-white transition hover:bg-green-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-green-200"
-                  >
-                    <Search
-                      aria-hidden="true"
-                      className="h-5 w-5"
-                    />
-
-                    <span className="ml-2 hidden font-semibold sm:inline">
-                      Search
-                    </span>
-                  </button>
-                </form>
+        {/* Search & Subject Tabs Section */}
+        <section aria-labelledby="faq-search-heading" className="border-b border-slate-200/80 bg-gradient-to-b from-white to-slate-50/60 py-10">
+          <Container>
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              {/* Live Search Bar */}
+              <div className="relative w-full lg:max-w-md">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="search"
+                  placeholder="Search FAQ questions by keyword or topic..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#256B29] focus:outline-none focus:ring-4 focus:ring-emerald-100/80 shadow-2xs transition-all"
+                />
               </div>
 
-              <aside className="rounded-3xl border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
-                <ShipWheel
-                  aria-hidden="true"
-                  className="h-10 w-10 text-green-200"
-                />
-
-                <p className="mt-5 text-sm font-bold uppercase tracking-[0.15em] text-green-200">
-                  Need more help?
-                </p>
-
-                <p className="mt-3 leading-7 text-slate-200">
-                  Contact the Ministry when you cannot find the information or
-                  service you require.
-                </p>
-
-                <Link
-                  href="/contact"
-                  className="mt-6 inline-flex items-center gap-2 rounded-lg border border-white/25 bg-white/10 px-5 py-3 font-semibold text-white transition hover:bg-white hover:text-slate-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+              {/* Subject Tabs */}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("all")}
+                  className={`rounded-xl px-4 py-2 text-xs font-extrabold transition-all cursor-pointer ${
+                    activeTab === "all"
+                      ? "bg-[#256B29] text-white shadow-md shadow-emerald-900/10 scale-[1.02]"
+                      : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-100"
+                  }`}
                 >
-                  Contact the Ministry
-
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="h-5 w-5"
-                  />
-                </Link>
-              </aside>
-            </div>
-          </Container>
-        </section>
-
-        <section
-          aria-labelledby="faq-categories-heading"
-          className="border-b border-slate-200 bg-slate-50 py-12"
-        >
-          <Container>
-            <div className="max-w-3xl">
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-green-700">
-                Browse by subject
-              </p>
-
-              <h2
-                id="faq-categories-heading"
-                className="mt-3 text-3xl font-bold tracking-tight text-slate-950"
-              >
-                FAQ Categories
-              </h2>
-            </div>
-
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-              {faqCategories.map((category) => {
-                const Icon = category.icon
-
-                return (
-                  <a
-                    key={category.id}
-                    href={`#${category.id}`}
-                    className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-green-300 hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+                  All Subjects
+                </button>
+                {faqGroups.map((group) => (
+                  <button
+                    key={group.id}
+                    type="button"
+                    onClick={() => setActiveTab(group.id)}
+                    className={`rounded-xl px-4 py-2 text-xs font-extrabold transition-all cursor-pointer ${
+                      activeTab === group.id
+                        ? "bg-[#256B29] text-white shadow-md shadow-emerald-900/10 scale-[1.02]"
+                        : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-100"
+                    }`}
                   >
-                    <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-green-50 text-green-700 transition group-hover:bg-green-700 group-hover:text-white">
-                      <Icon
-                        aria-hidden="true"
-                        className="h-5 w-5"
-                      />
-                    </div>
-
-                    <p className="mt-4 font-bold leading-6 text-slate-950 group-hover:text-green-800">
-                      {category.label}
-                    </p>
-                  </a>
-                )
-              })}
+                    {group.title}
+                  </button>
+                ))}
+              </div>
             </div>
           </Container>
         </section>
 
-        <section className="bg-white py-16 sm:py-20">
+        {/* Main Content Accordion Stream */}
+        <section className="bg-slate-50/80 py-12 sm:py-16">
           <Container>
-            <div className="grid gap-12 lg:grid-cols-[18rem_minmax(0,1fr)]">
-              <aside>
+            <div className="grid gap-10 lg:grid-cols-[18rem_minmax(0,1fr)]">
+              {/* Left Navigation Sidebar */}
+              <aside className="hidden lg:block">
                 <nav
-                  aria-label="Frequently asked question categories"
-                  className="sticky top-28 rounded-3xl border border-slate-200 bg-slate-50 p-6"
+                  aria-label="FAQ category navigation"
+                  className="sticky top-28 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-xs"
                 >
-                  <p className="text-sm font-bold uppercase tracking-[0.15em] text-green-700">
-                    On this page
-                  </p>
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#256B29] flex items-center gap-1.5 mb-2">
+                    <Sparkles className="h-3.5 w-3.5" />
+                    <span>Table of Contents</span>
+                  </span>
+                  <h3 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3">
+                    FAQ Categories
+                  </h3>
 
-                  <ol className="mt-5 space-y-1">
+                  <ol className="mt-4 space-y-1.5">
                     {faqGroups.map((group, index) => (
                       <li key={group.id}>
                         <a
                           href={`#${group.id}`}
-                          className="group flex items-start gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white hover:text-green-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+                          onClick={() => setActiveTab("all")}
+                          className={`flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all ${
+                            activeTab === group.id
+                              ? "bg-emerald-50 text-[#256B29] font-bold"
+                              : "text-slate-700 hover:bg-slate-100 hover:text-[#256B29]"
+                          }`}
                         >
-                          <span className="mt-0.5 text-xs font-bold text-slate-400 group-hover:text-green-700">
-                            {String(index + 1).padStart(2, "0")}
-                          </span>
-
+                          <span className="text-[#256B29] font-mono font-bold">0{index + 1}.</span>
                           <span>{group.title}</span>
                         </a>
                       </li>
@@ -475,275 +332,157 @@ export default function FrequentlyAskedQuestionsPage() {
                 </nav>
               </aside>
 
-              <div className="min-w-0 space-y-16">
-                {faqGroups.map((group, groupIndex) => {
-                  const Icon = group.icon
-
-                  return (
-                    <section
-                      key={group.id}
-                      id={group.id}
-                      aria-labelledby={`${group.id}-heading`}
-                      className={`scroll-mt-32 ${
-                        groupIndex > 0
-                          ? "border-t border-slate-200 pt-14"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-700">
-                          <Icon
-                            aria-hidden="true"
-                            className="h-6 w-6"
-                          />
+              {/* Right Accordion Questions Stream */}
+              <div className="min-w-0 space-y-12">
+                {filteredGroups.length > 0 ? (
+                  filteredGroups.map((group, groupIndex) => {
+                    const Icon = group.icon
+                    return (
+                      <section
+                        key={group.id}
+                        id={group.id}
+                        aria-labelledby={`${group.id}-heading`}
+                        className={`scroll-mt-28 ${groupIndex > 0 ? "border-t border-slate-200/80 pt-10" : ""}`}
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100/80 text-[#256B29] border border-emerald-200/80 shadow-2xs">
+                            <Icon className="h-5 w-5" aria-hidden="true" />
+                          </div>
+                          <div>
+                            <span className="text-xs font-extrabold uppercase tracking-wider text-[#256B29]">
+                              Category 0{groupIndex + 1}
+                            </span>
+                            <h2 id={`${group.id}-heading`} className="text-2xl font-extrabold tracking-tight text-slate-900">
+                              {group.title}
+                            </h2>
+                            <p className="mt-1 text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
+                              {group.description}
+                            </p>
+                          </div>
                         </div>
 
-                        <div>
-                          <p className="text-sm font-bold uppercase tracking-[0.15em] text-green-700">
-                            Category {groupIndex + 1}
-                          </p>
-
-                          <h2
-                            id={`${group.id}-heading`}
-                            className="mt-2 text-3xl font-bold tracking-tight text-slate-950"
-                          >
-                            {group.title}
-                          </h2>
-
-                          <p className="mt-3 max-w-3xl leading-7 text-slate-600">
-                            {group.description}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mt-8 space-y-4">
-                        {group.questions.map((faq, questionIndex) => (
-                          <details
-                            key={faq.question}
-                            className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition open:border-green-300 open:shadow-lg"
-                          >
-                            <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-5 px-5 py-4 font-bold text-slate-950 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-green-200 sm:px-6">
-                              <span className="flex items-start gap-4">
-                                <span className="mt-0.5 text-sm font-bold text-green-700">
-                                  {String(questionIndex + 1).padStart(2, "0")}
+                        {/* Accordions */}
+                        <div className="mt-6 space-y-4">
+                          {group.questions.map((faq, questionIndex) => (
+                            <details
+                              key={faq.question}
+                              className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs transition-all duration-200 open:border-emerald-300 open:shadow-md"
+                            >
+                              <summary className="flex min-h-[56px] cursor-pointer list-none items-center justify-between gap-4 px-6 py-4 text-xs sm:text-sm font-extrabold text-slate-900 transition hover:bg-slate-50 focus-visible:outline-none">
+                                <span className="flex items-start gap-3 text-left">
+                                  <span className="text-[#256B29] font-mono">0{questionIndex + 1}.</span>
+                                  <span className="leading-snug">{faq.question}</span>
                                 </span>
+                                <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200 group-open:rotate-180" aria-hidden="true" />
+                              </summary>
 
-                                <span>{faq.question}</span>
-                              </span>
+                              <div className="border-t border-slate-100 bg-slate-50/60 px-6 py-5 text-xs sm:text-sm leading-relaxed text-slate-700 space-y-3 font-normal">
+                                {/* Justified Answer Text */}
+                                <p className="text-justify leading-relaxed">{faq.answer}</p>
 
-                              <ChevronDown
-                                aria-hidden="true"
-                                className="h-5 w-5 shrink-0 text-slate-500 transition-transform duration-200 group-open:rotate-180"
-                              />
-                            </summary>
-
-                            <div className="border-t border-slate-200 bg-slate-50 px-5 py-5 sm:px-6">
-                              <p className="leading-8 text-slate-700">
-                                {faq.answer}
-                              </p>
-                            </div>
-                          </details>
-                        ))}
-                      </div>
-                    </section>
-                  )
-                })}
+                                {faq.linkHref && (
+                                  <div className="pt-2">
+                                    <Link
+                                      href={faq.linkHref}
+                                      className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#256B29] hover:text-[#1b4d1d] hover:underline"
+                                    >
+                                      <span>{faq.linkText || "View Related Section"}</span>
+                                      <ArrowRight className="h-3.5 w-3.5" />
+                                    </Link>
+                                  </div>
+                                )}
+                              </div>
+                            </details>
+                          ))}
+                        </div>
+                      </section>
+                    )
+                  })
+                ) : (
+                  <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center">
+                    <SearchX className="mx-auto h-12 w-12 text-slate-400" aria-hidden="true" />
+                    <h3 className="mt-4 text-lg font-bold text-slate-900">No questions match your query</h3>
+                    <p className="mt-1 text-xs text-slate-600">Try adjusting your search terms or selecting another subject filter.</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab("all")
+                        setSearchQuery("")
+                      }}
+                      className="mt-5 rounded-xl bg-[#256B29] px-5 py-2.5 text-xs font-extrabold text-white transition hover:bg-[#1b4d1d] cursor-pointer"
+                    >
+                      Clear search & filters
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </Container>
         </section>
 
-        <section
-          aria-labelledby="faq-contact-heading"
-          className="border-t border-slate-200 bg-slate-50 py-16 sm:py-20"
-        >
+        {/* Further Assistance Card */}
+        <section aria-labelledby="faq-contact-heading" className="border-t border-slate-200/80 bg-white py-14 sm:py-16">
           <Container>
             <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl">
               <div className="grid lg:grid-cols-[0.85fr_1.15fr]">
-                <div className="relative isolate overflow-hidden bg-[linear-gradient(145deg,#071d24_0%,#0a322f_55%,#0a4350_100%)] p-8 text-white sm:p-10">
+                {/* Left Ocean Dark Card */}
+                <div className="relative overflow-hidden bg-[linear-gradient(135deg,#041c22_0%,#093835_55%,#0c4e48_100%)] p-8 sm:p-10 text-white">
                   <div
                     aria-hidden="true"
-                    className="absolute -right-20 -top-20 h-64 w-64 rounded-full border border-white/10 bg-white/[0.03]"
+                    className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-emerald-400/10 blur-2xl"
                   />
-
-                  <div className="relative">
-                    <Mail
-                      aria-hidden="true"
-                      className="h-10 w-10 text-green-200"
-                    />
-
-                    <p className="mt-6 text-sm font-bold uppercase tracking-[0.16em] text-green-200">
-                      Further assistance
-                    </p>
-
-                    <h2
-                      id="faq-contact-heading"
-                      className="mt-3 text-3xl font-bold tracking-tight"
-                    >
+                  <div className="relative z-10">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-emerald-300 backdrop-blur-md border border-white/10">
+                      <Mail className="h-6 w-6" />
+                    </div>
+                    <span className="mt-5 block text-xs font-extrabold uppercase tracking-wider text-emerald-300">
+                      Direct Support
+                    </span>
+                    <h2 id="faq-contact-heading" className="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                       Couldn&apos;t find your answer?
                     </h2>
-
-                    <p className="mt-5 max-w-xl leading-8 text-slate-200">
-                      Contact the Ministry for assistance with public
-                      information, applications, services or technical
-                      problems.
+                    <p className="mt-3 text-xs sm:text-sm text-slate-300 leading-relaxed text-justify">
+                      Contact the Ministry of Fisheries directly for guidance regarding public information, downloadable application forms, aquaculture programs, or Right to Information requests.
                     </p>
                   </div>
                 </div>
 
-                <div className="p-8 sm:p-10">
-                  <div className="grid gap-6 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                      <Landmark
-                        aria-hidden="true"
-                        className="h-7 w-7 text-green-700"
-                      />
-
-                      <h3 className="mt-4 text-lg font-bold text-slate-950">
-                        General enquiries
-                      </h3>
-
-                      <p className="mt-2 leading-7 text-slate-600">
-                        Ask about Ministry services, documents, programmes and
-                        public information.
-                      </p>
+                {/* Right Info Grid */}
+                <div className="p-8 sm:p-10 flex flex-col justify-between space-y-6">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
+                        <Landmark className="h-4 w-4 text-[#256B29]" />
+                        <span>General Inquiries</span>
+                      </div>
+                      <p className="text-xs text-slate-600 text-justify">Inquire about public documents, official circulars, and government programs.</p>
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                      <MapPin
-                        aria-hidden="true"
-                        className="h-7 w-7 text-green-700"
-                      />
-
-                      <h3 className="mt-4 text-lg font-bold text-slate-950">
-                        Office information
-                      </h3>
-
-                      <p className="mt-2 leading-7 text-slate-600">
-                        Find official addresses, telephone numbers, email
-                        contacts and office locations.
-                      </p>
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5 space-y-2">
+                      <div className="flex items-center gap-2 text-xs font-extrabold text-slate-900">
+                        <MapPin className="h-4 w-4 text-[#256B29]" />
+                        <span>HQ Help Desk</span>
+                      </div>
+                      <p className="text-xs text-slate-600">Maligawatta, Colombo 10 • Tel: +94 112 327 060</p>
                     </div>
                   </div>
 
-                  <Link
-                    href="/contact"
-                    className="mt-8 inline-flex items-center gap-2 rounded-lg bg-green-700 px-6 py-3 font-semibold text-white transition hover:bg-green-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
-                  >
-                    Go to contact page
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+                      <Phone className="h-4 w-4 text-[#256B29]" />
+                      <span>Hotline: +94 112 327 060</span>
+                    </div>
 
-                    <ArrowRight
-                      aria-hidden="true"
-                      className="h-5 w-5"
-                    />
-                  </Link>
+                    <Link
+                      href="/contact"
+                      className="inline-flex min-h-[44px] items-center gap-2 rounded-2xl bg-[#256B29] px-6 text-xs font-extrabold text-white transition hover:bg-[#1b4d1d] shadow-md shadow-emerald-900/10"
+                    >
+                      <span>Go to Contact Page</span>
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Container>
-        </section>
-
-        <section
-          aria-labelledby="related-information-heading"
-          className="border-t border-slate-200 bg-white py-16"
-        >
-          <Container>
-            <div className="max-w-3xl">
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-green-700">
-                Related information
-              </p>
-
-              <h2
-                id="related-information-heading"
-                className="mt-3 text-3xl font-bold tracking-tight text-slate-950"
-              >
-                Website Help and Policies
-              </h2>
-            </div>
-
-            <div className="mt-8 grid gap-6 md:grid-cols-3">
-              <Link
-                href="/accessibility"
-                className="group rounded-3xl border border-slate-200 bg-slate-50 p-7 transition hover:-translate-y-1 hover:border-green-200 hover:bg-white hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
-              >
-                <ShieldCheck
-                  aria-hidden="true"
-                  className="h-8 w-8 text-green-700"
-                />
-
-                <h3 className="mt-5 text-xl font-bold text-slate-950 group-hover:text-green-800">
-                  Accessibility
-                </h3>
-
-                <p className="mt-3 leading-7 text-slate-600">
-                  Learn about accessible website features and how to report a
-                  barrier.
-                </p>
-
-                <span className="mt-5 inline-flex items-center gap-2 font-semibold text-green-700">
-                  Read statement
-
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  />
-                </span>
-              </Link>
-
-              <Link
-                href="/privacy"
-                className="group rounded-3xl border border-slate-200 bg-slate-50 p-7 transition hover:-translate-y-1 hover:border-green-200 hover:bg-white hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
-              >
-                <ShieldCheck
-                  aria-hidden="true"
-                  className="h-8 w-8 text-green-700"
-                />
-
-                <h3 className="mt-5 text-xl font-bold text-slate-950 group-hover:text-green-800">
-                  Privacy Policy
-                </h3>
-
-                <p className="mt-3 leading-7 text-slate-600">
-                  Learn how information submitted through this website is
-                  managed.
-                </p>
-
-                <span className="mt-5 inline-flex items-center gap-2 font-semibold text-green-700">
-                  Read privacy policy
-
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  />
-                </span>
-              </Link>
-
-              <Link
-                href="/terms-of-use"
-                className="group rounded-3xl border border-slate-200 bg-slate-50 p-7 transition hover:-translate-y-1 hover:border-green-200 hover:bg-white hover:shadow-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
-              >
-                <FileText
-                  aria-hidden="true"
-                  className="h-8 w-8 text-green-700"
-                />
-
-                <h3 className="mt-5 text-xl font-bold text-slate-950 group-hover:text-green-800">
-                  Terms of Use
-                </h3>
-
-                <p className="mt-3 leading-7 text-slate-600">
-                  Read the conditions that apply when using this website.
-                </p>
-
-                <span className="mt-5 inline-flex items-center gap-2 font-semibold text-green-700">
-                  Read terms
-
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="h-4 w-4 transition-transform group-hover:translate-x-1"
-                  />
-                </span>
-              </Link>
             </div>
           </Container>
         </section>

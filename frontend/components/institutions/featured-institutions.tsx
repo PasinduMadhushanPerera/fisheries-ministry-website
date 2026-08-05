@@ -1,9 +1,8 @@
 import Image from "next/image"
-import Link from "next/link"
 import {
-  ArrowRight,
   Building2,
   ExternalLink,
+  Info,
 } from "lucide-react"
 
 import { featuredInstitutions } from "@/data/institutions"
@@ -11,100 +10,99 @@ import { Container } from "@/components/ui/container"
 
 export function FeaturedInstitutions() {
   return (
-    <section className="bg-slate-50 py-16 sm:py-20 lg:py-24">
+    <section className="bg-slate-50/80 py-16 sm:py-20 lg:py-24 border-b border-slate-200/80">
       <Container>
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-[#256B29]">
+          <span className="inline-flex rounded-full bg-emerald-100/80 border border-emerald-200/80 px-4 py-1.5 text-xs font-extrabold uppercase tracking-wider text-[#256B29]">
             Featured Institutions
           </span>
 
-          <h2 className="mt-6 text-4xl font-bold tracking-tight text-slate-900">
+          <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
             Key Organizations Supporting the Fisheries Sector
           </h2>
 
-          <p className="mt-6 text-lg leading-8 text-slate-600">
-            These organizations play a significant role in research,
-            infrastructure development, education, aquaculture and the
-            sustainable management of Sri Lanka&apos;s fisheries and aquatic
-            resources.
+          <p className="mt-3 text-sm sm:text-base text-slate-600 leading-relaxed text-justify max-w-2xl mx-auto">
+            These statutory bodies and research institutes play a vital role in oceanographic research, harbour infrastructure, aquaculture extension, and sustainable aquatic resource administration across Sri Lanka.
           </p>
         </div>
 
-        <div className="mt-14 space-y-8">
+        <div className="mt-12 space-y-8">
           {featuredInstitutions.map((institution, index) => (
             <article
               key={institution.id}
-              className={`grid overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl lg:grid-cols-2 ${
+              className={`grid overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs transition-all duration-300 hover:border-emerald-300 hover:shadow-xl lg:grid-cols-2 ${
                 index % 2 === 1 ? "lg:[&>*:first-child]:order-2" : ""
               }`}
             >
-              {/* Image */}
-              <div className="relative min-h-[320px]">
+              {/* Image Banner */}
+              <div className="relative min-h-[300px] lg:min-h-[360px] overflow-hidden group">
                 <Image
                   src={institution.image}
                   alt={institution.title}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
 
-              {/* Content */}
-              <div className="flex flex-col justify-center p-8 lg:p-12">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-semibold text-[#256B29]">
-                    {institution.type}
-                  </span>
+                <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between text-white">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-md bg-emerald-500/80 border border-emerald-300/40 px-3 py-1 text-xs font-extrabold text-white backdrop-blur-md">
+                      {institution.type}
+                    </span>
+                    {institution.shortTitle && (
+                      <span className="rounded-md bg-white/20 border border-white/20 px-2.5 py-1 text-xs font-mono font-bold text-white backdrop-blur-md">
+                        {institution.shortTitle}
+                      </span>
+                    )}
+                  </div>
 
-                  {institution.shortTitle && (
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-                      {institution.shortTitle}
+                  {institution.established && (
+                    <span className="text-[11px] font-bold text-slate-200 bg-black/40 px-2.5 py-1 rounded-md backdrop-blur-md">
+                      Est. {institution.established}
                     </span>
                   )}
                 </div>
+              </div>
 
-                <h3 className="mt-6 text-3xl font-bold text-slate-900">
-                  {institution.title}
-                </h3>
+              {/* Content Card Body */}
+              <div className="flex flex-col justify-between p-7 sm:p-9 lg:p-10">
+                <div>
+                  <div className="flex items-center gap-2.5 text-xs font-extrabold uppercase tracking-wider text-[#256B29] mb-2">
+                    <Building2 className="h-4 w-4" />
+                    <span>Statutory Authority</span>
+                  </div>
 
-                <p className="mt-5 leading-8 text-slate-600">
-                  {institution.description}
-                </p>
+                  <h3 className="text-2xl font-extrabold text-slate-900 leading-snug">
+                    {institution.title}
+                  </h3>
 
-                <div className="mt-8 space-y-3">
-                  {institution.responsibilities.map((item) => (
-                    <div
-                      key={item}
-                      className="flex items-center gap-3"
-                    >
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 text-[#256B29]">
-                        <Building2 className="h-5 w-5" />
+                  <p className="mt-3 text-xs sm:text-sm leading-relaxed text-slate-600 text-justify">
+                    {institution.description}
+                  </p>
+
+                  <div className="mt-6 space-y-2.5 border-t border-slate-100 pt-5">
+                    {institution.responsibilities.slice(0, 3).map((item) => (
+                      <div key={item} className="flex items-center gap-2.5 text-xs font-medium text-slate-700">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-[#256B29]">
+                          <Info className="h-3.5 w-3.5" />
+                        </div>
+                        <span>{item}</span>
                       </div>
-
-                      <span className="text-slate-700">{item}</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
 
-                <div className="mt-10 flex flex-wrap gap-4">
-                  <Link
-                    href={institution.href}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[#256B29] px-6 py-3 font-semibold text-white transition hover:bg-[#1d5320]"
+                {/* Direct Official Website Button */}
+                <div className="mt-8 pt-5 border-t border-slate-100">
+                  <a
+                    href={institution.website || "https://www.fisheries.gov.lk"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-[#256B29] px-6 text-xs font-extrabold !text-white transition hover:bg-[#1b4d1d] shadow-md shadow-emerald-900/10 group/btn"
                   >
-                    Learn More
-                    <ArrowRight className="h-5 w-5" />
-                  </Link>
-
-                  {institution.website && (
-                    <Link
-                      href={institution.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-6 py-3 font-semibold text-slate-700 transition hover:bg-slate-100"
-                    >
-                      Official Website
-                      <ExternalLink className="h-4 w-4" />
-                    </Link>
-                  )}
+                    <span>Visit Official Website</span>
+                    <ExternalLink className="h-4 w-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                  </a>
                 </div>
               </div>
             </article>

@@ -597,7 +597,7 @@ function NewsDrawer({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex justify-end"
+      className="fixed inset-0 z-[9999] flex justify-end"
       role="presentation"
     >
       <button

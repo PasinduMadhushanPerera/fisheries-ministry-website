@@ -37,7 +37,7 @@ export default function HomePage() {
         <InstitutionsSection />
 
         {/* 7. Resources */}
-        <DocumentsSection />
+        {/* <DocumentsSection /> */}
       </main>
 
       {/* 8. Footer */}
