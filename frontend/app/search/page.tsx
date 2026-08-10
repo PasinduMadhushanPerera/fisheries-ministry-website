@@ -31,6 +31,41 @@ type SearchResult = {
 
 const searchResults: SearchResult[] = [
   {
+    id: "weather",
+    title: "Marine Weather & Sea Forecast",
+    summary:
+      "View today's weather conditions, sea conditions, wind speeds, and ocean forecasts relevant to fisheries and marine activities.",
+    href: "https://www.meteo.gov.lk",
+    category: "Resources",
+    keywords: [
+      "weather",
+      "forecast",
+      "sea state",
+      "waves",
+      "wind",
+      "marine",
+      "meteorology",
+      "coastal",
+    ],
+  },
+  {
+    id: "internal-affairs",
+    title: "Internal Affairs Unit & Public Complaints",
+    summary:
+      "Submit complaints, report concerns, or contact the Ministry's Internal Affairs Unit regarding public services and governance oversight.",
+    href: "https://www.publiccomplaint.gov.lk",
+    category: "Support",
+    keywords: [
+      "internal affairs",
+      "complaints",
+      "public complaint",
+      "grievances",
+      "oversight",
+      "integrity",
+      "helpline",
+    ],
+  },
+  {
     id: "local-training",
     title: "Local Fisheries Training",
     summary:

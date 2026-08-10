@@ -1,13 +1,16 @@
-import Image from "next/image"
 import {
   Building2,
   ExternalLink,
 } from "lucide-react"
 
-import { institutions } from "@/data/institutions"
+import { Institution, institutions } from "@/data/institutions"
 import { Container } from "@/components/ui/container"
 
-export function InstitutionsGrid() {
+export function InstitutionsGrid({
+  onSelectInstitution,
+}: {
+  onSelectInstitution?: (institution: Institution) => void
+}) {
   return (
     <section id="institutions" className="bg-white py-16 sm:py-20 lg:py-24">
       <Container>
@@ -25,69 +28,55 @@ export function InstitutionsGrid() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {institutions.map((institution) => (
             <article
               key={institution.id}
-              className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1"
+              className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-5 shadow-xs transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1"
             >
-              {/* Image Banner */}
-              <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 shrink-0">
-                <Image
+              {/* Logo Stage */}
+              <a
+                href={institution.website || "https://www.fisheries.gov.lk"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative h-32 w-full overflow-hidden rounded-2xl bg-white border border-slate-100 p-3 flex items-center justify-center shadow-xs transition-colors group-hover:border-emerald-200 block shrink-0"
+              >
+                <img
                   src={institution.image}
                   alt={institution.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-full object-contain p-1 transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
 
-                <div className="absolute left-4 top-4 flex items-center gap-2">
-                  <span className="rounded-md bg-white/90 px-2.5 py-1 text-[11px] font-extrabold text-slate-900 shadow-xs backdrop-blur-sm">
-                    {institution.type}
-                  </span>
-                  {institution.shortTitle && (
-                    <span className="rounded-md bg-emerald-500/90 px-2 py-1 text-[11px] font-mono font-bold text-white shadow-xs backdrop-blur-sm">
-                      {institution.shortTitle}
-                    </span>
-                  )}
-                </div>
-              </div>
+                <span className="absolute left-3 top-3 rounded-lg bg-[#256B29] text-white px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide shadow-xs">
+                  {institution.acronym || institution.shortTitle}
+                </span>
+              </a>
 
               {/* Content Body */}
-              <div className="p-6 flex flex-1 flex-col justify-between space-y-5">
+              <div className="mt-4 flex flex-1 flex-col justify-between space-y-4">
                 <div>
-                  <h3 className="text-lg font-extrabold leading-snug text-slate-900 group-hover:text-[#256B29] transition-colors line-clamp-2">
-                    {institution.title}
+                  <h3 className="text-base font-extrabold leading-snug text-slate-900 group-hover:text-[#256B29] transition-colors line-clamp-2">
+                    <a
+                      href={institution.website || "https://www.fisheries.gov.lk"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {institution.title}
+                    </a>
                   </h3>
 
-                  <p className="mt-2.5 text-xs text-slate-600 leading-relaxed text-justify line-clamp-3 font-normal">
+                  <p className="mt-2 text-xs text-slate-600 leading-relaxed text-justify line-clamp-3 font-normal">
                     {institution.description}
                   </p>
-
-                  <div className="mt-4 border-t border-slate-100 pt-4 space-y-2">
-                    <h4 className="text-[11px] font-extrabold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                      <Building2 className="h-3.5 w-3.5 text-[#256B29]" />
-                      <span>Key Responsibilities</span>
-                    </h4>
-
-                    <ul className="space-y-1.5">
-                      {institution.responsibilities.slice(0, 2).map((item) => (
-                        <li key={item} className="flex items-start gap-2 text-xs text-slate-600">
-                          <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
-                          <span className="line-clamp-1">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 </div>
 
                 {/* Direct Official Website Link */}
-                <div className="border-t border-slate-100 pt-4">
+                <div className="border-t border-slate-100 pt-3">
                   <a
                     href={institution.website || "https://www.fisheries.gov.lk"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-[40px] w-full items-center justify-center gap-2 rounded-xl bg-[#256B29] px-4 text-xs font-extrabold !text-white transition hover:bg-[#1b4d1d] shadow-2xs group/btn"
+                    className="inline-flex min-h-[38px] w-full items-center justify-center gap-2 rounded-xl bg-[#256B29] px-4 text-xs font-extrabold !text-white transition hover:bg-[#1b4d1d] shadow-2xs group/btn"
                   >
                     <span>Visit Official Website</span>
                     <ExternalLink className="h-3.5 w-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />

@@ -5,10 +5,14 @@ import {
   Info,
 } from "lucide-react"
 
-import { featuredInstitutions } from "@/data/institutions"
+import { Institution, featuredInstitutions } from "@/data/institutions"
 import { Container } from "@/components/ui/container"
 
-export function FeaturedInstitutions() {
+export function FeaturedInstitutions({
+  onSelectInstitution,
+}: {
+  onSelectInstitution?: (institution: Institution) => void
+}) {
   return (
     <section className="bg-slate-50/80 py-16 sm:py-20 lg:py-24 border-b border-slate-200/80">
       <Container>
