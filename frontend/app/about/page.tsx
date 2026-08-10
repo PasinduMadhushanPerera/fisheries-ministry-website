@@ -37,7 +37,7 @@ export default function AboutPage() {
           ]}
         />
 
-        <AboutHero />
+        {/* <AboutHero /> */}
         <MinistryOverview />
         <VisionMission />
         <MinistryObjectives />
