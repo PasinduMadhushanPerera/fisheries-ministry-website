@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Search } from "lucide-react"
+import { AlertCircle, Search } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
 import { siteConfig } from "@/config/site"
+import { ApiHeaderSetting } from "@/lib/api/header-footer"
 
 import { DesktopNavigation } from "./desktop-navigation"
 import { MobileNavigation } from "./mobile-navigation"
@@ -16,12 +17,21 @@ import { UtilityBar } from "./utility-bar"
 const COLLAPSE_SCROLL_POSITION = 140
 const EXPAND_SCROLL_POSITION = 40
 
-export function SiteHeader() {
+export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting }) {
   const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
 
   const scrolledRef = useRef(false)
   const animationFrameRef = useRef<number | null>(null)
+
+  const governmentName = initialHeader?.government_name || siteConfig.governmentName || "Government of Sri Lanka"
+  const ministryName = initialHeader?.ministry_name || "Ministry of Fisheries, Aquatic and Ocean Resources"
+  const tagline = initialHeader?.tagline || "Sustainable fisheries, aquatic resources and public services"
+  const logoUrl = initialHeader?.logo_url || "/images/government/logo.jpg"
+  const logoAlt = initialHeader?.logo_alt || "Emblem of the Government of Sri Lanka"
+  const searchPlaceholder = initialHeader?.search_placeholder || "Search this website"
+
+  const showEmergency = initialHeader?.enable_emergency_banner && initialHeader?.emergency_banner_text
 
   /*
    * Return to the top whenever the route changes.
@@ -96,6 +106,20 @@ export function SiteHeader() {
         Skip to main content
       </a>
 
+      {showEmergency && (
+        <div className="bg-amber-600 px-4 py-2 text-center text-xs font-bold text-white shadow-inner">
+          <Container className="flex items-center justify-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>{initialHeader.emergency_banner_text}</span>
+            {initialHeader.emergency_banner_link && (
+              <Link href={initialHeader.emergency_banner_link} className="underline hover:text-amber-100 ml-1">
+                Read Notice &rarr;
+              </Link>
+            )}
+          </Container>
+        </div>
+      )}
+
       <header
         id="site-header"
         className={`sticky top-0 z-[100] bg-white/95 backdrop-blur-md transition-shadow duration-300 ${
@@ -111,7 +135,7 @@ export function SiteHeader() {
               : "h-10 translate-y-0 opacity-100"
           }`}
         >
-          <UtilityBar />
+          <UtilityBar initialHeader={initialHeader} />
         </div>
 
         {/* Logo and search section */}
@@ -134,10 +158,11 @@ export function SiteHeader() {
                 }`}
               >
                 <Image
-                  src="/images/government/logo.jpg"
-                  alt="Emblem of the Government of Sri Lanka"
+                  src={logoUrl}
+                  alt={logoAlt}
                   width={64}
                   height={80}
+                  unoptimized={logoUrl.startsWith("http")}
                   priority
                   className="h-full w-auto object-contain"
                 />
@@ -151,7 +176,7 @@ export function SiteHeader() {
                       : "text-xs tracking-[0.12em] sm:text-sm"
                   }`}
                 >
-                  {siteConfig.governmentName}
+                  {governmentName}
                 </p>
 
                 <p
@@ -161,8 +186,7 @@ export function SiteHeader() {
                       : "text-base sm:text-xl lg:text-2xl"
                   }`}
                 >
-                  Ministry of Fisheries, Aquatic and Ocean
-                  Resources
+                  {ministryName}
                 </p>
 
                 <p
@@ -172,8 +196,7 @@ export function SiteHeader() {
                       : "max-h-6 opacity-100"
                   } hidden sm:block`}
                 >
-                  Sustainable fisheries, aquatic resources and
-                  public services
+                  {tagline}
                 </p>
               </div>
             </Link>
@@ -198,7 +221,7 @@ export function SiteHeader() {
                   type="search"
                   maxLength={100}
                   autoComplete="off"
-                  placeholder="Search this website"
+                  placeholder={searchPlaceholder}
                   className="min-h-12 min-w-0 flex-1 border-0 px-4 text-base text-slate-950 outline-none placeholder:text-slate-500"
                 />
 
@@ -230,7 +253,7 @@ export function SiteHeader() {
           </Container>
         </div>
 
-        {/* Primary navigation bar (Light Black / Dark Charcoal Background) */}
+        {/* Primary navigation bar (Dark Charcoal Background) */}
         <nav
           aria-label="Primary navigation"
           className="relative z-[105] border-b border-slate-800 bg-[#150c39] text-white shadow-md"

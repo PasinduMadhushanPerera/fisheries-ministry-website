@@ -13,6 +13,7 @@ import {
 } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
+import { ApiServicesSection } from "@/lib/api/home"
 
 type ServiceCardItem = {
   id: string
@@ -26,7 +27,7 @@ type ServiceCardItem = {
   fallbackIcon: React.ElementType
 }
 
-const serviceCards: ServiceCardItem[] = [
+const defaultServiceCards: ServiceCardItem[] = [
   {
     id: "local-training",
     title: "Local Fisheries Training",
@@ -77,7 +78,28 @@ const serviceCards: ServiceCardItem[] = [
   },
 ]
 
-export function PopularServices() {
+export function PopularServices({ initialSection }: { initialSection?: ApiServicesSection }) {
+  const badgeText = initialSection?.badge_text || "Ministry Portals"
+  const sectionTitle = initialSection?.section_title || "Services and Opportunities"
+  const sectionDescription =
+    initialSection?.section_description ||
+    "Explore local training programmes, foreign technical exchange, procurement notices, career recruitment, and key public opportunities provided by the Ministry of Fisheries."
+
+  const serviceCards: ServiceCardItem[] =
+    initialSection?.cards && initialSection.cards.length > 0
+      ? initialSection.cards.map((c) => ({
+          id: String(c.id),
+          title: c.title,
+          category: c.category,
+          description: c.description,
+          btnText: c.button_text || "Explore Portal",
+          href: c.url,
+          image: c.image_url || "/images/services/local-training.jpg",
+          alt: c.image_alt || c.title,
+          fallbackIcon: GraduationCap,
+        }))
+      : defaultServiceCards
+
   return (
     <section
       id="popular-services"
@@ -89,17 +111,17 @@ export function PopularServices() {
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wider text-[#256B29] flex items-center gap-1.5 mb-1">
               <Sparkles className="h-4 w-4 text-[#256B29]" />
-              <span>Ministry Portals</span>
+              <span>{badgeText}</span>
             </p>
             <h2
               id="popular-services-heading"
               className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
             >
-              Services and Opportunities
+              {sectionTitle}
             </h2>
           </div>
           <p className="max-w-xl text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
-            Explore local training programmes, foreign technical exchange, procurement notices, career recruitment, and key public opportunities provided by the Ministry of Fisheries.
+            {sectionDescription}
           </p>
         </div>
 
@@ -129,6 +151,7 @@ function ServiceCardItemComponent({ card }: { card: ServiceCardItem }) {
             src={card.image}
             alt={card.alt}
             fill
+            unoptimized={card.image.startsWith("http")}
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
             className="object-cover transition-transform duration-500 group-hover:scale-105"
             onError={() => setImageError(true)}

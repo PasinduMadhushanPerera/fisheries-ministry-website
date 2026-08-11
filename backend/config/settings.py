@@ -73,6 +73,11 @@ INSTALLED_APPS = [
     "notices",
     "news",
     "about",
+    "header_footer",
+    "home_page",
+    "pages",
+    "navigation",
+    "core_content",
 ]
 
 
@@ -93,8 +98,8 @@ ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        "BACKEND": ("django.template.backends.django." "DjangoTemplates"),
-        "DIRS": [],
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

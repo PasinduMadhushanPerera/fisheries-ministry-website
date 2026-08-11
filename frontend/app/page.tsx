@@ -7,38 +7,49 @@ import { QuickAccess } from "@/components/home/quick-access"
 import { QuickInformation } from "@/components/home/quick-information"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
+import { fetchHeaderFooterData } from "@/lib/api/header-footer"
+import { fetchHomePageData } from "@/lib/api/home"
 
-export default function HomePage() {
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
+export default async function HomePage() {
+  const [homeData, headerFooterData] = await Promise.all([
+    fetchHomePageData(),
+    fetchHeaderFooterData(),
+  ])
+
   return (
     <>
-      <SiteHeader />
+      {/* Global Header */}
+      <SiteHeader initialHeader={headerFooterData?.header} />
 
       <main
         id="main-content"
         tabIndex={-1}
         className="outline-none"
       >
-        {/* 1. Hero */}
-        <HomeHero />
+        {/* 1. Hero Carousel */}
+        <HomeHero initialSlides={homeData?.hero_slides} />
 
-        {/* 2. Quick Access */}
-        <QuickAccess />
+        {/* 2. Quick Access Bar */}
+        <QuickAccess initialItems={homeData?.quick_access} />
 
-        {/* 3. Latest News */}
-        <LatestNews />
+        {/* 3. Media centre : Latest News */}
+        <LatestNews initialSection={homeData?.news_section} />
 
-        {/* 4. Services and Opportunities */}
-        <PopularServices />
+        {/* 4. Ministry Portals : Services and Opportunities */}
+        <PopularServices initialSection={homeData?.services_section} />
 
-        {/* 5. Quick Information & Public Services */}
-        <QuickInformation />
+        {/* 5. Public Portals & Services : Quick Information & Public Services */}
+        <QuickInformation initialSection={homeData?.quick_info_section} />
 
-        {/* 6. Government Network */}
-        <InstitutionsSection />
+        {/* 6. Government Network : Ministry institutions and service organisations */}
+        <InstitutionsSection initialSection={homeData?.institutions_section} />
       </main>
 
-      {/* 7. Footer */}
-      <SiteFooter />
+      {/* Global Footer */}
+      <SiteFooter initialFooter={headerFooterData?.footer} />
     </>
   )
 }

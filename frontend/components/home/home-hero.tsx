@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Waves } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
+import { ApiHeroSlide } from "@/lib/api/home"
 
 const AUTO_PLAY_INTERVAL = 8000
 
@@ -19,7 +20,7 @@ type HeroSlide = {
   imagePosition?: string
 }
 
-const heroSlides: HeroSlide[] = [
+const defaultHeroSlides: HeroSlide[] = [
   {
     id: 1,
     eyebrow: "Official Government Website",
@@ -70,7 +71,21 @@ const heroSlides: HeroSlide[] = [
   },
 ]
 
-export function HomeHero() {
+export function HomeHero({ initialSlides }: { initialSlides?: ApiHeroSlide[] }) {
+  const heroSlides: HeroSlide[] =
+    initialSlides && initialSlides.length > 0
+      ? initialSlides.map((s) => ({
+          id: s.id,
+          eyebrow: s.eyebrow,
+          title: s.title,
+          highlightedTitle: s.highlighted_title,
+          description: s.description,
+          image: s.image_url || "/images/home/hero-fishing-harbour.jpg",
+          imageAlt: s.image_alt || "Ministry of Fisheries Hero Banner",
+          imagePosition: "center",
+        }))
+      : defaultHeroSlides
+
   const [activeSlide, setActiveSlide] = useState(0)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
@@ -99,16 +114,16 @@ export function HomeHero() {
 
     const intervalId = window.setInterval(() => {
       setActiveSlide((currentSlide) =>
-        currentSlide === heroSlides.length - 1 ? 0 : currentSlide + 1,
+        currentSlide >= heroSlides.length - 1 ? 0 : currentSlide + 1,
       )
     }, AUTO_PLAY_INTERVAL)
 
     return () => {
       window.clearInterval(intervalId)
     }
-  }, [prefersReducedMotion])
+  }, [prefersReducedMotion, heroSlides.length])
 
-  const currentSlide = heroSlides[activeSlide]
+  const currentSlide = heroSlides[activeSlide] || heroSlides[0]
 
   return (
     <>
@@ -134,6 +149,7 @@ export function HomeHero() {
                   src={slide.image}
                   alt={isActive ? slide.imageAlt : ""}
                   fill
+                  unoptimized={slide.image.startsWith("http")}
                   priority={index === 0}
                   sizes="100vw"
                   style={{
