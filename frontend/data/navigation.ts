@@ -15,7 +15,7 @@ export const mainNavigation: NavigationItem[] = [
     children: [
       {
         label: "Overview",
-        href: "/about/overview",
+        href: "/about",
       },
       {
         label: "Hon. Minister",
@@ -41,7 +41,7 @@ export const mainNavigation: NavigationItem[] = [
   },
   {
     label: "Opportunities & Portals",
-    href: "/#popular-services",
+    href: "/local-training",
     children: [
       {
         label: "Local Fisheries Training",
@@ -63,7 +63,7 @@ export const mainNavigation: NavigationItem[] = [
   },
   {
     label: "Media Centre",
-    href: "/media-centre",
+    href: "/media-centre/news",
     children: [
       {
         label: "News",
@@ -93,7 +93,7 @@ export const mainNavigation: NavigationItem[] = [
   },
   {
     label: "Statistics",
-    href: "/statistics",
+    href: "/statistics/at-a-glance",
     children: [
       {
         label: "Fisheries at a Glance",

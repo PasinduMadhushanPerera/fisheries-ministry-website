@@ -39,23 +39,43 @@ export function DesktopNavigation() {
     }
   }, [])
 
-  function isActive(href: string) {
+  /**
+   * Checks if a specific child/leaf link is active.
+   * Special case: '/about' or '/about/overview' is ONLY active when the user
+   * is on '/about' or '/about/overview' — NOT on sibling subpages like '/about/secretary' or '/about/divisions'.
+   */
+  function isChildActive(href: string) {
     if (href === "/") {
       return pathname === "/"
+    }
+
+    if (href === "/about" || href === "/about/overview") {
+      return pathname === "/about" || pathname === "/about/overview"
     }
 
     return pathname === href || pathname.startsWith(`${href}/`)
   }
 
+  /**
+   * Checks if a parent category is active (either the parent URL matches or any child is active).
+   */
   function isParentActive(
     href: string,
     children?: { href: string }[],
   ) {
-    if (isActive(href)) {
-      return true
+    if (href === "/") {
+      return pathname === "/"
     }
 
-    return children?.some((child) => isActive(child.href)) ?? false
+    if (children && children.length > 0) {
+      return (
+        children.some((child) => isChildActive(child.href)) ||
+        pathname === href ||
+        pathname.startsWith(`${href}/`)
+      )
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`)
   }
 
   function toggleMenu(label: string) {
@@ -75,7 +95,7 @@ export function DesktopNavigation() {
           const hasChildren =
             item.children && item.children.length > 0
 
-          const active = isParentActive(
+          const parentActive = isParentActive(
             item.href,
             item.children,
           )
@@ -105,7 +125,7 @@ export function DesktopNavigation() {
                 <div
                   className={cn(
                     "relative flex min-h-11 items-center rounded-lg transition-colors cursor-pointer",
-                    active
+                    parentActive
                       ? "bg-[#256B29] text-white font-bold"
                       : "text-slate-200 hover:bg-white/10 hover:text-white",
                   )}
@@ -113,7 +133,7 @@ export function DesktopNavigation() {
                   <Link
                     href={item.href}
                     aria-current={
-                      isActive(item.href) ? "page" : undefined
+                      isChildActive(item.href) ? "page" : undefined
                     }
                     onClick={() => setOpenMenu(null)}
                     className="inline-flex min-h-11 items-center rounded-l-lg px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 xl:px-4"
@@ -140,7 +160,7 @@ export function DesktopNavigation() {
                     />
                   </button>
 
-                  {active && (
+                  {parentActive && (
                     <span
                       aria-hidden="true"
                       className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-green-300"
@@ -150,18 +170,18 @@ export function DesktopNavigation() {
               ) : (
                 <Link
                   href={item.href}
-                  aria-current={active ? "page" : undefined}
+                  aria-current={parentActive ? "page" : undefined}
                   onClick={() => setOpenMenu(null)}
                   className={cn(
                     "relative inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 xl:px-4",
-                    active
+                    parentActive
                       ? "bg-[#256B29] text-white font-bold"
                       : "text-slate-200 hover:bg-white/10 hover:text-white",
                   )}
                 >
                   {item.label}
 
-                  {active && (
+                  {parentActive && (
                     <span
                       aria-hidden="true"
                       className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-green-300"
@@ -183,7 +203,7 @@ export function DesktopNavigation() {
                   <div className="overflow-hidden rounded-2xl border border-slate-700 bg-[#121c22] p-2 shadow-2xl backdrop-blur-xl">
                     <ul className="space-y-1">
                       {item.children?.map((child) => {
-                        const childActive = isActive(child.href)
+                        const childActive = isChildActive(child.href)
 
                         return (
                           <li key={child.href}>

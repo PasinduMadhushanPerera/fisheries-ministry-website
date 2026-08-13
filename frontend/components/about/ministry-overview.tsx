@@ -6,16 +6,80 @@ import {
   Award,
   TrendingUp,
   ShieldCheck,
+  Fish,
+  HeartHandshake,
 } from "lucide-react"
 
-import {
-  ministryOverviewPoints,
-} from "@/data/about"
 import { LinkButton } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Section } from "@/components/ui/section"
+import { ApiAboutOverview } from "@/lib/api/about"
 
-export function MinistryOverview() {
+export function MinistryOverview({ initialOverview }: { initialOverview?: ApiAboutOverview }) {
+  const eyebrow = initialOverview?.eyebrow || "Ministry Overview"
+  const title = initialOverview?.title || "Serving the fisheries sector and the nation"
+  const description =
+    initialOverview?.description ||
+    "Fishing has a long tradition in Sri Lanka spanning over two thousand years. From traditional coastal livelihoods to a multibillion-rupee modern industry, the Ministry provides leadership, regulatory oversight, and sustainable development."
+  const legacyTitle = initialOverview?.legacy_title || "Historical Legacy & Sector Evolution"
+  const legacyContent =
+    initialOverview?.legacy_content ||
+    "Marine fishing has gradually developed from a traditional coastal livelihood activity to a multibillion-rupee industry since Sri Lanka obtained independence in 1948. Inland fishing and aquaculture are recent developments over the last 75 years, with coastal shrimp farming commencing in the 1980s and marine aquaculture expanding rapidly since 2010."
+  const economicTitle = initialOverview?.economic_title || "Economic Impact & Resource Base"
+  const economicContent =
+    initialOverview?.economic_content ||
+    "The sector contributes around 1.4% to the national Gross Domestic Product (GDP), providing direct and indirect employment to approximately 575,000 individuals (3.7% of the nation's workforce). Annual fish production exceeds 530,000 metric tons valued at over USD 1.3 Billion, with export earnings topping USD 250 Million annually."
+  const economicSubcontent =
+    initialOverview?.economic_subcontent ||
+    "Local production currently satisfies 65% of national fish consumption. The Ministry is committed to fulfilling 100% of national consumption from local fisheries and sustainable aquaculture while expanding export revenues."
+
+  const stat1Value = initialOverview?.stat_1_value || "517,000"
+  const stat1Label = initialOverview?.stat_1_label || "Sq km EEZ Zone"
+  const stat2Value = initialOverview?.stat_2_value || "575,000"
+  const stat2Label = initialOverview?.stat_2_label || "Active Workforce"
+  const stat3Value = initialOverview?.stat_3_value || "530,000"
+  const stat3Label = initialOverview?.stat_3_label || "MT Annual Yield"
+  const stat4Value = initialOverview?.stat_4_value || "$250M+"
+  const stat4Label = initialOverview?.stat_4_label || "Export Earnings"
+
+  const ctaButtonText = initialOverview?.cta_button_text || "Explore Ministry Institutions"
+  const ctaButtonUrl = initialOverview?.cta_button_url || "/institutions"
+
+  const pillarBadge = initialOverview?.pillar_mandate_badge || "Strategic Mandate"
+  const pillarTitle = initialOverview?.pillar_mandate_title || "Key Public Pillars"
+
+  const pillars = [
+    {
+      num: "01",
+      title: initialOverview?.pillar_1_title || "National fisheries development",
+      description:
+        initialOverview?.pillar_1_description ||
+        "Supporting the responsible development of fisheries, aquaculture and related economic activities.",
+      icon: Fish,
+    },
+    {
+      num: "02",
+      title: initialOverview?.pillar_2_title || "Community-focused public services",
+      description:
+        initialOverview?.pillar_2_description ||
+        "Improving access to information, services and institutional support for fisheries communities.",
+      icon: HeartHandshake,
+    },
+    {
+      num: "03",
+      title: initialOverview?.pillar_3_title || "Responsible resource management",
+      description:
+        initialOverview?.pillar_3_description ||
+        "Promoting the sustainable use, conservation and protection of aquatic and ocean resources.",
+      icon: ShieldCheck,
+    },
+  ]
+
+  const benefitTitle = initialOverview?.benefit_banner_title || "National Protein & Economic Security"
+  const benefitText =
+    initialOverview?.benefit_banner_text ||
+    "Ensuring sustainable marine conservation while supplying nutritious food to Sri Lanka."
+
   return (
     <Section
       id="ministry-overview"
@@ -27,16 +91,16 @@ export function MinistryOverview() {
       <div className="max-w-3xl mb-12">
         <p className="text-xs font-extrabold uppercase tracking-wider text-[#256B29] flex items-center gap-1.5 mb-1.5">
           <Sparkles className="h-4 w-4 text-[#256B29]" />
-          <span>Ministry Overview</span>
+          <span>{eyebrow}</span>
         </p>
         <h2
           id="ministry-overview-heading"
           className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
         >
-          Serving the fisheries sector and the nation
+          {title}
         </h2>
         <p className="mt-3 text-sm sm:text-base text-slate-600 leading-relaxed text-justify">
-          Fishing has a long tradition in Sri Lanka spanning over two thousand years. From traditional coastal livelihoods to a multibillion-rupee modern industry, the Ministry provides leadership, regulatory oversight, and sustainable development.
+          {description}
         </p>
       </div>
 
@@ -47,53 +111,53 @@ export function MinistryOverview() {
           <div className="rounded-3xl border border-slate-200/80 bg-slate-50/50 p-6 sm:p-8 space-y-4 shadow-xs">
             <h3 className="text-lg font-extrabold text-slate-950 flex items-center gap-2">
               <Anchor className="h-5 w-5 text-[#256B29]" />
-              <span>Historical Legacy & Sector Evolution</span>
+              <span>{legacyTitle}</span>
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
-              Marine fishing has gradually developed from a traditional coastal livelihood activity to a multibillion-rupee industry since Sri Lanka obtained independence in 1948. Inland fishing and aquaculture are recent developments over the last 75 years, with coastal shrimp farming commencing in the 1980s and marine aquaculture expanding rapidly since 2010.
+              {legacyContent}
             </p>
           </div>
 
           <div className="rounded-3xl border border-slate-200/80 bg-white p-6 sm:p-8 space-y-4 shadow-xs">
             <h3 className="text-lg font-extrabold text-slate-950 flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-[#256B29]" />
-              <span>Economic Impact & Resource Base</span>
+              <span>{economicTitle}</span>
             </h3>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
-              The sector contributes around 1.4% to the national Gross Domestic Product (GDP), providing direct and indirect employment to approximately 575,000 individuals (3.7% of the nation&apos;s workforce). Annual fish production exceeds 530,000 metric tons valued at over USD 1.3 Billion, with export earnings topping USD 250 Million annually.
+              {economicContent}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed text-justify">
-              Local production currently satisfies 65% of national fish consumption. The Ministry is committed to fulfilling 100% of national consumption from local fisheries and sustainable aquaculture while expanding export revenues.
+              {economicSubcontent}
             </p>
           </div>
 
           {/* QUICK STATS STRIP */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
             <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3.5 text-center">
-              <p className="text-lg font-extrabold text-[#256B29]">517,000</p>
-              <p className="text-[11px] font-bold text-slate-600">Sq km EEZ Zone</p>
+              <p className="text-lg font-extrabold text-[#256B29]">{stat1Value}</p>
+              <p className="text-[11px] font-bold text-slate-600">{stat1Label}</p>
             </div>
             <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3.5 text-center">
-              <p className="text-lg font-extrabold text-[#256B29]">575,000</p>
-              <p className="text-[11px] font-bold text-slate-600">Active Workforce</p>
+              <p className="text-lg font-extrabold text-[#256B29]">{stat2Value}</p>
+              <p className="text-[11px] font-bold text-slate-600">{stat2Label}</p>
             </div>
             <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3.5 text-center">
-              <p className="text-lg font-extrabold text-[#256B29]">530,000</p>
-              <p className="text-[11px] font-bold text-slate-600">MT Annual Yield</p>
+              <p className="text-lg font-extrabold text-[#256B29]">{stat3Value}</p>
+              <p className="text-[11px] font-bold text-slate-600">{stat3Label}</p>
             </div>
             <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-3.5 text-center">
-              <p className="text-lg font-extrabold text-[#256B29]">$250M+</p>
-              <p className="text-[11px] font-bold text-slate-600">Export Earnings</p>
+              <p className="text-lg font-extrabold text-[#256B29]">{stat4Value}</p>
+              <p className="text-[11px] font-bold text-slate-600">{stat4Label}</p>
             </div>
           </div>
 
           <div className="pt-2">
             <LinkButton
-              href="/institutions"
+              href={ctaButtonUrl}
               variant="outline"
               className="border-slate-300 bg-white hover:border-[#256B29] hover:bg-emerald-50 text-xs font-extrabold"
             >
-              <span>Explore Ministry Institutions</span>
+              <span>{ctaButtonText}</span>
               <ArrowRight aria-hidden="true" className="h-4 w-4" />
             </LinkButton>
           </div>
@@ -105,14 +169,14 @@ export function MinistryOverview() {
             <div className="rounded-2xl bg-emerald-950 p-4 text-white flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-400">
-                  Strategic Mandate
+                  {pillarBadge}
                 </p>
-                <p className="text-sm font-extrabold">Key Public Pillars</p>
+                <p className="text-sm font-extrabold">{pillarTitle}</p>
               </div>
               <Award className="h-6 w-6 text-amber-400" />
             </div>
 
-            {ministryOverviewPoints.map((item, index) => {
+            {pillars.map((item) => {
               const Icon = item.icon
 
               return (
@@ -137,7 +201,7 @@ export function MinistryOverview() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-mono font-extrabold text-[#256B29]">
-                          0{index + 1}
+                          {item.num}
                         </span>
                         <CheckCircle2
                           aria-hidden="true"
@@ -165,9 +229,9 @@ export function MinistryOverview() {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <p className="text-xs font-extrabold text-slate-900">National Protein & Economic Security</p>
+              <p className="text-xs font-extrabold text-slate-900">{benefitTitle}</p>
               <p className="text-[11px] text-slate-600 leading-snug">
-                Ensuring sustainable marine conservation while supplying nutritious food to Sri Lanka.
+                {benefitText}
               </p>
             </div>
           </div>

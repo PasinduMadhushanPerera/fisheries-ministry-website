@@ -1,4 +1,5 @@
 import {
+  Download,
   ExternalLink,
   GitBranch,
   ZoomIn,
@@ -7,11 +8,24 @@ import Image from "next/image"
 
 import { Section } from "@/components/ui/section"
 import { SectionTitle } from "@/components/ui/section-title"
+import { ApiStructure } from "@/lib/api/about"
 
-const organizationalStructureImage =
-  "/images/about/organizational-structure.jpg"
+const fallbackImage = "/images/about/organizational-structure.jpg"
 
-export function OrganizationalStructure() {
+export function OrganizationalStructure({ initialStructure }: { initialStructure?: ApiStructure }) {
+  const eyebrow = initialStructure?.eyebrow || "Administration"
+  const title = initialStructure?.title || "Organizational structure"
+  const description =
+    initialStructure?.description ||
+    "View the official administrative and institutional structure of the Ministry."
+  const boxTitle = initialStructure?.chart_box_title || "Ministry organizational chart"
+  const boxSubtitle = initialStructure?.chart_box_subtitle || "Official administrative reporting structure"
+  const chartImage = initialStructure?.chart_image_url || fallbackImage
+  const chartPdf = initialStructure?.chart_pdf_url
+  const notes =
+    initialStructure?.executive_notes ||
+    "On smaller screens, scroll horizontally to examine the complete organizational chart or select 'View full size'."
+
   return (
     <Section
       id="organizational-structure"
@@ -21,9 +35,9 @@ export function OrganizationalStructure() {
     >
       <SectionTitle
         id="organizational-structure-heading"
-        eyebrow="Administration"
-        title="Organizational structure"
-        description="View the official administrative and institutional structure of the Ministry."
+        eyebrow={eyebrow}
+        title={title}
+        description={description}
         align="center"
       />
 
@@ -39,41 +53,51 @@ export function OrganizationalStructure() {
 
             <div>
               <h3 className="font-bold text-slate-950">
-                Ministry organizational chart
+                {boxTitle}
               </h3>
 
               <p className="mt-1 text-sm text-slate-600">
-                Official administrative reporting structure
+                {boxSubtitle}
               </p>
             </div>
           </div>
 
-          <a
-            href={organizationalStructureImage}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-800 transition hover:border-green-600 hover:text-[#256B29] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
-          >
-            <ZoomIn
-              aria-hidden="true"
-              className="h-4 w-4"
-            />
-            View full size
-            <ExternalLink
-              aria-hidden="true"
-              className="h-4 w-4"
-            />
+          <div className="flex items-center gap-3">
+            {chartPdf && (
+              <a
+                href={chartPdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#256B29] px-4 text-sm font-bold text-white transition hover:bg-[#1b4d1d]"
+              >
+                <Download aria-hidden="true" className="h-4 w-4" />
+                <span>Download PDF</span>
+              </a>
+            )}
 
-            <span className="visually-hidden">
-              opens organizational chart image in a new tab
-            </span>
-          </a>
+            <a
+              href={chartImage}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-800 transition hover:border-green-600 hover:text-[#256B29] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+            >
+              <ZoomIn
+                aria-hidden="true"
+                className="h-4 w-4"
+              />
+              <span>View full size</span>
+              <ExternalLink
+                aria-hidden="true"
+                className="h-4 w-4"
+              />
+            </a>
+          </div>
         </div>
 
         <div className="overflow-x-auto p-4 sm:p-7">
           <div className="relative mx-auto min-w-[700px] overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <Image
-              src={organizationalStructureImage}
+              src={chartImage}
               alt="Official organizational structure chart of the Ministry of Fisheries, Aquatic and Ocean Resources"
               width={1600}
               height={1100}
@@ -86,9 +110,7 @@ export function OrganizationalStructure() {
 
         <div className="border-t border-slate-200 bg-slate-50 px-5 py-4 sm:px-7">
           <p className="text-sm leading-6 text-slate-600">
-            On smaller screens, scroll horizontally to examine
-            the complete organizational chart or select
-            “View full size.”
+            {notes}
           </p>
         </div>
       </div>

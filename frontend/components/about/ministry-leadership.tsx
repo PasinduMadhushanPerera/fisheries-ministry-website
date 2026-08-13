@@ -9,8 +9,33 @@ import { leadershipRoles } from "@/data/about"
 import { Card } from "@/components/ui/card"
 import { Section } from "@/components/ui/section"
 import { SectionTitle } from "@/components/ui/section-title"
+import { ApiLeader, ApiSectionHeader } from "@/lib/api/about"
 
-export function MinistryLeadership() {
+export function MinistryLeadership({
+  initialHeader,
+  initialLeaders,
+}: {
+  initialHeader?: ApiSectionHeader
+  initialLeaders?: ApiLeader[]
+}) {
+  const eyebrow = initialHeader?.eyebrow || "Leadership"
+  const title = initialHeader?.title || "Ministry leadership"
+  const description =
+    initialHeader?.description ||
+    "Executive leadership of the Ministry of Fisheries, Aquatic and Ocean Resources."
+
+  const leaders =
+    initialLeaders && initialLeaders.length > 0
+      ? initialLeaders.map((l) => ({
+          role: l.role_title,
+          title: l.name,
+          ministry: l.ministry_badge,
+          description: l.short_description,
+          image: l.photo_url,
+          href: l.page_url,
+        }))
+      : leadershipRoles
+
   return (
     <Section
       id="ministry-leadership"
@@ -20,14 +45,14 @@ export function MinistryLeadership() {
     >
       <SectionTitle
         id="leadership-heading"
-        eyebrow="Leadership"
-        title="Ministry leadership"
-        description="Executive leadership of the Ministry of Fisheries, Aquatic and Ocean Resources."
+        eyebrow={eyebrow}
+        title={title}
+        description={description}
       />
 
       <div className="mt-12 grid gap-6 lg:grid-cols-3 items-stretch">
-        {leadershipRoles.map((leader) => (
-          <LeadershipCardComponent key={leader.role} leader={leader} />
+        {leaders.map((leader) => (
+          <LeadershipCardComponent key={leader.role + leader.title} leader={leader} />
         ))}
       </div>
     </Section>
@@ -37,7 +62,14 @@ export function MinistryLeadership() {
 function LeadershipCardComponent({
   leader,
 }: {
-  leader: (typeof leadershipRoles)[0]
+  leader: {
+    role: string
+    title: string
+    ministry: string
+    description: string
+    image: string
+    href: string
+  }
 }) {
   const [imageError, setImageError] = useState(false)
 

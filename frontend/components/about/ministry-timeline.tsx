@@ -1,16 +1,37 @@
 import {
-  ArrowRight,
   CalendarDays,
   CheckCircle2,
 } from "lucide-react"
 
-import { timeline } from "@/data/about"
-import { LinkButton } from "@/components/ui/button"
+import { timeline as defaultTimeline } from "@/data/about"
 import { Section } from "@/components/ui/section"
 import { SectionTitle } from "@/components/ui/section-title"
 import { cn } from "@/lib/utils"
+import { ApiSectionHeader, ApiTimelineEvent } from "@/lib/api/about"
 
-export function MinistryTimeline() {
+export function MinistryTimeline({
+  initialHeader,
+  initialTimeline,
+}: {
+  initialHeader?: ApiSectionHeader
+  initialTimeline?: ApiTimelineEvent[]
+}) {
+  const eyebrow = initialHeader?.eyebrow || "Our journey"
+  const title = initialHeader?.title || "Ministry history and development"
+  const description =
+    initialHeader?.description ||
+    "Key historical milestones shaping Sri Lanka's fisheries and ocean resources management."
+
+  const items =
+    initialTimeline && initialTimeline.length > 0
+      ? initialTimeline.map((t) => ({
+          period: t.year,
+          title: t.title,
+          description: t.description,
+          status: t.status_badge || "Official Milestone",
+        }))
+      : defaultTimeline
+
   return (
     <Section
       id="ministry-history"
@@ -20,9 +41,9 @@ export function MinistryTimeline() {
     >
       <SectionTitle
         id="ministry-history-heading"
-        eyebrow="Our journey"
-        title="Ministry history and development"
-        description="This timeline is prepared for officially verified historical milestones. Replace the draft content only after confirmation by the Ministry."
+        eyebrow={eyebrow}
+        title={title}
+        description={description}
         align="center"
       />
 
@@ -33,7 +54,7 @@ export function MinistryTimeline() {
         />
 
         <ol className="space-y-10 md:space-y-14">
-          {timeline.map((item, index) => {
+          {items.map((item, index) => {
             const isEven = index % 2 === 0
 
             return (
@@ -127,30 +148,6 @@ export function MinistryTimeline() {
             )
           })}
         </ol>
-      </div>
-
-      <div className="mt-12 rounded-3xl border border-amber-200 bg-amber-50 p-6 sm:p-7">
-        {/* <p className="font-bold text-amber-950">
-          Historical-content review required
-        </p> */}
-
-        {/* <p className="mt-2 max-w-4xl text-sm leading-6 text-amber-900">
-          Dates, previous Ministry names, legal changes and institutional
-          milestones must be checked against authorised government records
-          before this website is published.
-        </p> */}
-
-        {/* <LinkButton
-          href="/documents"
-          variant="outline"
-          className="mt-5 border-amber-300 bg-white text-amber-950 hover:bg-amber-100"
-        >
-          View official documents
-          <ArrowRight
-            aria-hidden="true"
-            className="h-4 w-4"
-          />
-        </LinkButton> */}
       </div>
     </Section>
   )
