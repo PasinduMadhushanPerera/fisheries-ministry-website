@@ -7,6 +7,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  Suspense,
   type ReactNode,
 } from "react"
 import {
@@ -73,7 +74,7 @@ type LanguageProviderProps = {
   children: ReactNode
 }
 
-export function LanguageProvider({
+function LanguageProviderContent({
   children,
 }: LanguageProviderProps) {
   const router = useRouter()
@@ -190,6 +191,18 @@ export function LanguageProvider({
     <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
+  )
+}
+
+export function LanguageProvider({
+  children,
+}: LanguageProviderProps) {
+  return (
+    <Suspense fallback={<>{children}</>}>
+      <LanguageProviderContent>
+        {children}
+      </LanguageProviderContent>
+    </Suspense>
   )
 }
 

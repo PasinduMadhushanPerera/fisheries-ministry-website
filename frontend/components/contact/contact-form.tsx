@@ -1,206 +1,180 @@
 "use client"
 
 import { useState } from "react"
-import { CheckCircle2, Loader2, Send } from "lucide-react"
+import { Send, CheckCircle2, Info, MessageSquare } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
 
 export function ContactForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    telephone: "",
+    subject: "General Inquiry",
+    message: "",
+  })
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    setIsSubmitting(true)
-
-    // Replace with backend API later
-    await new Promise((resolve) => setTimeout(resolve, 1200))
-
-    setIsSubmitting(false)
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
     setSubmitted(true)
-
-    event.currentTarget.reset()
+    setTimeout(() => {
+      setSubmitted(false)
+      setFormData({
+        fullName: "",
+        email: "",
+        telephone: "",
+        subject: "General Inquiry",
+        message: "",
+      })
+    }, 4000)
   }
 
   return (
-    <section
-      id="contact-form"
-      aria-labelledby="contact-form-heading"
-      className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24"
-    >
+    <section id="contact-form" className="py-12 sm:py-16 bg-slate-50 border-b border-slate-200" aria-label="Submit Public Inquiry">
       <Container>
-        <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-          {/* Left */}
-          <div>
-            <span className="inline-flex rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-[#256B29]">
-              Send an Inquiry
-            </span>
-
-            <h2
-              id="contact-form-heading"
-              className="mt-6 text-4xl font-bold tracking-tight text-slate-950"
-            >
-              We&apos;d Love to Hear From You
-            </h2>
-
-            <p className="mt-6 text-lg leading-8 text-slate-600">
-              Complete the form below to send your inquiry to the Ministry.
-              Once the backend is connected, messages will be delivered directly
-              to the appropriate department.
-            </p>
-
-            <div className="mt-10 rounded-[2rem] border border-emerald-100 bg-emerald-50 p-6">
-              <h3 className="text-lg font-bold text-slate-900">
-                Before You Submit
-              </h3>
-
-              <ul className="mt-4 space-y-3 text-slate-600">
-                <li>• Provide your full name.</li>
-                <li>• Use a valid email address.</li>
-                <li>• Select the appropriate subject.</li>
-                <li>• Clearly describe your inquiry.</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Form */}
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-            {submitted ? (
-              <div className="flex min-h-[420px] flex-col items-center justify-center text-center">
-                <CheckCircle2 className="h-20 w-20 text-green-600" />
-
-                <h3 className="mt-6 text-3xl font-bold text-slate-900">
-                  Message Sent
-                </h3>
-
-                <p className="mt-4 max-w-md leading-8 text-slate-600">
-                  Thank you for contacting the Ministry. This demo will later
-                  connect to the Django backend and email service.
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 lg:p-10 shadow-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+            {/* Left Column: Guidance Box */}
+            <div className="lg:col-span-5 space-y-6">
+              <div>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-[#256B29] border border-emerald-200">
+                  <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span>Public Inquiry Form</span>
+                </span>
+                <h2 className="mt-3 text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  Send an Inquiry
+                </h2>
+                <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                  Submit your question, feedback or public inquiry directly to the Ministry staff. All inquiries are assigned to relevant department officers.
                 </p>
-
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="mt-8 rounded-xl bg-[#256B29] px-6 py-3 font-semibold text-white transition hover:bg-[#1d5320]"
-                >
-                  Send Another Message
-                </button>
               </div>
-            ) : (
-              <form
-                onSubmit={handleSubmit}
-                className="space-y-6"
-              >
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="mb-2 block text-sm font-semibold text-slate-700"
-                    >
-                      Full Name
-                    </label>
 
-                    <input
-                      id="name"
-                      type="text"
-                      required
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#256B29]"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="mb-2 block text-sm font-semibold text-slate-700"
-                    >
-                      Email Address
-                    </label>
-
-                    <input
-                      id="email"
-                      type="email"
-                      required
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#256B29]"
-                    />
-                  </div>
+              {/* Green Guidance Box */}
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-5 space-y-3">
+                <div className="flex items-center gap-2 text-[#256B29] font-bold text-sm">
+                  <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>Before you submit</span>
                 </div>
+                <ul className="space-y-2 text-xs text-slate-700 font-medium list-disc pl-5 leading-relaxed">
+                  <li>Use your full official name as registered on identification</li>
+                  <li>Provide a valid email address for official response delivery</li>
+                  <li>Choose the correct subject division for faster processing</li>
+                  <li>Explain your inquiry clearly with relevant registration numbers</li>
+                </ul>
+              </div>
+            </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
+            {/* Right Column: Form */}
+            <div className="lg:col-span-7">
+              {submitted ? (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-8 text-center space-y-3">
+                  <CheckCircle2 className="h-12 w-12 text-[#388E3C] mx-auto" aria-hidden="true" />
+                  <h3 className="text-xl font-bold text-slate-900">Inquiry Submitted Successfully</h3>
+                  <p className="text-xs text-slate-600 max-w-md mx-auto">
+                    Thank you for reaching out. Your inquiry has been logged and forwarded to the designated division officer.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Full Name */}
+                    <div>
+                      <label htmlFor="fullName" className="block text-xs font-bold text-slate-700 mb-1">
+                        Full Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="fullName"
+                        required
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        placeholder="e.g. K. A. Perera"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#388E3C] focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Email Address */}
+                    <div>
+                      <label htmlFor="email" className="block text-xs font-bold text-slate-700 mb-1">
+                        Email Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        required
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="name@example.com"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#388E3C] focus:bg-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Telephone */}
+                    <div>
+                      <label htmlFor="telephone" className="block text-xs font-bold text-slate-700 mb-1">
+                        Telephone Number
+                      </label>
+                      <input
+                        type="tel"
+                        id="telephone"
+                        value={formData.telephone}
+                        onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
+                        placeholder="+94 77 123 4567"
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#388E3C] focus:bg-white focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Subject Dropdown */}
+                    <div>
+                      <label htmlFor="subject" className="block text-xs font-bold text-slate-700 mb-1">
+                        Subject Division <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="subject"
+                        value={formData.subject}
+                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                        className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-2.5 text-sm text-slate-900 transition focus:border-[#388E3C] focus:bg-white focus:outline-none cursor-pointer"
+                      >
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Fishing Licensing">Fishing Licensing (DFAR)</option>
+                        <option value="Aquaculture Permits">Aquaculture Permits (NAQDA)</option>
+                        <option value="Harbor & Infrastructure">Harbor & Infrastructure</option>
+                        <option value="Right to Information">Right to Information (RTI)</option>
+                        <option value="Media & Press">Media & Press Relations</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Message */}
                   <div>
-                    <label
-                      htmlFor="phone"
-                      className="mb-2 block text-sm font-semibold text-slate-700"
-                    >
-                      Telephone
+                    <label htmlFor="message" className="block text-xs font-bold text-slate-700 mb-1">
+                      Inquiry Message <span className="text-red-500">*</span>
                     </label>
-
-                    <input
-                      id="phone"
-                      type="tel"
-                      className="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#256B29]"
+                    <textarea
+                      id="message"
+                      rows={4}
+                      required
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder="Explain your inquiry or request clearly..."
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#388E3C] focus:bg-white focus:outline-none"
                     />
                   </div>
 
-                  <div>
-                    <label
-                      htmlFor="subject"
-                      className="mb-2 block text-sm font-semibold text-slate-700"
-                    >
-                      Subject
-                    </label>
-
-                    <select
-                      id="subject"
-                      required
-                      className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-[#256B29]"
-                    >
-                      <option value="">Select a subject</option>
-                      <option>General Inquiry</option>
-                      <option>Public Service</option>
-                      <option>Licensing</option>
-                      <option>Technical Assistance</option>
-                      <option>Complaints</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="mb-2 block text-sm font-semibold text-slate-700"
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    className="inline-flex min-h-[44px] w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-6 py-3 font-bold text-white transition hover:bg-[#256B29] cursor-pointer"
                   >
-                    Message
-                  </label>
-
-                  <textarea
-                    id="message"
-                    rows={7}
-                    required
-                    placeholder="Write your message..."
-                    className="w-full resize-none rounded-xl border border-slate-300 px-4 py-3 outline-none transition focus:border-[#256B29]"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#256B29] px-6 py-4 font-semibold text-white transition hover:bg-[#1d5320] disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-5 w-5" />
-                      Send Message
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
+                    <Send className="h-4 w-4" aria-hidden="true" />
+                    <span>Submit Inquiry</span>
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
       </Container>

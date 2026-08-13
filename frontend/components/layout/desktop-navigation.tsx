@@ -34,31 +34,48 @@ export function DesktopNavigation() {
     document.addEventListener("keydown", handleEscape)
 
     return () => {
-      document.removeEventListener(
-        "pointerdown",
-        handlePointerDown,
-      )
+      document.removeEventListener("pointerdown", handlePointerDown)
       document.removeEventListener("keydown", handleEscape)
     }
   }, [])
 
-  function isActive(href: string) {
+  /**
+   * Checks if a specific child/leaf link is active.
+   * Special case: '/about' or '/about/overview' is ONLY active when the user
+   * is on '/about' or '/about/overview' — NOT on sibling subpages like '/about/secretary' or '/about/divisions'.
+   */
+  function isChildActive(href: string) {
     if (href === "/") {
       return pathname === "/"
+    }
+
+    if (href === "/about" || href === "/about/overview") {
+      return pathname === "/about" || pathname === "/about/overview"
     }
 
     return pathname === href || pathname.startsWith(`${href}/`)
   }
 
+  /**
+   * Checks if a parent category is active (either the parent URL matches or any child is active).
+   */
   function isParentActive(
     href: string,
     children?: { href: string }[],
   ) {
-    if (isActive(href)) {
-      return true
+    if (href === "/") {
+      return pathname === "/"
     }
 
-    return children?.some((child) => isActive(child.href)) ?? false
+    if (children && children.length > 0) {
+      return (
+        children.some((child) => isChildActive(child.href)) ||
+        pathname === href ||
+        pathname.startsWith(`${href}/`)
+      )
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`)
   }
 
   function toggleMenu(label: string) {
@@ -71,14 +88,14 @@ export function DesktopNavigation() {
     <nav
       ref={navigationRef}
       aria-label="Main navigation"
-      className="hidden lg:block"
+      className="hidden lg:block w-full overflow-visible"
     >
-      <ul className="flex flex-wrap items-center gap-1">
+      <ul className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
         {mainNavigation.map((item) => {
           const hasChildren =
             item.children && item.children.length > 0
 
-          const active = isParentActive(
+          const parentActive = isParentActive(
             item.href,
             item.children,
           )
@@ -92,7 +109,7 @@ export function DesktopNavigation() {
           return (
             <li
               key={item.href}
-              className="relative"
+              className="relative group/nav"
               onMouseEnter={() => {
                 if (hasChildren) {
                   setOpenMenu(item.label)
@@ -107,19 +124,19 @@ export function DesktopNavigation() {
               {hasChildren ? (
                 <div
                   className={cn(
-                    "relative flex min-h-12 items-center rounded-md transition-colors",
-                    active
-                      ? "bg-green-50 text-[#256B29]"
-                      : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",
+                    "relative flex min-h-11 items-center rounded-lg transition-colors cursor-pointer",
+                    parentActive
+                      ? "bg-[#256B29] text-white font-bold"
+                      : "text-slate-200 hover:bg-white/10 hover:text-white",
                   )}
                 >
                   <Link
                     href={item.href}
                     aria-current={
-                      isActive(item.href) ? "page" : undefined
+                      isChildActive(item.href) ? "page" : undefined
                     }
                     onClick={() => setOpenMenu(null)}
-                    className="inline-flex min-h-12 items-center rounded-l-md px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 xl:px-4"
+                    className="inline-flex min-h-11 items-center rounded-l-lg px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 xl:px-4"
                   >
                     {item.label}
                   </Link>
@@ -132,7 +149,7 @@ export function DesktopNavigation() {
                     aria-expanded={expanded}
                     aria-controls={submenuId}
                     onClick={() => toggleMenu(item.label)}
-                    className="inline-flex min-h-12 min-w-10 items-center justify-center rounded-r-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+                    className="inline-flex min-h-11 min-w-8 items-center justify-center rounded-r-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 text-slate-300 hover:text-white cursor-pointer"
                   >
                     <ChevronDown
                       aria-hidden="true"
@@ -143,31 +160,31 @@ export function DesktopNavigation() {
                     />
                   </button>
 
-                  {active && (
+                  {parentActive && (
                     <span
                       aria-hidden="true"
-                      className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[#388E3C]"
+                      className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-green-300"
                     />
                   )}
                 </div>
               ) : (
                 <Link
                   href={item.href}
-                  aria-current={active ? "page" : undefined}
+                  aria-current={parentActive ? "page" : undefined}
                   onClick={() => setOpenMenu(null)}
                   className={cn(
-                    "relative inline-flex min-h-12 items-center rounded-md px-3 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 xl:px-4",
-                    active
-                      ? "bg-green-50 text-[#256B29]"
-                      : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",
+                    "relative inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 xl:px-4",
+                    parentActive
+                      ? "bg-[#256B29] text-white font-bold"
+                      : "text-slate-200 hover:bg-white/10 hover:text-white",
                   )}
                 >
                   {item.label}
 
-                  {active && (
+                  {parentActive && (
                     <span
                       aria-hidden="true"
-                      className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-[#388E3C]"
+                      className="absolute inset-x-3 bottom-0 h-0.5 rounded-full bg-green-300"
                     />
                   )}
                 </Link>
@@ -177,16 +194,16 @@ export function DesktopNavigation() {
                 <div
                   id={submenuId}
                   className={cn(
-                    "absolute left-0 top-full z-[60] w-72 pt-2 transition-all duration-200",
+                    "absolute left-1/2 -translate-x-1/2 top-full z-[9999] w-72 pt-1 transition-all duration-200 before:absolute before:inset-x-0 before:-top-3 before:h-3",
                     expanded
-                      ? "visible translate-y-0 opacity-100"
-                      : "invisible translate-y-2 opacity-0",
+                      ? "visible translate-y-0 opacity-100 pointer-events-auto"
+                      : "invisible translate-y-2 opacity-0 pointer-events-none",
                   )}
                 >
-                  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
-                    <ul>
+                  <div className="overflow-hidden rounded-2xl border border-slate-700 bg-[#121c22] p-2 shadow-2xl backdrop-blur-xl">
+                    <ul className="space-y-1">
                       {item.children?.map((child) => {
-                        const childActive = isActive(child.href)
+                        const childActive = isChildActive(child.href)
 
                         return (
                           <li key={child.href}>
@@ -197,10 +214,10 @@ export function DesktopNavigation() {
                               }
                               onClick={() => setOpenMenu(null)}
                               className={cn(
-                                "flex min-h-11 items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200",
+                                "flex min-h-10 items-center rounded-xl px-4 py-2.5 text-xs sm:text-sm font-normal transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400",
                                 childActive
-                                  ? "bg-green-50 text-[#256B29]"
-                                  : "text-slate-700 hover:bg-slate-50 hover:text-[#256B29]",
+                                  ? "bg-[#256B29] text-white font-semibold"
+                                  : "text-slate-200 hover:bg-white/10 hover:text-emerald-300",
                               )}
                             >
                               {child.label}

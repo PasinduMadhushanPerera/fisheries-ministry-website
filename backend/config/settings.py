@@ -3,7 +3,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
@@ -13,9 +12,7 @@ def get_required_env(name: str) -> str:
     value = os.getenv(name)
 
     if not value:
-        raise RuntimeError(
-            f"Required environment variable '{name}' is missing."
-        )
+        raise RuntimeError(f"Required environment variable '{name}' is missing.")
 
     return value
 
@@ -43,11 +40,7 @@ def get_list_env(
 ) -> list[str]:
     value = os.getenv(name, default)
 
-    return [
-        item.strip()
-        for item in value.split(",")
-        if item.strip()
-    ]
+    return [item.strip() for item in value.split(",") if item.strip()]
 
 
 SECRET_KEY = get_required_env("DJANGO_SECRET_KEY")
@@ -60,7 +53,6 @@ DEBUG = get_boolean_env(
 ALLOWED_HOSTS = get_list_env(
     "DJANGO_ALLOWED_HOSTS",
     "127.0.0.1,localhost",
-    
 )
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
@@ -75,23 +67,28 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "corsheaders",
     "rest_framework",
-
     "common",
     "notices",
     "news",
     "about",
-    
+    "minister_profile",
+    "deputy_minister_profile",
+    "secretary_profile",
+    "divisions_page",
+    "organization_structure",
+    "header_footer",
+    "home_page",
+    "pages",
+    "navigation",
+    "core_content",
 ]
 
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-
     "corsheaders.middleware.CorsMiddleware",
-
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -106,26 +103,14 @@ ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
     {
-        "BACKEND": (
-            "django.template.backends.django."
-            "DjangoTemplates"
-        ),
-        "DIRS": [],
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
-                (
-                    "django.template.context_processors."
-                    "request"
-                ),
-                (
-                    "django.contrib.auth."
-                    "context_processors.auth"
-                ),
-                (
-                    "django.contrib.messages."
-                    "context_processors.messages"
-                ),
+                ("django.template.context_processors." "request"),
+                ("django.contrib.auth." "context_processors.auth"),
+                ("django.contrib.messages." "context_processors.messages"),
             ],
         },
     },
@@ -137,9 +122,30 @@ WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql",
+#         "NAME": get_required_env("DB_NAME"),
+#         "USER": get_required_env("DB_USER"),
+#         "PASSWORD": get_required_env("DB_PASSWORD"),
+#         "HOST": os.getenv(
+#             "DB_HOST",
+#             "127.0.0.1",
+#         ),
+#         "PORT": os.getenv(
+#             "DB_PORT",
+#             "5432",
+#         ),
+#         "CONN_MAX_AGE": 60,
+#         "OPTIONS": {
+#             "connect_timeout": 10,
+#         },
+#     },
+# }
+
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
+        "ENGINE": "django.db.backends.mysql",
         "NAME": get_required_env("DB_NAME"),
         "USER": get_required_env("DB_USER"),
         "PASSWORD": get_required_env("DB_PASSWORD"),
@@ -149,11 +155,12 @@ DATABASES = {
         ),
         "PORT": os.getenv(
             "DB_PORT",
-            "5432",
+            "3306",
         ),
         "CONN_MAX_AGE": 60,
         "OPTIONS": {
-            "connect_timeout": 10,
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            "charset": "utf8mb4",
         },
     },
 }
@@ -167,25 +174,16 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "MinimumLengthValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "MinimumLengthValidator"),
         "OPTIONS": {
             "min_length": 12,
         },
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "CommonPasswordValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "CommonPasswordValidator"),
     },
     {
-        "NAME": (
-            "django.contrib.auth.password_validation."
-            "NumericPasswordValidator"
-        ),
+        "NAME": ("django.contrib.auth.password_validation." "NumericPasswordValidator"),
     },
 ]
 
@@ -227,34 +225,19 @@ CORS_ALLOW_CREDENTIALS = True
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        (
-            "rest_framework.permissions."
-            "IsAuthenticatedOrReadOnly"
-        ),
+        ("rest_framework.permissions." "IsAuthenticatedOrReadOnly"),
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        (
-            "rest_framework.authentication."
-            "SessionAuthentication"
-        ),
+        ("rest_framework.authentication." "SessionAuthentication"),
     ],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
-    "DEFAULT_PAGINATION_CLASS": (
-        "rest_framework.pagination."
-        "PageNumberPagination"
-    ),
+    "DEFAULT_PAGINATION_CLASS": ("rest_framework.pagination." "PageNumberPagination"),
     "PAGE_SIZE": 10,
     "DEFAULT_THROTTLE_CLASSES": [
-        (
-            "rest_framework.throttling."
-            "AnonRateThrottle"
-        ),
-        (
-            "rest_framework.throttling."
-            "UserRateThrottle"
-        ),
+        ("rest_framework.throttling." "AnonRateThrottle"),
+        ("rest_framework.throttling." "UserRateThrottle"),
     ],
     "DEFAULT_THROTTLE_RATES": {
         "anon": "120/minute",

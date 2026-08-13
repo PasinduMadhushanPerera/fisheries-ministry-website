@@ -2,8 +2,19 @@ import { ArrowRight, PhoneCall } from "lucide-react"
 import Link from "next/link"
 
 import { Section } from "@/components/ui/section"
+import { ApiCTA } from "@/lib/api/about"
 
-export function AboutCTA() {
+export function AboutCTA({ initialCTA }: { initialCTA?: ApiCTA }) {
+  const badge = initialCTA?.badge || "Continue Your Journey"
+  const title = initialCTA?.title || "Discover services, information and opportunities"
+  const description =
+    initialCTA?.description ||
+    "Explore digital services, fisheries information, institutional resources, publications and official announcements from the Ministry of Fisheries, Aquatic and Ocean Resources."
+  const button1Text = initialCTA?.button_1_text || "Explore Downloads Centre"
+  const button1Url = initialCTA?.button_1_url || "/downloads"
+  const button2Text = initialCTA?.button_2_text || "Contact the Ministry"
+  const button2Url = initialCTA?.button_2_url || "/contact"
+
   return (
     <Section
       id="about-cta"
@@ -24,26 +35,23 @@ export function AboutCTA() {
 
         <div className="relative mx-auto max-w-4xl text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-green-100">
-            Continue Your Journey
+            {badge}
           </p>
 
           <h2 className="mt-5 text-4xl font-bold leading-tight sm:text-5xl">
-            Discover services, information and opportunities
+            {title}
           </h2>
 
           <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-green-50">
-            Explore digital services, fisheries information, institutional
-            resources, publications and official announcements from the
-            Ministry of Fisheries, Aquatic and Ocean Resources.
+            {description}
           </p>
 
           <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
             <Link
-              href="/services"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-black px-7 py-4 font-semibold text-[#256B29] transition hover:scale-105 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+              href={button1Url}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 font-extrabold text-[#256B29] transition hover:scale-105 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40 shadow-md"
             >
-              Explore Services
-
+              <span>{button1Text}</span>
               <ArrowRight
                 className="h-5 w-5"
                 aria-hidden="true"
@@ -51,11 +59,10 @@ export function AboutCTA() {
             </Link>
 
             <Link
-              href="/contact"
+              href={button2Url}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-7 py-4 font-semibold text-white backdrop-blur transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
             >
-              Contact the Ministry
-
+              <span>{button2Text}</span>
               <PhoneCall
                 className="h-5 w-5"
                 aria-hidden="true"

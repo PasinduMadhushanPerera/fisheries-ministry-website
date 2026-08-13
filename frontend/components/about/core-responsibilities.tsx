@@ -21,10 +21,10 @@ export function CoreResponsibilities() {
         description="The Ministry provides leadership and coordination across policy, administration, sustainability, community development and institutional services."
         actions={
           <LinkButton
-            href="/services"
+            href="/downloads"
             variant="outline"
           >
-            Explore public services
+            Explore Downloads Portal
             <ArrowRight
               aria-hidden="true"
               className="h-4 w-4"

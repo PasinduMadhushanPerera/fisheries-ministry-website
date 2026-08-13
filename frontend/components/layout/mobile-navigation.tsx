@@ -117,9 +117,13 @@ export function MobileNavigation() {
     )
   }
 
-  function isActive(href: string) {
+  function isChildActive(href: string) {
     if (href === "/") {
       return pathname === "/"
+    }
+
+    if (href === "/about" || href === "/about/overview") {
+      return pathname === "/about" || pathname === "/about/overview"
     }
 
     return pathname === href || pathname.startsWith(`${href}/`)
@@ -129,11 +133,19 @@ export function MobileNavigation() {
     href: string,
     children?: { href: string }[],
   ) {
-    if (isActive(href)) {
-      return true
+    if (href === "/") {
+      return pathname === "/"
     }
 
-    return children?.some((child) => isActive(child.href)) ?? false
+    if (children && children.length > 0) {
+      return (
+        children.some((child) => isChildActive(child.href)) ||
+        pathname === href ||
+        pathname.startsWith(`${href}/`)
+      )
+    }
+
+    return pathname === href || pathname.startsWith(`${href}/`)
   }
 
   const mobileMenu =
@@ -257,7 +269,7 @@ export function MobileNavigation() {
                                 <Link
                                   href={item.href}
                                   aria-current={
-                                    isActive(item.href)
+                                    isChildActive(item.href)
                                       ? "page"
                                       : undefined
                                   }
@@ -303,7 +315,7 @@ export function MobileNavigation() {
                                     className="mt-1 space-y-1 border-l-2 border-emerald-100 pl-4"
                                   >
                                     {item.children?.map((child) => {
-                                      const childActive = isActive(
+                                      const childActive = isChildActive(
                                         child.href,
                                       )
 
@@ -320,9 +332,9 @@ export function MobileNavigation() {
                                               setIsOpen(false)
                                             }
                                             className={cn(
-                                              "flex min-h-11 items-center justify-between gap-3 rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+                                              "flex min-h-11 items-center justify-between gap-3 rounded-lg px-4 py-2 text-sm font-normal transition-colors",
                                               childActive
-                                                ? "bg-green-50 text-[#256B29]"
+                                                ? "bg-green-50 text-[#256B29] font-semibold"
                                                 : "text-slate-700 hover:bg-slate-50 hover:text-slate-950",
                                             )}
                                           >

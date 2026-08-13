@@ -1,7 +1,8 @@
 export interface Institution {
   id: string
   title: string
-  shortTitle?: string
+  shortTitle: string
+  acronym: string
   type:
     | "Department"
     | "Authority"
@@ -14,134 +15,204 @@ export interface Institution {
   responsibilities: string[]
   image: string
   href: string
-  website?: string
+  website: string
+  isExternal: boolean
   featured?: boolean
+  established?: string
+  actOrMandate?: string
+  location?: string
+  contactPhone?: string
+  contactEmail?: string
+  detailedOverview?: string[]
+  coreDivisions?: string[]
 }
 
-export const featuredInstitutions: Institution[] = [
+export const institutions: Institution[] = [
   {
-    id: "institution-1",
-    title: "National Aquatic Resources Research and Development Agency",
+    id: "dfar",
+    title: "Department of Fisheries & Aquatic Resources",
+    shortTitle: "Department of Fisheries",
+    acronym: "DFAR",
+    type: "Department",
+    description:
+      "Responsible for fisheries management, vessel registration, licensing, and marine enforcement across Sri Lanka.",
+    responsibilities: [
+      "Fisheries administration & law enforcement",
+      "Fishing vessel registration & seaworthiness licensing",
+      "Monitoring, Control & Surveillance (MCS) operations",
+      "Fisher welfare, insurance & safety protocol delivery",
+    ],
+    image: "/images/institutions/dfar.jpg",
+    href: "https://fisheriesdept.gov.lk/",
+    website: "https://fisheriesdept.gov.lk/",
+    isExternal: true,
+    featured: true,
+    established: "1941",
+    actOrMandate: "Fisheries & Aquatic Resources Act No. 2 of 1996",
+    location: "New Secretariat, Maligawatta, Colombo 10, Sri Lanka",
+    contactPhone: "+94 112 449 175",
+    contactEmail: "info@fisheriesdept.gov.lk",
+  },
+  {
+    id: "nara",
+    title: "National Aquatic Resources Research Agency",
     shortTitle: "NARA",
+    acronym: "NARA",
     type: "Research Institute",
     description:
-      "Supports research, scientific studies and technical development related to aquatic resources, fisheries and marine environments.",
+      "Conducts scientific research in oceanography, marine biology, fisheries management, and aquatic environment.",
     responsibilities: [
-      "Aquatic resources research",
-      "Marine scientific studies",
-      "Technical advisory services",
+      "Aquatic resources research & marine biodiversity surveys",
+      "Oceanographic studies & hydrographic survey mapping",
+      "Technical advisory services for sustainable fisheries",
+      "Post-harvest technology & fish quality assessment",
     ],
-    image: "/images/institutions/institution-1.jpg",
-    href: "/institutions/nara",
+    image: "/images/institutions/nara.jpg",
+    href: "http://www.nara.ac.lk/",
+    website: "http://www.nara.ac.lk/",
+    isExternal: true,
     featured: true,
+    established: "1981",
+    actOrMandate: "NARA Act No. 54 of 1981",
+    location: "Crow Island, Mattakkuliya, Colombo 15, Sri Lanka",
+    contactPhone: "+94 112 521 000",
+    contactEmail: "info@nara.ac.lk",
   },
   {
-    id: "institution-2",
+    id: "naqda",
     title: "National Aquaculture Development Authority",
     shortTitle: "NAQDA",
+    acronym: "NAQDA",
     type: "Authority",
     description:
-      "Supports the development of aquaculture and inland fisheries through technical assistance, training and sector-development programmes.",
+      "Drives sustainable inland fisheries, commercial shrimp farming, seed production, and freshwater aquaculture.",
     responsibilities: [
-      "Aquaculture development",
-      "Inland fisheries support",
-      "Training and technical assistance",
+      "Aquaculture development & extension services",
+      "Freshwater & brackishwater fingerling production",
+      "Technical assistance for shrimp and ornamental fish farming",
+      "Commercial aquaculture licensing & cluster support",
     ],
-    image: "/images/institutions/institution-2.jpg",
-    href: "/institutions/naqda",
+    image: "/images/institutions/naqda.jpg",
+    href: "https://naqda.gov.lk/",
+    website: "https://naqda.gov.lk/",
+    isExternal: true,
     featured: true,
+    established: "1998",
+    actOrMandate: "NAQDA Act No. 5 of 1998",
+    location: "No. 41/1, New Parliament Road, Pelawatte, Battaramulla, Sri Lanka",
+    contactPhone: "+94 112 786 497",
+    contactEmail: "info@naqda.gov.lk",
   },
   {
-    id: "institution-3",
-    title: "Ceylon Fisheries Corporation",
-    shortTitle: "CFC",
+    id: "cfhc",
+    title: "Ceylon Fishery Harbours Corporation",
+    shortTitle: "CFHC",
+    acronym: "CFHC",
     type: "Corporation",
     description:
-      "Supports fisheries-sector services and market-related activities connected with fish distribution and public access.",
+      "Constructs, manages, and operates fishery harbours, anchorage facilities, and maritime safety infrastructure.",
     responsibilities: [
-      "Fisheries-related services",
-      "Distribution support",
-      "Public-sector market operations",
+      "Fishery-harbour management & maritime maintenance",
+      "Harbour infrastructure development & dredging",
+      "Slipway, fuel bunkering & vessel repair services",
+      "Coastal harbour security & anchorage coordination",
     ],
-    image: "/images/institutions/institution-3.jpg",
-    href: "/institutions/cfc",
+    image: "/images/institutions/cfhc.jpg",
+    href: "https://cfhc.gov.lk/",
+    website: "https://cfhc.gov.lk/",
+    isExternal: true,
     featured: true,
+    established: "1972",
+    actOrMandate: "State Industrial Corporations Act No. 49 of 1957",
+    location: "No. 15, Rock House Lane, Colombo 15, Sri Lanka",
+    contactPhone: "+94 112 529 361",
+    contactEmail: "info@cfhc.gov.lk",
+  },
+  {
+    id: "cfc",
+    title: "Ceylon Fisheries Corporation",
+    shortTitle: "CFC",
+    acronym: "CFC",
+    type: "Corporation",
+    description:
+      "Manages commercial fish purchasing, cold storage facilities, fish processing, and islandwide public distribution.",
+    responsibilities: [
+      "Islandwide fresh fish purchasing & cold chain distribution",
+      "Public-sector market operations & price stabilization",
+      "Ice production & cold storage facility management",
+    ],
+    image: "/images/institutions/cfc.jpg",
+    href: "https://cfc.gov.lk/",
+    website: "https://cfc.gov.lk/",
+    isExternal: true,
+    featured: true,
+    established: "1964",
+    location: "No. 118, Rockhouse Lane, Colombo 15, Sri Lanka",
+    contactPhone: "+94 112 523 000",
+    contactEmail: "info@cfc.gov.lk",
+  },
+  {
+    id: "cnfl",
+    title: "CEY-NOR FOUNDATION LTD",
+    shortTitle: "CEY-NOR",
+    acronym: "CNFL",
+    type: "Corporation",
+    description:
+      "Specializes in fiberglass boat manufacturing, marine vessel construction, and modern fishing gear technology.",
+    responsibilities: [
+      "Fiberglass multiday vessel & boat manufacturing",
+      "Marine engine installation & hull repairs",
+      "Modern fishing gear & maritime technology supply",
+    ],
+    image: "/images/institutions/cnfl.jpg",
+    href: "https://www.ceynor.gov.lk/",
+    website: "https://www.ceynor.gov.lk/",
+    isExternal: true,
+    established: "1967",
+    location: "No. 335, D.R. Wijewardena Mawatha, Colombo 10, Sri Lanka",
+    contactPhone: "+94 112 448 040",
+    contactEmail: "info@ceynor.gov.lk",
+  },
+  {
+    id: "nsl",
+    title: "North Sea Ltd",
+    shortTitle: "North Sea",
+    acronym: "NSL",
+    type: "Corporation",
+    description:
+      "Operates state-of-the-art fishing net manufacturing plants supplying high-quality netting products to local fishers.",
+    responsibilities: [
+      "High-strength fishing net manufacturing & supply",
+      "Fiberglass vessel construction & repair",
+      "Community-service delivery for coastal fishers",
+    ],
+    image: "/images/institutions/nsl.jpg",
+    href: "https://northsea.lk/",
+    website: "https://northsea.lk/",
+    isExternal: true,
+    established: "2001",
+    location: "Gurunagar, Jaffna / Weerawila, Hambantota, Sri Lanka",
+    contactPhone: "+94 212 222 145",
+    contactEmail: "info@northsea.lk",
+  },
+  {
+    id: "other",
+    title: "Other Sector Organisations",
+    shortTitle: "Affiliates",
+    acronym: "OTHER",
+    type: "Other",
+    description:
+      "Explore statutory boards, provincial fisheries bodies, and partner institutions under Ministry jurisdiction.",
+    responsibilities: [
+      "Provincial fisheries extension offices",
+      "Co-operative societies & stakeholder bodies",
+      "Marine environment protection partners",
+    ],
+    image: "/images/institutions/other.jpg",
+    href: "/institutions",
+    website: "https://other.lk/",
+    isExternal: false,
   },
 ]
 
-export const institutions: Institution[] = [
-  ...featuredInstitutions,
-  {
-    id: "institution-4",
-    title: "Department of Fisheries and Aquatic Resources",
-    shortTitle: "DFAR",
-    type: "Department",
-    description:
-      "Supports fisheries administration, regulatory functions and services associated with the management of fisheries and aquatic resources.",
-    responsibilities: [
-      "Fisheries administration",
-      "Licensing and regulation",
-      "Resource-management support",
-    ],
-    image: "/images/institutions/institution-4.jpg",
-    href: "/institutions/dfar",
-  },
-  {
-    id: "institution-5",
-    title: "Ceylon Fishery Harbours Corporation",
-    shortTitle: "CFHC",
-    type: "Corporation",
-    description:
-      "Supports the management and development of fishery-harbour infrastructure and related facilities.",
-    responsibilities: [
-      "Fishery-harbour management",
-      "Infrastructure development",
-      "Harbour-service coordination",
-    ],
-    image: "/images/institutions/institution-5.jpg",
-    href: "/institutions/cfhc",
-  },
-  {
-    id: "institution-6",
-    title: "North Sea Limited",
-    type: "Corporation",
-    description:
-      "Provides fisheries-related products and services in support of fishing communities and sector activities.",
-    responsibilities: [
-      "Fisheries-related products",
-      "Industry support services",
-      "Community-service delivery",
-    ],
-    image: "/images/institutions/institution-6.jpg",
-    href: "/institutions/north-sea-limited",
-  },
-  {
-    id: "institution-7",
-    title: "Ocean University of Sri Lanka",
-    shortTitle: "OCUSL",
-    type: "Training Institute",
-    description:
-      "Supports education, professional training and skills development connected with ocean, fisheries and maritime sectors.",
-    responsibilities: [
-      "Higher education",
-      "Vocational training",
-      "Maritime and fisheries skills development",
-    ],
-    image: "/images/institutions/institution-7.jpg",
-    href: "/institutions/ocean-university",
-  },
-  {
-    id: "institution-8",
-    title: "Regional Fisheries Offices",
-    type: "Regional Office",
-    description:
-      "Provide regional-level services, coordination and public assistance for fisheries-sector stakeholders.",
-    responsibilities: [
-      "Regional service delivery",
-      "Stakeholder coordination",
-      "Public assistance",
-    ],
-    image: "/images/institutions/institution-8.jpg",
-    href: "/institutions/regional-offices",
-  },
-]
+export const featuredInstitutions = institutions.filter((inst) => inst.featured)

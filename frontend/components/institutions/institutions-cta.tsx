@@ -49,10 +49,10 @@ export function InstitutionsCTA() {
                 </Link>
 
                 <Link
-                  href="/services"
+                  href="/downloads"
                   className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 font-semibold text-white transition hover:bg-white/20"
                 >
-                  View Services
+                  View Downloads
                 </Link>
               </div>
             </div>

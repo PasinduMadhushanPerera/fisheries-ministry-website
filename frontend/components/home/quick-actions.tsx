@@ -53,7 +53,7 @@ export function QuickActions() {
 
             <h2
               id="quick-actions-heading"
-              className="mt-2 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl"
+              className="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl"
             >
               Find what you need faster
             </h2>

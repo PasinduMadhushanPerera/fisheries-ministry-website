@@ -95,10 +95,10 @@ export function FormsHero() {
               </Link>
 
               <Link
-                href="/services"
+                href="/downloads"
                 className="inline-flex min-h-12 items-center justify-center rounded-lg border border-white/30 bg-white/5 px-6 py-3 font-semibold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
               >
-                View services
+                View Downloads
               </Link>
             </div>
           </div>
