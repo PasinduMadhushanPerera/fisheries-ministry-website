@@ -5,14 +5,22 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronDown } from "lucide-react"
 
-import { mainNavigation } from "@/data/navigation"
+import { mainNavigation, NavigationItem } from "@/data/navigation"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 
 export function DesktopNavigation() {
   const pathname = usePathname()
+  const { language } = useLanguage()
 
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const navigationRef = useRef<HTMLElement>(null)
+
+  function getLabel(item: NavigationItem) {
+    if (language === "si" && item.label_si) return item.label_si
+    if (language === "ta" && item.label_ta) return item.label_ta
+    return item.label
+  }
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -39,11 +47,6 @@ export function DesktopNavigation() {
     }
   }, [])
 
-  /**
-   * Checks if a specific child/leaf link is active.
-   * Special case: '/about' or '/about/overview' is ONLY active when the user
-   * is on '/about' or '/about/overview' — NOT on sibling subpages like '/about/secretary' or '/about/divisions'.
-   */
   function isChildActive(href: string) {
     if (href === "/") {
       return pathname === "/"
@@ -56,9 +59,6 @@ export function DesktopNavigation() {
     return pathname === href || pathname.startsWith(`${href}/`)
   }
 
-  /**
-   * Checks if a parent category is active (either the parent URL matches or any child is active).
-   */
   function isParentActive(
     href: string,
     children?: { href: string }[],
@@ -100,6 +100,7 @@ export function DesktopNavigation() {
             item.children,
           )
 
+          const itemLabel = getLabel(item)
           const expanded = openMenu === item.label
 
           const submenuId = `desktop-submenu-${item.label
@@ -138,14 +139,14 @@ export function DesktopNavigation() {
                     onClick={() => setOpenMenu(null)}
                     className="inline-flex min-h-11 items-center rounded-l-lg px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-400 xl:px-4"
                   >
-                    {item.label}
+                    {itemLabel}
                   </Link>
 
                   <button
                     type="button"
                     aria-label={`${
                       expanded ? "Close" : "Open"
-                    } ${item.label} menu`}
+                    } ${itemLabel} menu`}
                     aria-expanded={expanded}
                     aria-controls={submenuId}
                     onClick={() => toggleMenu(item.label)}
@@ -179,7 +180,7 @@ export function DesktopNavigation() {
                       : "text-slate-200 hover:bg-white/10 hover:text-white",
                   )}
                 >
-                  {item.label}
+                  {itemLabel}
 
                   {parentActive && (
                     <span
@@ -204,6 +205,7 @@ export function DesktopNavigation() {
                     <ul className="space-y-1">
                       {item.children?.map((child) => {
                         const childActive = isChildActive(child.href)
+                        const childLabel = getLabel(child)
 
                         return (
                           <li key={child.href}>
@@ -220,7 +222,7 @@ export function DesktopNavigation() {
                                   : "text-slate-200 hover:bg-white/10 hover:text-emerald-300",
                               )}
                             >
-                              {child.label}
+                              {childLabel}
                             </Link>
                           </li>
                         )

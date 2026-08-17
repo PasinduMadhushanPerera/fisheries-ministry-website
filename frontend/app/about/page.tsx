@@ -14,6 +14,8 @@ import { AboutCTA } from "@/components/about/about-cta"
 import { fetchAboutPageData } from "@/lib/api/about"
 import { fetchHeaderFooterData } from "@/lib/api/header-footer"
 
+import { getServerLanguage } from "@/lib/get-server-language"
+
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
@@ -23,9 +25,15 @@ export const metadata: Metadata = {
     "Learn about the Ministry of Fisheries, Aquatic and Ocean Resources, its responsibilities, vision, mission and leadership.",
 }
 
-export default async function AboutPage() {
+interface AboutPageProps {
+  searchParams: Promise<{ lang?: string }>
+}
+
+export default async function AboutPage({ searchParams }: AboutPageProps) {
+  const lang = await getServerLanguage(searchParams)
+
   const [aboutData, headerFooterData] = await Promise.all([
-    fetchAboutPageData(),
+    fetchAboutPageData(lang),
     fetchHeaderFooterData(),
   ])
 

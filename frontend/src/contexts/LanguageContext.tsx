@@ -22,7 +22,7 @@ import {
   type LanguageCode,
 } from "@/src/locales/translations"
 
-const LANGUAGE_STORAGE_KEY = "fisheries-language"
+export const LANGUAGE_STORAGE_KEY = "fisheries-language"
 
 type TranslationDictionary =
   (typeof translations)[LanguageCode]
@@ -38,7 +38,7 @@ const LanguageContext =
   createContext<LanguageContextValue | null>(null)
 
 function isValidLanguage(
-  value: string | null,
+  value: string | null | undefined,
 ): value is LanguageCode {
   if (!value) {
     return false
@@ -74,6 +74,20 @@ type LanguageProviderProps = {
   children: ReactNode
 }
 
+function getCookieLanguage(): LanguageCode | null {
+  if (typeof document === "undefined") return null
+  const match = document.cookie.match(new RegExp(`(?:^|; )${LANGUAGE_STORAGE_KEY}=([^;]*)`))
+  if (match && isValidLanguage(match[1])) {
+    return match[1] as LanguageCode
+  }
+  return null
+}
+
+function setCookieLanguage(lang: LanguageCode) {
+  if (typeof document === "undefined") return
+  document.cookie = `${LANGUAGE_STORAGE_KEY}=${lang}; path=/; max-age=31536000; SameSite=Lax`
+}
+
 function LanguageProviderContent({
   children,
 }: LanguageProviderProps) {
@@ -87,8 +101,7 @@ function LanguageProviderContent({
   const urlLanguage = searchParams.get("lang")
 
   /*
-   * Load the language from the URL first.
-   * When the URL has no valid language, use localStorage.
+   * Initialize language from URL, localStorage, or Cookie.
    */
   useEffect(() => {
     let nextLanguage: LanguageCode = "en"
@@ -96,43 +109,57 @@ function LanguageProviderContent({
     if (isValidLanguage(urlLanguage)) {
       nextLanguage = urlLanguage
     } else {
-      const storedLanguage =
-        window.localStorage.getItem(
-          LANGUAGE_STORAGE_KEY,
-        )
-
+      const storedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
       if (isValidLanguage(storedLanguage)) {
         nextLanguage = storedLanguage
+      } else {
+        const cookieLang = getCookieLanguage()
+        if (cookieLang) {
+          nextLanguage = cookieLang
+        }
       }
     }
 
     setLanguageState(nextLanguage)
+    setCookieLanguage(nextLanguage)
+    document.documentElement.lang = nextLanguage
+    document.documentElement.dir = "ltr"
   }, [urlLanguage])
 
   /*
-   * Keep the document language and localStorage synchronized.
+   * Keep the document language, cookie, and localStorage synchronized whenever language state changes.
    */
   useEffect(() => {
     document.documentElement.lang = language
     document.documentElement.dir = "ltr"
+    setCookieLanguage(language)
 
-    window.localStorage.setItem(
-      LANGUAGE_STORAGE_KEY,
-      language,
-    )
+    try {
+      window.localStorage.setItem(
+        LANGUAGE_STORAGE_KEY,
+        language,
+      )
+    } catch {
+      // Ignore storage errors
+    }
   }, [language])
 
   /*
-   * Change the active language and update the URL.
+   * Change the active language, write to cookies & localStorage, and update the URL query.
    */
   const setLanguage = useCallback(
     (nextLanguage: LanguageCode) => {
       setLanguageState(nextLanguage)
+      setCookieLanguage(nextLanguage)
 
-      window.localStorage.setItem(
-        LANGUAGE_STORAGE_KEY,
-        nextLanguage,
-      )
+      try {
+        window.localStorage.setItem(
+          LANGUAGE_STORAGE_KEY,
+          nextLanguage,
+        )
+      } catch {
+        // Ignore storage errors
+      }
 
       document.documentElement.lang = nextLanguage
       document.documentElement.dir = "ltr"
@@ -153,23 +180,16 @@ function LanguageProviderContent({
           scroll: false,
         },
       )
+      router.refresh()
     },
     [pathname, router, searchParams],
   )
 
-  /*
-   * Get the complete translation dictionary for
-   * the currently selected language.
-   */
   const t = useMemo<TranslationDictionary>(
-    () => translations[language],
+    () => translations[language] || translations.en,
     [language],
   )
 
-  /*
-   * Retrieve a translation using a key such as:
-   * translate("header.searchPlaceholder")
-   */
   const translate = useCallback(
     (key: string) => {
       return getTranslationValue(t, key)
@@ -206,13 +226,16 @@ export function LanguageProvider({
   )
 }
 
-export function useLanguage() {
+export function useLanguage(): LanguageContextValue {
   const context = useContext(LanguageContext)
 
   if (!context) {
-    throw new Error(
-      "useLanguage must be used inside LanguageProvider",
-    )
+    return {
+      language: "en",
+      setLanguage: () => {},
+      t: translations.en,
+      translate: (key: string) => key,
+    }
   }
 
   return context

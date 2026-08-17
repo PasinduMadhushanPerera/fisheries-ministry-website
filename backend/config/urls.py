@@ -30,6 +30,10 @@ def custom_get_app_list(request, app_label=None):
         "secretary_profile",
         "divisions_page",
         "organization_structure",
+        "local_training",
+        "foreign_training",
+        "procurement_page",
+        "recruitment_page",
     }
     filtered = [app for app in app_list if app.get("app_label") in allowed_apps]
     
@@ -51,6 +55,14 @@ def custom_get_app_list(request, app_label=None):
             return 6
         if label == "organization_structure":
             return 7
+        if label == "local_training":
+            return 8
+        if label == "foreign_training":
+            return 9
+        if label == "procurement_page":
+            return 10
+        if label == "recruitment_page":
+            return 11
         return 99
 
     return sorted(filtered, key=app_order)
@@ -77,6 +89,10 @@ urlpatterns = [
     path("api/v1/secretary/", include("secretary_profile.urls")),
     path("api/v1/divisions/", include("divisions_page.urls")),
     path("api/v1/organization-structure/", include("organization_structure.urls")),
+    path("api/v1/local-training/", include("local_training.urls")),
+    path("api/v1/foreign-training/", include("foreign_training.urls")),
+    path("api/v1/procurement/", include("procurement_page.urls")),
+    path("api/v1/recruitment/", include("recruitment_page.urls")),
 ]
 
 if settings.DEBUG:

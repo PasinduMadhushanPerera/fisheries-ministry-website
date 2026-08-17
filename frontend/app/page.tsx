@@ -1,4 +1,3 @@
-import { DocumentsSection } from "@/components/home/documents-section"
 import { HomeHero } from "@/components/home/home-hero"
 import { InstitutionsSection } from "@/components/home/institutions-section"
 import { LatestNews } from "@/components/home/latest-news"
@@ -10,12 +9,20 @@ import { SiteHeader } from "@/components/layout/site-header"
 import { fetchHeaderFooterData } from "@/lib/api/header-footer"
 import { fetchHomePageData } from "@/lib/api/home"
 
+import { getServerLanguage } from "@/lib/get-server-language"
+
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
-export default async function HomePage() {
+interface HomePageProps {
+  searchParams: Promise<{ lang?: string }>
+}
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const lang = await getServerLanguage(searchParams)
+
   const [homeData, headerFooterData] = await Promise.all([
-    fetchHomePageData(),
+    fetchHomePageData(lang),
     fetchHeaderFooterData(),
   ])
 

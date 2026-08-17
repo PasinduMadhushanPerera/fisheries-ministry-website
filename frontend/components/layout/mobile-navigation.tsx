@@ -14,12 +14,20 @@ import {
   X,
 } from "lucide-react"
 
-import { mainNavigation } from "@/data/navigation"
+import { mainNavigation, NavigationItem } from "@/data/navigation"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 
 export function MobileNavigation() {
   const pathname = usePathname()
   const navigationId = useId()
+  const { language } = useLanguage()
+
+  function getLabel(item: NavigationItem) {
+    if (language === "si" && item.label_si) return item.label_si
+    if (language === "ta" && item.label_ta) return item.label_ta
+    return item.label
+  }
 
   // const [isMounted, setIsMounted] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
@@ -241,6 +249,7 @@ export function MobileNavigation() {
                       const hasChildren =
                         item.children && item.children.length > 0
 
+                      const itemLabel = getLabel(item)
                       const expanded = expandedItems.includes(
                         item.label,
                       )
@@ -276,14 +285,14 @@ export function MobileNavigation() {
                                   onClick={() => setIsOpen(false)}
                                   className="flex min-h-[52px] min-w-0 flex-1 items-center px-4 py-3 font-semibold"
                                 >
-                                  {item.label}
+                                  {itemLabel}
                                 </Link>
 
                                 <button
                                   type="button"
                                   aria-label={`${
                                     expanded ? "Collapse" : "Expand"
-                                  } ${item.label} menu`}
+                                  } ${itemLabel} menu`}
                                   aria-expanded={expanded}
                                   aria-controls={submenuId}
                                   onClick={() =>
@@ -318,6 +327,7 @@ export function MobileNavigation() {
                                       const childActive = isChildActive(
                                         child.href,
                                       )
+                                      const childLabel = getLabel(child)
 
                                       return (
                                         <li key={child.href}>
@@ -339,7 +349,7 @@ export function MobileNavigation() {
                                             )}
                                           >
                                             <span>
-                                              {child.label}
+                                              {childLabel}
                                             </span>
 
                                             <ChevronRight
@@ -362,18 +372,13 @@ export function MobileNavigation() {
                               }
                               onClick={() => setIsOpen(false)}
                               className={cn(
-                                "flex min-h-[52px] items-center justify-between gap-4 rounded-lg px-4 py-3 font-semibold transition-colors",
+                                "flex min-h-[52px] items-center rounded-lg px-4 py-3 font-semibold transition-colors",
                                 active
                                   ? "bg-green-50 text-[#256B29]"
                                   : "text-slate-800 hover:bg-slate-50",
                               )}
                             >
-                              <span>{item.label}</span>
-
-                              <ChevronRight
-                                aria-hidden="true"
-                                className="h-5 w-5 shrink-0"
-                              />
+                              {itemLabel}
                             </Link>
                           )}
                         </li>
