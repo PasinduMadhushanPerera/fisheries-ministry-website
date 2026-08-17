@@ -1,210 +1,146 @@
+from django import forms
 from django.contrib import admin
-from django.core.exceptions import ValidationError
-
-from .models import (
-    Notice,
-    NoticeAttachment,
-    NoticeCategory,
-    NoticeTranslation,
-)
+from .models import NoticePageHeader, NoticeItem
 
 
-@admin.register(NoticeCategory)
-class NoticeCategoryAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-        "is_active",
-        "created_at",
+class NoticePageHeaderAdminForm(forms.ModelForm):
+    class Meta:
+        model = NoticePageHeader
+        fields = "__all__"
+
+
+class NoticeItemAdminForm(forms.ModelForm):
+    class Meta:
+        model = NoticeItem
+        fields = "__all__"
+        widgets = {
+            "summary_en": forms.Textarea(attrs={"rows": 3}),
+            "summary_si": forms.Textarea(attrs={"rows": 3}),
+            "summary_ta": forms.Textarea(attrs={"rows": 3}),
+            "content_en": forms.Textarea(attrs={"rows": 6}),
+            "content_si": forms.Textarea(attrs={"rows": 6}),
+            "content_ta": forms.Textarea(attrs={"rows": 6}),
+        }
+
+
+@admin.register(NoticePageHeader)
+class NoticePageHeaderAdmin(admin.ModelAdmin):
+    form = NoticePageHeaderAdminForm
+    list_display = ["library_title_en", "catalogue_badge_en", "featured_badge_en", "updated_at"]
+    fieldsets = (
+        ("🇬🇧 English Section Badges & Titles", {
+            "fields": (
+                ("featured_badge_en", "catalogue_badge_en"),
+                "library_title_en",
+            ),
+        }),
+        ("🇱🇰 Sinhala Section Badges & Titles (සිංහල)", {
+            "fields": (
+                ("featured_badge_si", "catalogue_badge_si"),
+                "library_title_si",
+            ),
+        }),
+        ("🇱🇰 Tamil Section Badges & Titles (தமிழ்)", {
+            "fields": (
+                ("featured_badge_ta", "catalogue_badge_ta"),
+                "library_title_ta",
+            ),
+        }),
     )
 
-    search_fields = (
-        "name",
-    )
-
-    list_filter = (
-        "is_active",
-    )
-
-    prepopulated_fields = {
-        "slug": ("name",),
-    }
+    def has_add_permission(self, request):
+        return not NoticePageHeader.objects.exists()
 
 
-class NoticeTranslationInline(admin.StackedInline):
-    model = NoticeTranslation
-
-    extra = 3
-
-    min_num = 3
-
-    max_num = 3
-
-    fields = (
-        "language",
-        "title",
-        "slug",
-        "summary",
-        "content",
-        "seo_title",
-        "seo_description",
-    )
-
-
-class NoticeAttachmentInline(admin.TabularInline):
-    model = NoticeAttachment
-
-    extra = 0
-
-    fields = (
-        "title",
-        "file",
-        "is_public",
-        "sort_order",
-        "uploaded_by",
-    )
-
-
-@admin.register(Notice)
-class NoticeAdmin(admin.ModelAdmin):
-
-    list_display = (
-        "id",
-        "__str__",
+@admin.register(NoticeItem)
+class NoticeItemAdmin(admin.ModelAdmin):
+    form = NoticeItemAdminForm
+    list_display = [
+        "notice_number",
+        "title_en",
         "category",
-        "status",
         "priority",
+        "published_date",
+        "expiry_date",
+        "is_urgent",
         "is_featured",
-        "published_at",
-    )
-
-    list_filter = (
-        "status",
-        "priority",
-        "category",
-        "is_featured",
-    )
-
-    search_fields = (
-        "translations__title",
-        "translations__summary",
-    )
-
-    inlines = [
-        NoticeTranslationInline,
-        NoticeAttachmentInline,
+        "is_active",
     ]
-
-    readonly_fields = (
-        "created_at",
-        "updated_at",
-    )
+    list_display_links = ["title_en"]
+    list_editable = ["category", "priority", "is_urgent", "is_featured", "is_active"]
+    list_filter = ["category", "priority", "is_urgent", "is_featured", "is_active"]
+    search_fields = [
+        "notice_number",
+        "title_en",
+        "title_si",
+        "title_ta",
+        "summary_en",
+        "summary_si",
+        "summary_ta",
+        "department_en",
+        "slug",
+    ]
+    prepopulated_fields = {"slug": ("title_en",)}
 
     fieldsets = (
-        (
-            "General",
-            {
-                "fields": (
-                    "category",
-                    "status",
-                    "priority",
-                    "is_featured",
-                )
-            },
-        ),
-        (
-            "Publishing",
-            {
-                "fields": (
-                    "published_at",
-                    "expires_at",
-                )
-            },
-        ),
-        (
-            "Audit",
-            {
-                "fields": (
-                    "created_by",
-                    "updated_by",
-                    "created_at",
-                    "updated_at",
-                )
-            },
-        ),
+        ("🏷️ Notice Classification & Reference", {
+            "fields": (
+                ("notice_number", "order"),
+                ("category", "priority"),
+                ("is_urgent", "is_featured", "is_active"),
+                "slug",
+            ),
+        }),
+        ("🇬🇧 English Content", {
+            "fields": (
+                "title_en",
+                "department_en",
+                "summary_en",
+                "content_en",
+                "attachment_title_en",
+            ),
+        }),
+        ("🇱🇰 Sinhala Content (සිංහල)", {
+            "fields": (
+                "title_si",
+                "department_si",
+                "summary_si",
+                "content_si",
+                "attachment_title_si",
+            ),
+        }),
+        ("🇱🇰 Tamil Content (தமிழ்)", {
+            "fields": (
+                "title_ta",
+                "department_ta",
+                "summary_ta",
+                "content_ta",
+                "attachment_title_ta",
+            ),
+        }),
+        ("📅 Publication & Closing Dates", {
+            "fields": (
+                ("published_date", "expiry_date"),
+            ),
+        }),
+        ("📄 Document Download & Circular Attachments", {
+            "fields": (
+                ("document_file", "file_url"),
+                ("file_type", "file_size"),
+            ),
+        }),
     )
 
-    def save_model(
-        self,
-        request,
-        obj,
-        form,
-        change,
-    ):
-        if not change:
-            obj.created_by = request.user
+    def save_model(self, request, obj, form, change):
+        if obj.is_featured:
+            # When a notice is marked featured, unmark any previous featured notices
+            NoticeItem.objects.filter(is_featured=True).exclude(pk=obj.pk).update(is_featured=False)
+        super().save_model(request, obj, form, change)
 
-        obj.updated_by = request.user
-
-        super().save_model(
-            request,
-            obj,
-            form,
-            change,
-        )
-
-    def save_related(
-        self,
-        request,
-        form,
-        formsets,
-        change,
-    ):
-        super().save_related(
-            request,
-            form,
-            formsets,
-            change,
-        )
-
-        notice = form.instance
-
-        if (
-            notice.status == "published"
-            and not notice.has_all_translations
-        ):
-            raise ValidationError(
-                "English, Sinhala and Tamil translations are required before publishing."
-            )
-
-
-@admin.register(NoticeTranslation)
-class NoticeTranslationAdmin(admin.ModelAdmin):
-
-    list_display = (
-        "title",
-        "language",
-        "notice",
-    )
-
-    list_filter = (
-        "language",
-    )
-
-    search_fields = (
-        "title",
-        "summary",
-    )
-
-
-@admin.register(NoticeAttachment)
-class NoticeAttachmentAdmin(admin.ModelAdmin):
-
-    list_display = (
-        "title",
-        "notice",
-        "is_public",
-    )
-
-    list_filter = (
-        "is_public",
-    )
+    def save_formset(self, request, form, formset, change):
+        instances = formset.save(commit=False)
+        featured_set = [inst for inst in instances if getattr(inst, "is_featured", False)]
+        if featured_set:
+            last_featured = featured_set[-1]
+            NoticeItem.objects.filter(is_featured=True).exclude(pk=last_featured.pk).update(is_featured=False)
+        super().save_formset(request, form, formset, change)

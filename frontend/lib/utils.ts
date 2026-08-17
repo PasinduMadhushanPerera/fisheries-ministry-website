@@ -24,3 +24,31 @@ export function stripHtml(html?: string | null): string {
     .replace(/&gt;/g, ">")
     .trim()
 }
+
+/**
+ * Robustly extracts the clean 11-character YouTube video ID from any YouTube URL or string.
+ */
+export function extractYouTubeId(urlOrId?: string | null): string {
+  if (!urlOrId) return ""
+  const val = String(urlOrId).trim()
+
+  // Direct 11-char ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(val)) {
+    return val
+  }
+
+  // Common URL patterns
+  const patterns = [
+    /(?:v=|\/embed\/|youtu\.be\/|\/v\/|\/shorts\/|\/live\/)([a-zA-Z0-9_-]{11})/,
+    /[?&]v=([a-zA-Z0-9_-]{11})/,
+  ]
+
+  for (const regex of patterns) {
+    const match = val.match(regex)
+    if (match && match[1]) {
+      return match[1]
+    }
+  }
+
+  return ""
+}

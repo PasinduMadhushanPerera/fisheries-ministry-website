@@ -15,7 +15,7 @@ export interface NewsAttachment {
 }
 
 export interface NewsArticle {
-  id: number;
+  id: number | string;
   category: NewsCategory | null;
   status: string;
   priority: string;
@@ -62,28 +62,98 @@ function buildApiUrl(
   return url.toString();
 }
 
+function normalizeArticle(item: any): NewsArticle {
+  const attachments: NewsAttachment[] = [];
+  if (Array.isArray(item.attachments)) {
+    item.attachments.forEach((att: any, idx: number) => {
+      attachments.push({
+        id: att.id || idx + 1,
+        title: att.title || att.attachment_title || "Official document",
+        file: att.file || att.download_url || "",
+        file_url: att.file_url || att.download_url || null,
+        file_type: att.file_type || "PDF",
+      });
+    });
+  } else if (item.attachment_title || item.download_url) {
+    attachments.push({
+      id: 1,
+      title: item.attachment_title || "Official press release / attachment",
+      file: item.download_url || "",
+      file_url: item.download_url || null,
+      file_type: item.file_type || "PDF",
+    });
+  }
+
+  return {
+    id: item.id || 0,
+    category: item.category
+      ? (typeof item.category === "object"
+          ? item.category
+          : { id: 1, name: item.category_label || item.category, slug: item.category })
+      : null,
+    status: item.status || "published",
+    priority: item.priority || "normal",
+    is_featured: Boolean(item.is_featured),
+    hero_image: item.image_url || item.hero_image || null,
+    hero_image_url: item.image_url || item.hero_image_url || null,
+    published_at: item.published_date || item.published_at || item.created_at || new Date().toISOString(),
+    expires_at: item.expires_at || null,
+    title: item.title || "",
+    slug: item.slug || `news-${item.id}`,
+    summary: item.summary || "",
+    content: item.content || item.summary || "",
+    image_alt_text: item.image_alt || item.image_alt_text || item.title || "",
+    seo_title: item.seo_title || item.title || "",
+    seo_description: item.seo_description || item.summary || "",
+    attachments,
+    created_at: item.created_at || new Date().toISOString(),
+    updated_at: item.updated_at || new Date().toISOString(),
+  };
+}
+
 async function parseNewsResponse(response: Response): Promise<NewsApiResponse> {
   if (!response.ok) {
     throw new Error(`Unable to load news. Server returned ${response.status}.`);
   }
 
-  const data: unknown = await response.json();
+  const data: any = await response.json();
 
   if (Array.isArray(data)) {
+    const results = data.map(normalizeArticle);
     return {
-      count: data.length,
+      count: results.length,
       next: null,
       previous: null,
-      results: data as NewsArticle[],
+      results,
     };
   }
 
-  return data as NewsApiResponse;
+  if (data && Array.isArray(data.articles)) {
+    const results = data.articles.map(normalizeArticle);
+    return {
+      count: results.length,
+      next: null,
+      previous: null,
+      results,
+    };
+  }
+
+  if (data && Array.isArray(data.results)) {
+    const results = data.results.map(normalizeArticle);
+    return {
+      count: data.count || results.length,
+      next: data.next || null,
+      previous: data.previous || null,
+      results,
+    };
+  }
+
+  return { count: 0, next: null, previous: null, results: [] };
 }
 
 function isValidNewsArticle(article: NewsArticle): boolean {
   return Boolean(
-    article.title && article.slug && article.summary && article.content,
+    article.title && article.slug && (article.summary || article.content),
   );
 }
 
@@ -107,7 +177,7 @@ export async function getNews(
 
 export async function getLatestNews(
   language: LanguageCode = "en",
-  limit = 3,
+  limit = 5,
 ): Promise<NewsArticle[]> {
   const response = await getNews(language);
 
@@ -163,7 +233,8 @@ export async function getNewsById(
     );
   }
 
-  return response.json() as Promise<NewsArticle>;
+  const raw = await response.json();
+  return normalizeArticle(raw);
 }
 
 export async function getNewsBySlug(
@@ -184,11 +255,7 @@ export async function getRelatedNews(
 
   return response.results
     .filter(isValidNewsArticle)
-    .filter(
-      (article) =>
-        article.id !== currentArticle.id &&
-        article.category?.id === currentArticle.category?.id,
-    )
+    .filter((article) => article.id !== currentArticle.id)
     .slice(0, limit);
 }
 
@@ -203,7 +270,7 @@ export function formatNewsDate(
   const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) {
-    return null;
+    return value; // return raw string like "2026-03-12" if not parseable
   }
 
   return new Intl.DateTimeFormat(locale, {
@@ -218,27 +285,13 @@ export function getNewsImageUrl(article: NewsArticle): string | null {
 }
 
 export function getNewsImageAlt(article: NewsArticle): string {
-  return (
-    article.image_alt_text?.trim() ||
-    article.title?.trim() ||
-    "Ministry news image"
-  );
+  return article.image_alt_text ?? article.title ?? "Ministry news image";
 }
 
-export function getAbsoluteNewsUrl(value: string | null): string | null {
-  if (!value) {
-    return null;
+export function getAbsoluteNewsUrl(url: string | null): string | null {
+  if (!url) return null;
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
   }
-
-  if (value.startsWith("http://") || value.startsWith("https://")) {
-    return value;
-  }
-
-  try {
-    const backendOrigin = new URL(API_BASE_URL).origin;
-
-    return new URL(value, backendOrigin).toString();
-  } catch {
-    return value;
-  }
+  return url;
 }

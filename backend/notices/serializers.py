@@ -1,180 +1,101 @@
-from pathlib import Path
-
 from rest_framework import serializers
-
-from common.choices import Language
-
-from .models import Notice, NoticeAttachment, NoticeCategory
+from .models import NoticePageHeader, NoticeItem, CATEGORY_LABELS_MAP
 
 
-class NoticeCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NoticeCategory
-        fields = [
-            "id",
-            "name",
-            "slug",
-        ]
+def resolve_lang(obj, field_base: str, context: dict) -> str:
+    lang = context.get("lang", "en")
+    if lang in ["si", "ta"]:
+        val = getattr(obj, f"{field_base}_{lang}", None)
+        if val and str(val).strip():
+            return str(val).strip()
+    return getattr(obj, f"{field_base}_en", "")
 
 
-class NoticeAttachmentSerializer(serializers.ModelSerializer):
-    file_url = serializers.SerializerMethodField()
-    file_type = serializers.SerializerMethodField()
-
-    class Meta:
-        model = NoticeAttachment
-        fields = [
-            "id",
-            "title",
-            "file",
-            "file_url",
-            "file_type",
-        ]
-
-    def get_file_url(self, obj):
-        if not obj.file:
-            return None
-
-        request = self.context.get("request")
-
-        if request:
-            return request.build_absolute_uri(obj.file.url)
-
-        return obj.file.url
-
-    def get_file_type(self, obj):
-        if not obj.file:
-            return None
-
-        return Path(obj.file.name).suffix.upper().lstrip(".")
-
-
-class NoticeSerializer(serializers.ModelSerializer):
+class NoticePageHeaderSerializer(serializers.ModelSerializer):
+    badge_text = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
-    slug = serializers.SerializerMethodField()
+    highlighted_title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    featured_badge = serializers.SerializerMethodField()
+    catalogue_badge = serializers.SerializerMethodField()
+    library_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = NoticePageHeader
+        fields = [
+            "badge_text",
+            "title",
+            "highlighted_title",
+            "description",
+            "featured_badge",
+            "catalogue_badge",
+            "library_title",
+        ]
+
+    def get_badge_text(self, obj): return resolve_lang(obj, "badge_text", self.context)
+    def get_title(self, obj): return resolve_lang(obj, "title", self.context)
+    def get_highlighted_title(self, obj): return resolve_lang(obj, "highlighted_title", self.context)
+    def get_description(self, obj): return resolve_lang(obj, "description", self.context)
+    def get_featured_badge(self, obj): return resolve_lang(obj, "featured_badge", self.context)
+    def get_catalogue_badge(self, obj): return resolve_lang(obj, "catalogue_badge", self.context)
+    def get_library_title(self, obj): return resolve_lang(obj, "library_title", self.context)
+
+
+class NoticeItemSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    department = serializers.SerializerMethodField()
+    category_label = serializers.SerializerMethodField()
     summary = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
-    seo_title = serializers.SerializerMethodField()
-    seo_description = serializers.SerializerMethodField()
-
-    category = NoticeCategorySerializer(read_only=True)
-    attachments = NoticeAttachmentSerializer(
-        many=True,
-        read_only=True,
-    )
+    attachment_title = serializers.SerializerMethodField()
+    download_url = serializers.SerializerMethodField()
 
     class Meta:
-        model = Notice
+        model = NoticeItem
         fields = [
             "id",
-            "category",
-            "status",
-            "priority",
-            "is_featured",
-            "published_at",
-            "expires_at",
-            "title",
             "slug",
+            "order",
+            "notice_number",
+            "category",
+            "category_label",
+            "priority",
+            "is_urgent",
+            "is_featured",
+            "title",
+            "department",
             "summary",
             "content",
-            "seo_title",
-            "seo_description",
-            "attachments",
+            "published_date",
+            "expiry_date",
+            "attachment_title",
+            "download_url",
+            "file_type",
+            "file_size",
             "created_at",
             "updated_at",
         ]
 
-    def get_requested_language(self):
-        request = self.context.get("request")
+    def get_title(self, obj): return resolve_lang(obj, "title", self.context)
+    def get_department(self, obj): return resolve_lang(obj, "department", self.context)
+    def get_summary(self, obj): return resolve_lang(obj, "summary", self.context)
+    def get_content(self, obj): return resolve_lang(obj, "content", self.context)
+    def get_attachment_title(self, obj): return resolve_lang(obj, "attachment_title", self.context)
 
-        if not request:
-            return Language.ENGLISH
+    def get_category_label(self, obj):
+        custom = resolve_lang(obj, "category_label", self.context)
+        if custom:
+            return custom
+        lang = self.context.get("lang", "en")
+        cat_tuple = CATEGORY_LABELS_MAP.get(obj.category)
+        if cat_tuple:
+            if lang == "si": return cat_tuple[1]
+            if lang == "ta": return cat_tuple[2]
+            return cat_tuple[0]
+        return obj.get_category_display()
 
-        language = request.query_params.get(
-            "lang",
-            Language.ENGLISH,
-        )
-
-        supported_languages = {
-            choice[0] for choice in Language.choices
-        }
-
-        if language not in supported_languages:
-            return Language.ENGLISH
-
-        return language
-
-    def get_translation(self, obj):
-        language = self.get_requested_language()
-
-        translations = getattr(
-            obj,
-            "prefetched_translations",
-            None,
-        )
-
-        if translations is not None:
-            # First try the requested language.
-            for translation in translations:
-                if translation.language == language:
-                    return translation
-
-            # Fall back to English.
-            for translation in translations:
-                if translation.language == Language.ENGLISH:
-                    return translation
-
-            # Use any available translation as the final fallback.
-            return translations[0] if translations else None
-
-        translation = obj.translations.filter(
-            language=language,
-        ).first()
-
-        if translation:
-            return translation
-
-        return obj.translations.filter(
-            language=Language.ENGLISH,
-        ).first()
-
-    def get_title(self, obj):
-        translation = self.get_translation(obj)
-        return translation.title if translation else None
-
-    def get_slug(self, obj):
-        translation = self.get_translation(obj)
-        return translation.slug if translation else None
-
-    def get_summary(self, obj):
-        translation = self.get_translation(obj)
-        return translation.summary if translation else None
-
-    def get_content(self, obj):
-        translation = self.get_translation(obj)
-        return translation.content if translation else None
-
-    def get_seo_title(self, obj):
-        translation = self.get_translation(obj)
-        return translation.seo_title if translation else None
-
-    def get_seo_description(self, obj):
-        translation = self.get_translation(obj)
-
-        return (
-            translation.seo_description
-            if translation
-            else None
-        )
-
-
-class NoticeListSerializer(NoticeSerializer):
-    """Serializer used for the notice list endpoint."""
-
-    pass
-
-
-class NoticeDetailSerializer(NoticeSerializer):
-    """Serializer used for the notice detail endpoint."""
-
-    pass
+    def get_download_url(self, obj):
+        if obj.document_file:
+            request = self.context.get("request")
+            return request.build_absolute_uri(obj.document_file.url) if request else obj.document_file.url
+        return obj.file_url or ""

@@ -1,88 +1,65 @@
-from django.db.models import Prefetch, Q
-from django.utils import timezone
-from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
-
-from .models import (
-    Notice,
-    NoticeAttachment,
-    NoticeTranslation,
-)
-from .serializers import (
-    NoticeDetailSerializer,
-    NoticeListSerializer,
-)
+from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import NoticePageHeader, NoticeItem
+from .serializers import NoticePageHeaderSerializer, NoticeItemSerializer
 
 
-class NoticeViewSet(viewsets.ReadOnlyModelViewSet):
+class NoticePageDataView(APIView):
     """
-    Public read-only Notice API.
+    API endpoint returning all customizable sections of Media Centre : Notices in the requested language (?lang=en/si/ta).
+    Returns all active notices ordered by featured status and newly added date/time.
     """
+    permission_classes = [permissions.AllowAny]
 
-    permission_classes = [AllowAny]
-    lookup_field = "id"
+    def get(self, request):
+        lang = request.GET.get("lang", "en").lower().strip()
+        if lang not in ["en", "si", "ta"]:
+            lang = "en"
 
-    def get_queryset(self):
-        now = timezone.now()
+        context = {"request": request, "lang": lang}
 
-        queryset = (
-            Notice.objects.filter(
-                status="published",
-                published_at__lte=now,
-            )
-            .filter(
-                Q(expires_at__isnull=True)
-                | Q(expires_at__gte=now)
-            )
-            .select_related("category")
-            .prefetch_related(
-                Prefetch(
-                    "translations",
-                    queryset=NoticeTranslation.objects.all(),
-                    to_attr="prefetched_translations",
-                ),
-                Prefetch(
-                    "attachments",
-                    queryset=NoticeAttachment.objects.filter(
-                        is_public=True,
-                    ).order_by(
-                        "sort_order",
-                        "created_at",
-                    ),
-                ),
-            )
-            .order_by(
-                "-is_featured",
-                "-priority",
-                "-published_at",
-                "-created_at",
-            )
+        header, _ = NoticePageHeader.objects.get_or_create(id=1)
+        header_data = NoticePageHeaderSerializer(header, context=context).data
+
+        notices_query = NoticeItem.objects.filter(is_active=True).order_by(
+            "-is_featured", "-created_at", "-id"
         )
 
-        category = self.request.query_params.get("category")
-        search = self.request.query_params.get("search")
-        featured = self.request.query_params.get("featured")
+        limit_param = request.GET.get("limit")
+        if limit_param:
+            try:
+                limit_val = int(limit_param)
+                if limit_val > 0:
+                    notices_query = notices_query[:limit_val]
+            except (ValueError, TypeError):
+                pass
 
-        if category and category != "all":
-            queryset = queryset.filter(
-                category__slug=category,
-            )
+        notices_data = NoticeItemSerializer(notices_query, many=True, context=context).data
 
-        if featured in {"true", "1"}:
-            queryset = queryset.filter(is_featured=True)
+        return Response({
+            "language": lang,
+            "header": header_data,
+            "notices": notices_data,
+        })
 
-        if search:
-            queryset = queryset.filter(
-                Q(translations__title__icontains=search)
-                | Q(translations__summary__icontains=search)
-                | Q(translations__content__icontains=search)
-                | Q(category__name__icontains=search)
-            ).distinct()
 
-        return queryset
+class NoticeDetailView(APIView):
+    """
+    API endpoint returning a single notice by slug in the requested language.
+    """
+    permission_classes = [permissions.AllowAny]
 
-    def get_serializer_class(self):
-        if self.action == "retrieve":
-            return NoticeDetailSerializer
+    def get(self, request, slug):
+        lang = request.GET.get("lang", "en").lower().strip()
+        if lang not in ["en", "si", "ta"]:
+            lang = "en"
 
-        return NoticeListSerializer
+        context = {"request": request, "lang": lang}
+
+        try:
+            notice = NoticeItem.objects.get(slug=slug, is_active=True)
+            notice_data = NoticeItemSerializer(notice, context=context).data
+            return Response(notice_data)
+        except NoticeItem.DoesNotExist:
+            return Response({"error": "Notice not found"}, status=status.HTTP_404_NOT_FOUND)

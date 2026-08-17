@@ -1,209 +1,141 @@
-from pathlib import Path
-
 from rest_framework import serializers
-
-from common.choices import Language
-
-from .models import (
-    News,
-    NewsAttachment,
-    NewsCategory,
-)
+from .models import NewsPageHeader, NewsArticleItem
 
 
-class NewsCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NewsCategory
-        fields = [
-            "id",
-            "name",
-            "slug",
-        ]
+def resolve_lang(obj, field_base: str, context: dict) -> str:
+    lang = context.get("lang", "en")
+    if lang in ["si", "ta"]:
+        val = getattr(obj, f"{field_base}_{lang}", None)
+        if val and str(val).strip():
+            return str(val).strip()
+    return getattr(obj, f"{field_base}_en", "")
 
 
-class NewsAttachmentSerializer(serializers.ModelSerializer):
-    file_url = serializers.SerializerMethodField()
-    file_type = serializers.SerializerMethodField()
+CATEGORY_LABELS = {
+    "ministry": {
+        "en": "Ministry News",
+        "si": "අමාත්‍යාංශ පුවත්",
+        "ta": "அமைச்சுச் செய்திகள்",
+    },
+    "development": {
+        "en": "Sector Development",
+        "si": "ක්ෂේත්‍ර සංවර්ධනය",
+        "ta": "துறைசார் அபிவிருத்தி",
+    },
+    "community": {
+        "en": "Fisher Community & Welfare",
+        "si": "ධීවර ප්‍රජාව සහ සුබසාධනය",
+        "ta": "மீனவ சமூகம் & நலன்புரி",
+    },
+    "aquaculture": {
+        "en": "Aquaculture & Inland",
+        "si": "ජලජීවී සහ මිරිදිය වගාව",
+        "ta": "நீரியல் மற்றும் நன்னீர் வளர்ப்பு",
+    },
+    "ocean": {
+        "en": "Ocean Resources & Marine",
+        "si": "සාගර සම්පත් සහ සංරක්ෂණය",
+        "ta": "கடல்சார் வளங்கள் & பாதுகாப்பு",
+    },
+    "events": {
+        "en": "Events & Ceremonies",
+        "si": "විශේෂ සිදුවීම් සහ උත්සව",
+        "ta": "நிகழ்வுகள் & வைபவங்கள்",
+    },
+    "other": {
+        "en": "General News",
+        "si": "පොදු පුවත්",
+        "ta": "பொதுச் செய்திகள்",
+    },
+}
 
-    class Meta:
-        model = NewsAttachment
-        fields = [
-            "id",
-            "title",
-            "file",
-            "file_url",
-            "file_type",
-        ]
 
-    def get_file_url(self, obj):
-        if not obj.file:
-            return None
-
-        request = self.context.get("request")
-
-        if request:
-            return request.build_absolute_uri(obj.file.url)
-
-        return obj.file.url
-
-    def get_file_type(self, obj):
-        if not obj.file:
-            return None
-
-        return Path(obj.file.name).suffix.upper().lstrip(".")
-
-
-class NewsSerializer(serializers.ModelSerializer):
+class NewsPageHeaderSerializer(serializers.ModelSerializer):
+    badge_text = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
-    slug = serializers.SerializerMethodField()
+    highlighted_title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    featured_badge = serializers.SerializerMethodField()
+    catalogue_badge = serializers.SerializerMethodField()
+    library_title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = NewsPageHeader
+        fields = [
+            "badge_text",
+            "title",
+            "highlighted_title",
+            "description",
+            "featured_badge",
+            "catalogue_badge",
+            "library_title",
+        ]
+
+    def get_badge_text(self, obj): return resolve_lang(obj, "badge_text", self.context)
+    def get_title(self, obj): return resolve_lang(obj, "title", self.context)
+    def get_highlighted_title(self, obj): return resolve_lang(obj, "highlighted_title", self.context)
+    def get_description(self, obj): return resolve_lang(obj, "description", self.context)
+    def get_featured_badge(self, obj): return resolve_lang(obj, "featured_badge", self.context)
+    def get_catalogue_badge(self, obj): return resolve_lang(obj, "catalogue_badge", self.context)
+    def get_library_title(self, obj): return resolve_lang(obj, "library_title", self.context)
+
+
+class NewsArticleItemSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    publisher = serializers.SerializerMethodField()
+    category_label = serializers.SerializerMethodField()
     summary = serializers.SerializerMethodField()
     content = serializers.SerializerMethodField()
-    image_alt_text = serializers.SerializerMethodField()
-    seo_title = serializers.SerializerMethodField()
-    seo_description = serializers.SerializerMethodField()
-    hero_image_url = serializers.SerializerMethodField()
-
-    category = NewsCategorySerializer(read_only=True)
-
-    attachments = NewsAttachmentSerializer(
-        many=True,
-        read_only=True,
-    )
+    attachment_title = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+    download_url = serializers.SerializerMethodField()
 
     class Meta:
-        model = News
+        model = NewsArticleItem
         fields = [
             "id",
-            "category",
-            "status",
-            "priority",
-            "is_featured",
-            "hero_image",
-            "hero_image_url",
-            "published_at",
-            "expires_at",
-            "title",
             "slug",
+            "order",
+            "category",
+            "category_label",
+            "is_featured",
+            "title",
+            "publisher",
             "summary",
             "content",
-            "image_alt_text",
-            "seo_title",
-            "seo_description",
-            "attachments",
+            "published_date",
+            "image_url",
+            "image_alt",
+            "attachment_title",
+            "download_url",
+            "file_type",
+            "file_size",
             "created_at",
             "updated_at",
         ]
 
-    def get_requested_language(self):
-        request = self.context.get("request")
+    def get_title(self, obj): return resolve_lang(obj, "title", self.context)
+    def get_publisher(self, obj): return resolve_lang(obj, "publisher", self.context)
+    def get_summary(self, obj): return resolve_lang(obj, "summary", self.context)
+    def get_content(self, obj): return resolve_lang(obj, "content", self.context)
+    def get_attachment_title(self, obj): return resolve_lang(obj, "attachment_title", self.context)
 
-        if not request:
-            return Language.ENGLISH
+    def get_category_label(self, obj):
+        custom = resolve_lang(obj, "category_label", self.context)
+        if custom:
+            return custom
+        lang = self.context.get("lang", "en")
+        cat_map = CATEGORY_LABELS.get(obj.category, {})
+        return cat_map.get(lang) or cat_map.get("en") or obj.get_category_display()
 
-        language = request.query_params.get(
-            "lang",
-            Language.ENGLISH,
-        )
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get("request")
+            return request.build_absolute_uri(obj.image.url) if request else obj.image.url
+        return obj.image_url_fallback or "/images/home/hero-fishing-harbour.jpg"
 
-        supported_languages = {
-            choice[0] for choice in Language.choices
-        }
-
-        if language not in supported_languages:
-            return Language.ENGLISH
-
-        return language
-
-    def get_translation(self, obj):
-        language = self.get_requested_language()
-
-        translations = getattr(
-            obj,
-            "prefetched_translations",
-            None,
-        )
-
-        if translations is not None:
-            for translation in translations:
-                if translation.language == language:
-                    return translation
-
-            for translation in translations:
-                if translation.language == Language.ENGLISH:
-                    return translation
-
-            return translations[0] if translations else None
-
-        translation = obj.translations.filter(
-            language=language,
-        ).first()
-
-        if translation:
-            return translation
-
-        return obj.translations.filter(
-            language=Language.ENGLISH,
-        ).first()
-
-    def get_hero_image_url(self, obj):
-        if not obj.hero_image:
-            return None
-
-        request = self.context.get("request")
-
-        if request:
-            return request.build_absolute_uri(
-                obj.hero_image.url
-            )
-
-        return obj.hero_image.url
-
-    def get_title(self, obj):
-        translation = self.get_translation(obj)
-        return translation.title if translation else None
-
-    def get_slug(self, obj):
-        translation = self.get_translation(obj)
-        return translation.slug if translation else None
-
-    def get_summary(self, obj):
-        translation = self.get_translation(obj)
-        return translation.summary if translation else None
-
-    def get_content(self, obj):
-        translation = self.get_translation(obj)
-        return translation.content if translation else None
-
-    def get_image_alt_text(self, obj):
-        translation = self.get_translation(obj)
-
-        return (
-            translation.image_alt_text
-            if translation
-            else None
-        )
-
-    def get_seo_title(self, obj):
-        translation = self.get_translation(obj)
-        return translation.seo_title if translation else None
-
-    def get_seo_description(self, obj):
-        translation = self.get_translation(obj)
-
-        return (
-            translation.seo_description
-            if translation
-            else None
-        )
-
-
-class NewsListSerializer(NewsSerializer):
-    """Serializer used for the public news list."""
-
-    pass
-
-
-class NewsDetailSerializer(NewsSerializer):
-    """Serializer used for individual news articles."""
-
-    pass
+    def get_download_url(self, obj):
+        if obj.document_file:
+            request = self.context.get("request")
+            return request.build_absolute_uri(obj.document_file.url) if request else obj.document_file.url
+        return obj.file_url or ""

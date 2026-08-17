@@ -1,96 +1,65 @@
-from django.db.models import Prefetch, Q
-from django.utils import timezone
-from rest_framework import viewsets
-from rest_framework.permissions import AllowAny
-
-from .models import (
-    News,
-    NewsAttachment,
-    NewsTranslation,
-)
-from .serializers import (
-    NewsDetailSerializer,
-    NewsListSerializer,
-)
+from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import NewsPageHeader, NewsArticleItem
+from .serializers import NewsPageHeaderSerializer, NewsArticleItemSerializer
 
 
-class NewsViewSet(viewsets.ReadOnlyModelViewSet):
+class NewsPageDataView(APIView):
     """
-    Public read-only News API.
+    API endpoint returning all customizable sections of Media Centre : News in the requested language (?lang=en/si/ta).
+    Returns all active news articles ordered by featured status and newly added date/time.
     """
+    permission_classes = [permissions.AllowAny]
 
-    permission_classes = [AllowAny]
-    lookup_field = "id"
+    def get(self, request):
+        lang = request.GET.get("lang", "en").lower().strip()
+        if lang not in ["en", "si", "ta"]:
+            lang = "en"
 
-    def get_queryset(self):
-        now = timezone.now()
+        context = {"request": request, "lang": lang}
 
-        queryset = (
-            News.objects.filter(
-                status="published",
-                published_at__lte=now,
-            )
-            .filter(
-                Q(expires_at__isnull=True)
-                | Q(expires_at__gte=now)
-            )
-            .select_related("category")
-            .prefetch_related(
-                Prefetch(
-                    "translations",
-                    queryset=NewsTranslation.objects.all(),
-                    to_attr="prefetched_translations",
-                ),
-                Prefetch(
-                    "attachments",
-                    queryset=NewsAttachment.objects.filter(
-                        is_public=True,
-                    ).order_by(
-                        "sort_order",
-                        "created_at",
-                    ),
-                ),
-            )
+        header, _ = NewsPageHeader.objects.get_or_create(id=1)
+        header_data = NewsPageHeaderSerializer(header, context=context).data
+
+        articles_query = NewsArticleItem.objects.filter(is_active=True).order_by(
+            "-is_featured", "-created_at", "-id"
         )
 
-        category = self.request.query_params.get(
-            "category"
-        )
-        search = self.request.query_params.get("search")
-        featured = self.request.query_params.get(
-            "featured"
-        )
+        limit_param = request.GET.get("limit")
+        if limit_param:
+            try:
+                limit_val = int(limit_param)
+                if limit_val > 0:
+                    articles_query = articles_query[:limit_val]
+            except (ValueError, TypeError):
+                pass
 
-        if category and category != "all":
-            queryset = queryset.filter(
-                category__slug=category,
-            )
+        articles_data = NewsArticleItemSerializer(articles_query, many=True, context=context).data
 
-        if featured in {"true", "1"}:
-            queryset = queryset.filter(
-                is_featured=True,
-            )
+        return Response({
+            "language": lang,
+            "header": header_data,
+            "articles": articles_data,
+        })
 
-        if search:
-            queryset = queryset.filter(
-                Q(translations__title__icontains=search)
-                | Q(
-                    translations__summary__icontains=search
-                )
-                | Q(
-                    translations__content__icontains=search
-                )
-                | Q(category__name__icontains=search)
-            ).distinct()
 
-        return queryset.order_by(
-            "-is_featured",
-            "-published_at",
-            "-created_at",
-        )
+class NewsDetailView(APIView):
+    """
+    API endpoint returning a single news article by slug in the requested language.
+    """
+    permission_classes = [permissions.AllowAny]
 
-    def get_serializer_class(self):
-        if self.action == "retrieve":
-            return NewsDetailSerializer
+    def get(self, request, slug):
+        lang = request.GET.get("lang", "en").lower().strip()
+        if lang not in ["en", "si", "ta"]:
+            lang = "en"
 
-        return NewsListSerializer
+        context = {"request": request, "lang": lang}
+
+        try:
+            article = NewsArticleItem.objects.get(slug=slug, is_active=True)
+            article_data = NewsArticleItemSerializer(article, context=context).data
+            return Response(article_data)
+        except NewsArticleItem.DoesNotExist:
+            return Response({"error": "News article not found"}, status=status.HTTP_404_NOT_FOUND)

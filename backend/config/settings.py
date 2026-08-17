@@ -82,6 +82,10 @@ INSTALLED_APPS = [
     "foreign_training",
     "procurement_page",
     "recruitment_page",
+    "press_releases",
+    "events",
+    "gallery",
+    "videos",
     "header_footer",
     "home_page",
     "pages",
@@ -216,12 +220,23 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CORS_ALLOWED_ORIGINS = get_list_env(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000",
+    "http://localhost:3000,http://127.0.0.1:3000,http://localhost:8000,http://127.0.0.1:8000",
 )
+
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "cache-control",
+    "pragma",
+    "expires",
+]
 
 CSRF_TRUSTED_ORIGINS = get_list_env(
     "CSRF_TRUSTED_ORIGINS",
-    "http://localhost:3000",
+    "http://localhost:3000,http://127.0.0.1:3000",
 )
 
 CORS_ALLOW_CREDENTIALS = True

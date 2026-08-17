@@ -1,48 +1,52 @@
 import type { Metadata } from "next"
 
-import { FeaturedGallery } from "@/components/media/featured-gallery"
-import { GalleryGrid } from "@/components/media/gallery-grid"
-import { GalleryHero } from "@/components/media/gallery-hero"
+import { GalleryPageContent } from "@/components/media/gallery-page-content"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
+import { fetchHeaderFooterData } from "@/lib/api/header-footer"
+import { fetchGalleryPageData } from "@/lib/api/gallery"
+import { getServerLanguage } from "@/lib/get-server-language"
+
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
 
 export const metadata: Metadata = {
-  title: "Photo Gallery | Media Centre",
+  title: "Photo Gallery & Media Archive - Ministry of Fisheries",
   description:
-    "Browse official photo galleries from the Ministry of Fisheries, Aquatic and Ocean Resources, including fisheries programmes, aquaculture projects, community initiatives and official events.",
+    "Browse official photo collections from the Ministry of Fisheries, including coastal development programmes, aquaculture projects, and state events.",
 }
 
-const breadcrumbItems = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "Media Centre",
-    href: "/media-centre",
-  },
-  {
-    label: "Gallery",
-  },
-]
+interface GalleryPageProps {
+  searchParams: Promise<{ lang?: string }>
+}
 
-export default function GalleryPage() {
+export default async function GalleryPage({ searchParams }: GalleryPageProps) {
+  const lang = await getServerLanguage(searchParams)
+
+  const [galleryData, headerFooterData] = await Promise.all([
+    fetchGalleryPageData(lang),
+    fetchHeaderFooterData(),
+  ])
+
   return (
     <>
-      <SiteHeader />
+      <SiteHeader initialHeader={headerFooterData?.header} />
 
-      <main>
-        <Breadcrumb items={breadcrumbItems} />
+      <main id="main-content" tabIndex={-1} className="outline-none">
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Media Centre", href: "/media-centre/gallery" },
+            { label: "Gallery" },
+          ]}
+        />
 
-        <GalleryHero />
-
-        <FeaturedGallery />
-
-        <GalleryGrid />
+        <GalleryPageContent initialData={galleryData} />
       </main>
 
-      <SiteFooter />
+      <SiteFooter initialFooter={headerFooterData?.footer} />
     </>
   )
 }

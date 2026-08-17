@@ -1,7 +1,6 @@
 "use client"
 
 import {
-  ArrowLeft,
   ArrowRight,
   CalendarDays,
   ChevronLeft,
@@ -26,8 +25,8 @@ import {
 import { LinkButton } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Section } from "@/components/ui/section"
-import { SectionTitle } from "@/components/ui/section-title"
 import { stripHtml } from "@/lib/utils"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 import {
   formatNewsDate,
   getLatestNews,
@@ -49,10 +48,8 @@ const API_BASE_URL = (
 ).replace(/\/$/, "")
 
 function getAbsoluteFileUrl(fileUrl: string): string {
-  if (
-    fileUrl.startsWith("http://") ||
-    fileUrl.startsWith("https://")
-  ) {
+  if (!fileUrl) return "/images/home/hero-fishing-harbour.jpg"
+  if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
     return fileUrl
   }
 
@@ -78,22 +75,77 @@ function getFileType(fileUrl: string): string {
   return "Document"
 }
 
-// Fallback images for attractive card visuals if backend doesn't have custom upload
 const fallbackNewsImages = [
+  "/images/home/hero-fishing-harbour.jpg",
   "/images/institutions/dfar.jpg",
   "/images/institutions/nara.jpg",
   "/images/institutions/naqda.jpg",
   "/images/institutions/cfhc.jpg",
-  "/images/institutions/cfc.jpg",
 ]
 
+function mapCardToArticle(card: any, idx: number): NewsArticle {
+  const attachments = []
+  if (Array.isArray(card.attachments) && card.attachments.length > 0) {
+    card.attachments.forEach((att: any, aIdx: number) => {
+      attachments.push({
+        id: att.id || aIdx + 1,
+        title: att.title || att.attachment_title || "Official document",
+        file: att.file || att.download_url || "",
+        file_url: att.file_url || att.download_url || null,
+        file_type: att.file_type || "PDF",
+      })
+    })
+  } else if (card.attachment_title || card.download_url) {
+    attachments.push({
+      id: 1,
+      title: card.attachment_title || "Official press release / circular",
+      file: card.download_url || "",
+      file_url: card.download_url || null,
+      file_type: card.file_type || "PDF",
+    })
+  }
+
+  return {
+    id: card.id || idx + 1,
+    category: {
+      id: idx + 1,
+      name: card.category_label || card.category || "Ministry News",
+      slug: card.category || "ministry-news",
+    },
+    status: "published",
+    priority: "normal",
+    is_featured: Boolean(card.is_featured),
+    hero_image: card.image_url || fallbackNewsImages[idx % fallbackNewsImages.length],
+    hero_image_url: card.image_url || fallbackNewsImages[idx % fallbackNewsImages.length],
+    published_at: card.published_date || new Date().toISOString(),
+    expires_at: null,
+    title: card.title || "Ministry news update",
+    slug: card.slug || `news-${card.id || idx + 1}`,
+    summary: card.summary || "",
+    content: card.content || card.summary || "",
+    image_alt_text: card.image_alt || card.title || "News illustration",
+    seo_title: card.title || "",
+    seo_description: card.summary || "",
+    attachments,
+    created_at: card.published_date || new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }
+}
+
 export function LatestNews({
-  language = "en",
+  language: propLanguage,
   initialSection,
 }: LatestNewsProps) {
-  const [newsItems, setNewsItems] = useState<NewsArticle[]>([])
+  const contextLanguage = useLanguage()
+  const activeLanguage = ((propLanguage || contextLanguage?.language || "en") as LanguageCode)
+
+  const initialItems = initialSection?.cards
+    ? initialSection.cards.map(mapCardToArticle).slice(0, 5)
+    : []
+
+  const [newsItems, setNewsItems] = useState<NewsArticle[]>(initialItems)
   const [selectedNews, setSelectedNews] = useState<NewsArticle | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(initialItems.length === 0)
   const [error, setError] = useState<string | null>(null)
   const [isPaused, setIsPaused] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
@@ -103,7 +155,6 @@ export function LatestNews({
   const previouslyFocusedElement = useRef<HTMLElement | null>(null)
   const autoScrollTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const count = initialSection?.max_articles || 5
   const eyebrow = initialSection?.eyebrow || "Media centre"
   const title = initialSection?.title || "Latest News"
   const description =
@@ -113,57 +164,40 @@ export function LatestNews({
   const buttonUrl = initialSection?.button_url || "/media-centre/news"
 
   const loadLatestNews = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-
-    // Check if custom home news cards are configured in admin
-    if (initialSection?.cards && initialSection.cards.length > 0) {
-      const customItems: NewsArticle[] = initialSection.cards.map((card, idx) => ({
-        id: card.id,
-        category: {
-          id: idx + 1,
-          name: card.category || "Ministry news",
-          slug: "ministry-news",
-        },
-        status: "published",
-        priority: "normal",
-        is_featured: card.is_featured,
-        hero_image: card.image_url || fallbackNewsImages[idx % fallbackNewsImages.length],
-        hero_image_url: card.image_url || fallbackNewsImages[idx % fallbackNewsImages.length],
-        published_at: card.published_date || new Date().toISOString(),
-        expires_at: null,
-        title: card.title,
-        slug: `news-${card.id}`,
-        summary: card.summary,
-        content: card.content,
-        image_alt_text: card.image_alt || "News illustration",
-        seo_title: card.title,
-        seo_description: card.summary,
-        attachments: [],
-        created_at: card.published_date || new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      }))
-      setNewsItems(customItems)
-      setIsLoading(false)
-      return
-    }
-
     try {
-      const latestNews = await getLatestNews(language, count)
-      setNewsItems(latestNews)
+      const latestNews = await getLatestNews(activeLanguage, 5)
+      if (latestNews && latestNews.length > 0) {
+        setNewsItems(latestNews.slice(0, 5))
+        setError(null)
+      } else if (initialSection?.cards && initialSection.cards.length > 0) {
+        setNewsItems(initialSection.cards.map(mapCardToArticle).slice(0, 5))
+      }
     } catch (requestError) {
       console.error("Failed to load latest news:", requestError)
-      setNewsItems([])
-      setError(
-        "Latest Ministry news is temporarily unavailable. Please visit the news page for official updates."
-      )
+      if (initialSection?.cards && initialSection.cards.length > 0) {
+        setNewsItems(initialSection.cards.map(mapCardToArticle).slice(0, 5))
+      } else if (newsItems.length === 0) {
+        setError(
+          "Latest Ministry news is temporarily unavailable. Please visit the news page for official updates."
+        )
+      }
     } finally {
       setIsLoading(false)
     }
-  }, [language, count, initialSection])
+  }, [activeLanguage, initialSection, newsItems.length])
 
+  // Fetch on mount, language change, and on tab focus
   useEffect(() => {
     void loadLatestNews()
+
+    const handleWindowFocus = () => {
+      void loadLatestNews()
+    }
+    window.addEventListener("focus", handleWindowFocus)
+
+    return () => {
+      window.removeEventListener("focus", handleWindowFocus)
+    }
   }, [loadLatestNews])
 
   /*
@@ -175,14 +209,13 @@ export function LatestNews({
     const container = scrollContainerRef.current
     if (!container) return
 
-    const SCROLL_SPEED = 1 // 1 pixel per step for ultra-smooth movement
-    const INTERVAL_MS = 28 // ~35 fps smooth ticker
+    const SCROLL_SPEED = 1
+    const INTERVAL_MS = 28
 
     const scrollStep = () => {
       if (isPaused || isHovered || !scrollContainerRef.current) return
 
       const el = scrollContainerRef.current
-      // If we reached the end, loop smoothly back to start
       if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) {
         el.scrollLeft = 0
       } else {
@@ -252,7 +285,7 @@ export function LatestNews({
     }
   }, [selectedNews, closeNewsPreview])
 
-  // Double items for seamless infinite marquee loop if 5 items
+  // Double items for seamless marquee loop
   const displayItems = newsItems.length > 0 ? [...newsItems, ...newsItems] : []
 
   return (
@@ -288,7 +321,7 @@ export function LatestNews({
               type="button"
               onClick={() => setIsPaused((prev) => !prev)}
               aria-label={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 shadow-xs transition hover:bg-slate-100 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 shadow-xs transition hover:bg-slate-100 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 cursor-pointer"
               title={isPaused ? "Resume auto-scroll" : "Pause auto-scroll"}
             >
               {isPaused ? <Play className="h-4 w-4 fill-current" /> : <Pause className="h-4 w-4 fill-current" />}
@@ -299,7 +332,7 @@ export function LatestNews({
               type="button"
               onClick={handleScrollLeft}
               aria-label="Previous news slide"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 shadow-xs transition hover:bg-slate-100 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 shadow-xs transition hover:bg-slate-100 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 cursor-pointer"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -309,7 +342,7 @@ export function LatestNews({
               type="button"
               onClick={handleScrollRight}
               aria-label="Next news slide"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 shadow-xs transition hover:bg-slate-100 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-300 bg-white text-slate-700 shadow-xs transition hover:bg-slate-100 hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 cursor-pointer"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
@@ -327,7 +360,7 @@ export function LatestNews({
         </div>
 
         {/* Loading State */}
-        {isLoading && (
+        {isLoading && newsItems.length === 0 && (
           <div
             role="status"
             aria-live="polite"
@@ -344,7 +377,7 @@ export function LatestNews({
         )}
 
         {/* Error State */}
-        {!isLoading && error && (
+        {!isLoading && error && newsItems.length === 0 && (
           <div
             role="alert"
             className="mt-10 rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-xs"
@@ -360,7 +393,7 @@ export function LatestNews({
               <button
                 type="button"
                 onClick={() => void loadLatestNews()}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 font-semibold text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 cursor-pointer"
               >
                 Try again
               </button>
@@ -387,7 +420,7 @@ export function LatestNews({
         )}
 
         {/* Live Marquee Slider Track */}
-        {!isLoading && !error && newsItems.length > 0 && (
+        {newsItems.length > 0 && (
           <div
             className="mt-8 relative"
             onMouseEnter={() => setIsHovered(true)}
@@ -442,15 +475,11 @@ export function LatestNews({
                           {item.category?.name ?? "Ministry news"}
                         </span>
 
-                        {/* Featured Badge or Number */}
-                        {item.is_featured ? (
+                        {/* Featured Badge */}
+                        {item.is_featured && (
                           <span className="absolute right-3.5 top-3.5 inline-flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-sm">
                             <Sparkles className="h-3 w-3 fill-current" />
                             Featured
-                          </span>
-                        ) : (
-                          <span className="absolute right-3.5 top-3.5 rounded-full bg-slate-900/70 backdrop-blur-md px-2.5 py-1 text-[11px] font-bold text-white shadow-sm">
-                            #{item.id}
                           </span>
                         )}
 
@@ -473,15 +502,15 @@ export function LatestNews({
                           </p>
                         </div>
 
-                        {/* Bottom Interactive Trigger */}
-                        <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
-                          <span className="text-xs font-extrabold text-[#15803d] group-hover:text-[#0d3829] flex items-center gap-1.5 transition-colors">
-                            <span>Read Full Story</span>
-                            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                        {/* Bottom Styled Action Button */}
+                        <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                          <span className="inline-flex min-h-[36px] items-center justify-center gap-1.5 rounded-xl bg-[#256B29] px-4 text-xs font-extrabold text-white shadow-2xs transition group-hover:bg-[#1b4d1d]">
+                            <span>Read More</span>
+                            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                           </span>
 
-                          <span className="text-[11px] font-semibold text-slate-400 group-hover:text-emerald-600 transition-colors">
-                            Click to expand
+                          <span className="text-[11px] font-semibold text-slate-400">
+                            Click to preview
                           </span>
                         </div>
                       </div>
@@ -494,57 +523,68 @@ export function LatestNews({
         )}
       </Section>
 
-      {/* Same-Page Full Story Modal */}
+      {/* Screen-Centered News Story Modal */}
       {selectedNews && (
-        <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 sm:p-6">
-          <button
-            type="button"
-            aria-label="Close news preview"
-            onClick={closeNewsPreview}
-            className="absolute inset-0 cursor-default bg-slate-950/80 backdrop-blur-sm"
-          />
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="news-preview-title"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/80 p-4 sm:p-6 backdrop-blur-md overflow-y-auto"
+        >
+          <div className="relative w-full max-w-3xl max-h-[90vh] flex flex-col rounded-3xl border border-slate-200 bg-white shadow-2xl overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Dark Ocean Header */}
+            <div className="flex shrink-0 flex-col gap-3 border-b border-slate-200 px-6 sm:px-8 py-6 bg-[linear-gradient(135deg,#041c22_0%,#093835_55%,#0c4e48_100%)] text-white relative overflow-hidden">
+              <div
+                aria-hidden="true"
+                className="absolute -right-10 -top-10 h-36 w-36 rounded-full bg-emerald-400/10 blur-xl"
+              />
 
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="news-preview-title"
-            aria-describedby="news-preview-summary"
-            className="relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/20 bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-200"
-          >
-            <header className="flex items-start justify-between gap-5 border-b border-slate-200 bg-gradient-to-r from-emerald-50/70 via-slate-50 to-white px-6 py-5 sm:px-8">
-              <div className="flex min-w-0 items-start gap-4">
-                <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-[#15803d] sm:flex border border-emerald-200 shadow-xs">
-                  <Newspaper aria-hidden="true" className="h-6 w-6" />
-                </div>
-
-                <div className="min-w-0">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-[#15803d]">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <div className="relative z-10 flex items-center justify-between">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-md bg-emerald-500/20 border border-emerald-400/30 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-emerald-300 shadow-xs">
                     {selectedNews.category?.name ?? "Ministry News"}
                   </span>
-                  <h2
-                    id="news-preview-title"
-                    className="mt-1 text-lg sm:text-2xl font-black leading-snug text-slate-950"
-                  >
-                    {stripHtml(selectedNews.title) || "Ministry news update"}
-                  </h2>
+                  {selectedNews.is_featured && (
+                    <span className="inline-flex items-center gap-1 rounded-md bg-amber-500/20 border border-amber-400/30 px-2.5 py-0.5 text-xs font-extrabold text-amber-300">
+                      <Sparkles className="h-3 w-3" />
+                      Featured Story
+                    </span>
+                  )}
                 </div>
+
+                <button
+                  ref={closeButtonRef}
+                  type="button"
+                  onClick={closeNewsPreview}
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-slate-300 hover:bg-white hover:text-slate-900 transition-colors cursor-pointer"
+                  aria-label="Close news preview"
+                >
+                  <X className="h-5 w-5" aria-hidden="true" />
+                </button>
               </div>
 
-              <button
-                ref={closeButtonRef}
-                type="button"
-                onClick={closeNewsPreview}
-                aria-label="Close news preview"
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
-              >
-                <X aria-hidden="true" className="h-5 w-5" />
-              </button>
-            </header>
+              {/* Pure White Article Title */}
+              <div className="relative z-10 mt-2">
+                <h3
+                  id="news-preview-title"
+                  className="text-xl sm:text-2xl font-extrabold !text-white leading-snug tracking-tight"
+                >
+                  {stripHtml(selectedNews.title)}
+                </h3>
 
-            <div className="overflow-y-auto">
+                <div className="mt-3 pt-2 border-t border-white/15 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-bold text-emerald-200">
+                  <div className="flex items-center gap-1.5">
+                    <CalendarDays className="h-4 w-4 text-emerald-300" />
+                    <span>{formatNewsDate(selectedNews.published_at) ?? "Recent"}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Scrollable Body */}
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6">
               {getNewsImageUrl(selectedNews) && (
-                <div className="aspect-[16/7] overflow-hidden bg-slate-100">
+                <div className="relative aspect-[16/8] w-full overflow-hidden rounded-2xl bg-slate-900 border border-slate-200">
                   <img
                     src={getAbsoluteFileUrl(getNewsImageUrl(selectedNews) as string)}
                     alt={getNewsImageAlt(selectedNews)}
@@ -553,89 +593,92 @@ export function LatestNews({
                 </div>
               )}
 
-              <div className="px-6 py-6 sm:px-8 sm:py-8">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-extrabold text-[#14532d] border border-emerald-200">
-                    {selectedNews.category?.name ?? "Ministry news"}
-                  </span>
-                  <span className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500">
-                    <CalendarDays aria-hidden="true" className="h-4 w-4 text-emerald-600" />
-                    Published {formatNewsDate(selectedNews.published_at) ?? "Recent"}
-                  </span>
-                </div>
-
-                <p
-                  id="news-preview-summary"
-                  className="mt-6 border-l-4 border-[#16a34a] pl-5 text-base font-semibold leading-relaxed text-slate-800 bg-emerald-50/40 py-3 pr-4 rounded-r-xl"
-                >
-                  {stripHtml(selectedNews.summary) || "Official Ministry news update."}
+              {/* Excerpt */}
+              <div className="rounded-2xl bg-emerald-50/70 border border-emerald-200/80 p-4 sm:p-5">
+                <p className="text-xs sm:text-sm font-semibold text-slate-800 leading-relaxed italic">
+                  &ldquo;{stripHtml(selectedNews.summary)}&rdquo;
                 </p>
-
-                {selectedNews.content && (
-                  <div
-                    className="prose prose-slate mt-6 max-w-none leading-relaxed prose-headings:text-slate-950 prose-a:text-[#16a34a] prose-p:text-slate-700"
-                    dangerouslySetInnerHTML={{ __html: selectedNews.content }}
-                  />
-                )}
-
-                {selectedNews.attachments?.length > 0 && (
-                  <div className="mt-8 border-t border-slate-200 pt-6">
-                    <h3 className="text-base font-extrabold text-slate-950">Official Attachments</h3>
-                    <div className="mt-4 grid gap-3">
-                      {selectedNews.attachments.map((attachment) => {
-                        const attachmentUrl = attachment.file_url || attachment.file
-                        return (
-                          <a
-                            key={attachment.id}
-                            href={getAbsoluteFileUrl(attachmentUrl)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group/file flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition hover:border-emerald-300 hover:bg-white hover:shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 sm:flex-row sm:items-center sm:justify-between"
-                          >
-                            <div className="flex min-w-0 items-center gap-3">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-[#15803d]">
-                                <FileText aria-hidden="true" className="h-5 w-5" />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="truncate text-sm font-bold text-slate-950">
-                                  {attachment.title}
-                                </p>
-                                <p className="mt-0.5 text-xs text-slate-500">
-                                  {attachment.file_type || getFileType(attachmentUrl)}
-                                </p>
-                              </div>
-                            </div>
-                            <span className="inline-flex shrink-0 items-center gap-2 text-xs font-bold text-[#15803d]">
-                              <Download aria-hidden="true" className="h-4 w-4" />
-                              Open file
-                            </span>
-                          </a>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
               </div>
+
+              {/* Rich HTML Content */}
+              {selectedNews.content && (
+                <div
+                  className="prose prose-slate max-w-none prose-p:text-xs sm:prose-p:text-sm prose-p:leading-relaxed prose-p:text-slate-700 prose-headings:font-extrabold prose-headings:text-slate-900 prose-a:text-[#256B29] prose-a:font-bold"
+                  dangerouslySetInnerHTML={{ __html: selectedNews.content }}
+                />
+              )}
+
+              {/* Attachments */}
+              {selectedNews.attachments?.length > 0 && (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 mt-6">
+                  <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 mb-3 flex items-center gap-1.5">
+                    <FileText className="h-4 w-4 text-[#256B29]" />
+                    <span>Official Attachments & Press Releases</span>
+                  </h4>
+                  <div className="grid gap-3">
+                    {selectedNews.attachments.map((attachment) => {
+                      const attachmentUrl = attachment.file_url || attachment.file
+                      return (
+                        <div
+                          key={attachment.id}
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-[#256B29]">
+                              <FileText className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-slate-900 truncate">
+                                {attachment.title}
+                              </p>
+                              <p className="text-[11px] text-slate-500 font-medium">
+                                {attachment.file_type || getFileType(attachmentUrl)}
+                              </p>
+                            </div>
+                          </div>
+
+                          {attachmentUrl ? (
+                            <a
+                              href={getAbsoluteFileUrl(attachmentUrl)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[#256B29] px-4 text-xs font-bold text-white transition hover:bg-[#1b4d1d]"
+                            >
+                              <Download className="h-3.5 w-3.5" />
+                              <span>Download</span>
+                            </a>
+                          ) : (
+                            <span className="text-[11px] font-bold text-slate-400">
+                              Official Record
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <footer className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50 px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+            {/* Modal Action Footer */}
+            <div className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-200 px-6 py-4 bg-slate-50">
+              <Link
+                href={`/media-centre/news/${selectedNews.slug}`}
+                className="inline-flex min-h-[40px] items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
+              >
+                <span>View Full Page</span>
+                <ArrowRight className="h-3.5 w-3.5 text-[#256B29]" />
+              </Link>
+
               <button
                 type="button"
                 onClick={closeNewsPreview}
-                className="inline-flex min-h-10 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
+                className="inline-flex min-h-[40px] items-center justify-center rounded-xl bg-[#256B29] px-6 text-xs font-extrabold text-white hover:bg-[#1b4d1d] transition shadow-xs cursor-pointer"
               >
-                Close
+                <span>Close</span>
               </button>
-
-              <Link
-                href="/media-centre/news"
-                className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#15803d] px-5 text-sm font-bold text-white transition hover:bg-[#0d3829] shadow-xs"
-              >
-                <span>View all news</span>
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </footer>
-          </section>
+            </div>
+          </div>
         </div>
       )}
     </>

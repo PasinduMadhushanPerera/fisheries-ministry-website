@@ -1,190 +1,134 @@
 import Link from "next/link"
+import Image from "next/image"
 import {
   ArrowLeft,
   CalendarDays,
   Download,
   FileText,
-  Newspaper,
+  Building2,
+  Sparkles,
 } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
-import {
-  formatNewsDate,
-  getAbsoluteNewsUrl,
-  getNewsImageAlt,
-  getNewsImageUrl,
-  type NewsArticle,
-} from "@/src/lib/news"
+import type { ApiNewsArticleItem } from "@/lib/api/news"
 
-type NewsDetailProps = {
-  article: NewsArticle
+interface NewsDetailProps {
+  article: ApiNewsArticleItem
 }
 
-export function NewsDetail({
-  article,
-}: NewsDetailProps) {
-  const imageUrl = getAbsoluteNewsUrl(
-    getNewsImageUrl(article),
-  )
-
-  const publishedDate = formatNewsDate(
-    article.published_at,
-  )
+export function NewsDetail({ article }: NewsDetailProps) {
+  const imageUrl = article.image_url || "/images/home/hero-fishing-harbour.jpg"
 
   return (
     <article className="bg-white">
-      <Container className="py-16 sm:py-20">
+      <Container className="py-12 sm:py-16">
         <Link
           href="/media-centre/news"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-green-700 transition hover:text-green-900 focus-visible:rounded focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200"
+          className="inline-flex items-center gap-2 text-xs font-bold text-[#256B29] transition hover:text-[#1b4d1d] hover:underline"
         >
-          <ArrowLeft
-            aria-hidden="true"
-            className="h-4 w-4"
-          />
-
-          Back to News
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+          <span>Back to All News</span>
         </Link>
 
-        <div className="mt-8 max-w-4xl">
-          <span className="inline-flex rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-800">
-            {article.category?.name ??
-              "Ministry news"}
-          </span>
+        <div className="mt-6 max-w-4xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex rounded-full bg-emerald-50 border border-emerald-200/80 px-3.5 py-1 text-xs font-extrabold uppercase tracking-wider text-[#256B29]">
+              {article.category_label || "Ministry News"}
+            </span>
 
-          <h1 className="mt-6 text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl">
-            {article.title ??
-              "Ministry news update"}
+            {article.is_featured && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-extrabold text-amber-800">
+                <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+                <span>Featured News</span>
+              </span>
+            )}
+          </div>
+
+          <h1 className="mt-4 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-950 leading-tight">
+            {article.title}
           </h1>
 
           {article.summary && (
-            <p className="mt-6 text-xl leading-9 text-slate-600">
+            <p className="mt-5 text-base sm:text-lg leading-relaxed text-slate-600 font-medium">
               {article.summary}
             </p>
           )}
 
-          <div className="mt-8 flex flex-wrap gap-x-8 gap-y-4 border-y border-slate-200 py-6 text-sm text-slate-600">
+          <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-slate-200 py-4 text-xs font-bold text-slate-600">
             <div className="flex items-center gap-2">
-              <CalendarDays
-                aria-hidden="true"
-                className="h-5 w-5 text-green-700"
-              />
-
-              <time
-                dateTime={
-                  article.published_at ??
-                  undefined
-                }
-              >
-                {publishedDate ??
-                  "Publication date unavailable"}
-              </time>
+              <CalendarDays aria-hidden="true" className="h-4 w-4 text-[#256B29]" />
+              <span>Published: {article.published_date || "Recent"}</span>
             </div>
 
-            {article.is_featured && (
-              <div className="flex items-center gap-2">
-                <Newspaper
-                  aria-hidden="true"
-                  className="h-5 w-5 text-green-700"
-                />
-
-                <span>Featured news</span>
+            {article.publisher && (
+              <div className="flex items-center gap-2 text-slate-700">
+                <Building2 aria-hidden="true" className="h-4 w-4 text-[#256B29]" />
+                <span>Publisher: {article.publisher}</span>
               </div>
             )}
           </div>
         </div>
 
+        {/* Hero Cover Image */}
         {imageUrl && (
-          <div className="mt-10 overflow-hidden rounded-3xl border border-slate-200 bg-slate-100 shadow-sm">
-            <div className="aspect-[16/8]">
-              <img
+          <div className="mt-8 max-w-5xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 shadow-md">
+            <div className="relative aspect-[16/8] w-full">
+              <Image
                 src={imageUrl}
-                alt={getNewsImageAlt(article)}
-                className="h-full w-full object-cover"
+                alt={article.image_alt || article.title}
+                fill
+                unoptimized
+                priority
+                className="object-cover"
               />
             </div>
           </div>
         )}
 
-        <div className="mx-auto mt-14 max-w-3xl">
-          {article.content && (
-            <div
-              className="prose prose-slate max-w-none prose-headings:text-slate-950 prose-p:text-slate-700 prose-p:leading-8 prose-a:text-green-700 prose-a:font-semibold hover:prose-a:text-green-900"
-              dangerouslySetInnerHTML={{
-                __html: article.content,
-              }}
-            />
-          )}
+        {/* Main Article Content */}
+        <div className="mt-12 max-w-3xl">
+          <div className="prose prose-slate max-w-none prose-headings:font-extrabold prose-headings:text-slate-950 prose-p:text-slate-700 prose-p:leading-relaxed prose-a:text-[#256B29] prose-a:font-bold">
+            {article.content ? (
+              <div dangerouslySetInnerHTML={{ __html: article.content }} />
+            ) : (
+              <p>{article.summary}</p>
+            )}
+          </div>
 
-          {article.attachments.length > 0 && (
-            <section
-              aria-labelledby="news-attachments-heading"
-              className="mt-12 border-t border-slate-200 pt-8"
-            >
-              <h2
-                id="news-attachments-heading"
-                className="text-2xl font-bold text-slate-950"
-              >
-                Attachments
+          {/* Downloadable Attachment (if provided) */}
+          {(article.attachment_title || article.download_url) && (
+            <section aria-labelledby="news-attachments-heading" className="mt-12 border-t border-slate-200 pt-8">
+              <h2 id="news-attachments-heading" className="text-xl font-extrabold text-slate-950">
+                Official Attachments & Press Releases
               </h2>
 
-              <p className="mt-3 leading-7 text-slate-600">
-                Open or download documents related to
-                this news article.
-              </p>
+              <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-[#256B29]">
+                    <FileText aria-hidden="true" className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-extrabold text-slate-950">
+                      {article.attachment_title || "Official Gazette / Press Release"}
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      {article.file_type || "PDF"} • {article.file_size || "Document"}
+                    </p>
+                  </div>
+                </div>
 
-              <div className="mt-6 grid gap-4">
-                {article.attachments.map(
-                  (attachment) => {
-                    const attachmentUrl =
-                      getAbsoluteNewsUrl(
-                        attachment.file_url ??
-                          attachment.file,
-                      )
-
-                    if (!attachmentUrl) {
-                      return null
-                    }
-
-                    return (
-                      <a
-                        key={attachment.id}
-                        href={attachmentUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex flex-col gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 transition hover:border-green-200 hover:bg-white hover:shadow-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-green-200 sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <div className="flex min-w-0 items-center gap-4">
-                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-green-700">
-                            <FileText
-                              aria-hidden="true"
-                              className="h-6 w-6"
-                            />
-                          </div>
-
-                          <div className="min-w-0">
-                            <h3 className="truncate font-bold text-slate-950">
-                              {attachment.title}
-                            </h3>
-
-                            <p className="mt-1 text-sm text-slate-500">
-                              {attachment.file_type ??
-                                "News document"}
-                            </p>
-                          </div>
-                        </div>
-
-                        <span className="inline-flex shrink-0 items-center gap-2 font-bold text-green-700 transition group-hover:text-green-900">
-                          <Download
-                            aria-hidden="true"
-                            className="h-4 w-4"
-                          />
-
-                          Open file
-                        </span>
-                      </a>
-                    )
-                  },
+                {article.download_url && article.download_url !== "#" ? (
+                  <a
+                    href={article.download_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#1b4d1d]"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Download File</span>
+                  </a>
+                ) : (
+                  <span className="text-xs font-bold text-slate-400">Official Record</span>
                 )}
               </div>
             </section>

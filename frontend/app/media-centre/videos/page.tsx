@@ -1,48 +1,52 @@
 import type { Metadata } from "next"
 
-import { FeaturedVideo } from "@/components/media/featured-video"
-import { VideoList } from "@/components/media/video-list"
-import { VideosHero } from "@/components/media/videos-hero"
+import { VideosPageContent } from "@/components/media/videos-page-content"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
+import { fetchHeaderFooterData } from "@/lib/api/header-footer"
+import { fetchVideosPageData } from "@/lib/api/videos"
+import { getServerLanguage } from "@/lib/get-server-language"
+
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
 
 export const metadata: Metadata = {
-  title: "Videos | Media Centre",
+  title: "Official Videos & Documentaries - Ministry of Fisheries",
   description:
     "Watch official videos from the Ministry of Fisheries, Aquatic and Ocean Resources, including fisheries programmes, aquaculture projects, community initiatives and marine conservation activities.",
 }
 
-const breadcrumbItems = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "Media Centre",
-    href: "/media-centre",
-  },
-  {
-    label: "Videos",
-  },
-]
+interface VideosPageProps {
+  searchParams: Promise<{ lang?: string }>
+}
 
-export default function VideosPage() {
+export default async function VideosPage({ searchParams }: VideosPageProps) {
+  const lang = await getServerLanguage(searchParams)
+
+  const [videosData, headerFooterData] = await Promise.all([
+    fetchVideosPageData(lang),
+    fetchHeaderFooterData(),
+  ])
+
   return (
     <>
-      <SiteHeader />
+      <SiteHeader initialHeader={headerFooterData?.header} />
 
-      <main>
-        <Breadcrumb items={breadcrumbItems} />
+      <main id="main-content" tabIndex={-1} className="outline-none">
+        <Breadcrumb
+          items={[
+            { label: "Home", href: "/" },
+            { label: "Media Centre", href: "/media-centre/videos" },
+            { label: "Videos" },
+          ]}
+        />
 
-        <VideosHero />
-
-        <FeaturedVideo />
-
-        <VideoList />
+        <VideosPageContent initialData={videosData} />
       </main>
 
-      <SiteFooter />
+      <SiteFooter initialFooter={headerFooterData?.footer} />
     </>
   )
 }

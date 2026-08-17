@@ -1,14 +1,26 @@
 import { Newspaper } from "lucide-react"
 import { PageHero } from "@/components/ui/page-hero"
+import type { ApiNewsHeader } from "@/lib/api/news"
 
-export function NewsHero() {
+interface NewsHeroProps {
+  initialHeader?: ApiNewsHeader
+}
+
+export function NewsHero({ initialHeader }: NewsHeroProps) {
+  const badgeText = initialHeader?.badge_text || "Ministry Newsroom"
+  const title = initialHeader?.title || "Latest News &"
+  const highlightTitle = initialHeader?.highlighted_title || "Ministry Updates"
+  const description =
+    initialHeader?.description ||
+    "Read the latest fisheries news, development updates, community welfare programmes, and official events from across Sri Lanka."
+
   return (
     <PageHero
       badgeIcon={Newspaper}
-      badgeText="Ministry News"
-      title="Latest News &"
-      highlightTitle="Ministry Updates"
-      description="Read the latest fisheries news, development updates, community programmes, and events from across Sri Lanka."
+      badgeText={badgeText}
+      title={title}
+      highlightTitle={highlightTitle}
+      description={description}
       cardIcon={Newspaper}
       cardEyebrow="Official Newsroom"
       cardTitle="Fisheries & Ocean News"

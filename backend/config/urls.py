@@ -34,6 +34,12 @@ def custom_get_app_list(request, app_label=None):
         "foreign_training",
         "procurement_page",
         "recruitment_page",
+        "news",
+        "notices",
+        "press_releases",
+        "events",
+        "gallery",
+        "videos",
     }
     filtered = [app for app in app_list if app.get("app_label") in allowed_apps]
     
@@ -63,6 +69,18 @@ def custom_get_app_list(request, app_label=None):
             return 10
         if label == "recruitment_page":
             return 11
+        if label == "news":
+            return 12
+        if label == "notices":
+            return 13
+        if label == "press_releases":
+            return 14
+        if label == "events":
+            return 15
+        if label == "gallery":
+            return 16
+        if label == "videos":
+            return 17
         return 99
 
     return sorted(filtered, key=app_order)
@@ -83,6 +101,10 @@ urlpatterns = [
     # Existing APIs
     path("api/v1/notices/", include("notices.urls")),
     path("api/v1/news/", include("news.urls")),
+    path("api/v1/press-releases/", include("press_releases.urls")),
+    path("api/v1/events/", include("events.urls")),
+    path("api/v1/gallery/", include("gallery.urls")),
+    path("api/v1/videos/", include("videos.urls")),
     path("api/v1/about/", include("about.urls")),
     path("api/v1/minister/", include("minister_profile.urls")),
     path("api/v1/deputy-minister/", include("deputy_minister_profile.urls")),

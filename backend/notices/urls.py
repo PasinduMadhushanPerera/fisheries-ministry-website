@@ -1,17 +1,7 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
-
-from .views import NoticeViewSet
-
-
-router = DefaultRouter()
-router.register(
-    "notices",
-    NoticeViewSet,
-    basename="notice",
-)
-
+from django.urls import path
+from .views import NoticePageDataView, NoticeDetailView
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("", NoticePageDataView.as_view(), name="notices-page-data"),
+    path("<slug:slug>/", NoticeDetailView.as_view(), name="notice-detail"),
 ]

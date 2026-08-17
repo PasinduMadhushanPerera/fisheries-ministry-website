@@ -8,11 +8,11 @@ import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { fetchHeaderFooterData } from "@/lib/api/header-footer"
 import { fetchHomePageData } from "@/lib/api/home"
-
 import { getServerLanguage } from "@/lib/get-server-language"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+export const fetchCache = "force-no-store"
 
 interface HomePageProps {
   searchParams: Promise<{ lang?: string }>
