@@ -13,6 +13,10 @@ import { UpcomingEvents } from "@/components/media/upcoming-events"
 
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
+
 export const metadata: Metadata = {
   title: "Media Centre",
   description:

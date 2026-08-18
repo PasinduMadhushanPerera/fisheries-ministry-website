@@ -40,6 +40,12 @@ def custom_get_app_list(request, app_label=None):
         "events",
         "gallery",
         "videos",
+        "fisheries_statistics",
+        "weekly_fish_prices",
+        "monthly_fish_production",
+        "annual_statistics",
+        "export_import_statistics",
+        "fishery_information",
     }
     filtered = [app for app in app_list if app.get("app_label") in allowed_apps]
     
@@ -81,6 +87,18 @@ def custom_get_app_list(request, app_label=None):
             return 16
         if label == "videos":
             return 17
+        if label == "fisheries_statistics":
+            return 18
+        if label == "weekly_fish_prices":
+            return 19
+        if label == "monthly_fish_production":
+            return 20
+        if label == "annual_statistics":
+            return 21
+        if label == "export_import_statistics":
+            return 22
+        if label == "fishery_information":
+            return 23
         return 99
 
     return sorted(filtered, key=app_order)
@@ -105,6 +123,12 @@ urlpatterns = [
     path("api/v1/events/", include("events.urls")),
     path("api/v1/gallery/", include("gallery.urls")),
     path("api/v1/videos/", include("videos.urls")),
+    path("api/v1/statistics/", include("fisheries_statistics.urls")),
+    path("api/v1/statistics/", include("weekly_fish_prices.urls")),
+    path("api/v1/statistics/", include("monthly_fish_production.urls")),
+    path("api/v1/statistics/", include("annual_statistics.urls")),
+    path("api/v1/statistics/", include("export_import_statistics.urls")),
+    path("api/v1/statistics/", include("fishery_information.urls")),
     path("api/v1/about/", include("about.urls")),
     path("api/v1/minister/", include("minister_profile.urls")),
     path("api/v1/deputy-minister/", include("deputy_minister_profile.urls")),
