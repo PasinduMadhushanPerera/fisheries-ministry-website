@@ -46,6 +46,7 @@ def custom_get_app_list(request, app_label=None):
         "annual_statistics",
         "export_import_statistics",
         "fishery_information",
+        "rti_page",
     }
     filtered = [app for app in app_list if app.get("app_label") in allowed_apps]
     
@@ -99,6 +100,8 @@ def custom_get_app_list(request, app_label=None):
             return 22
         if label == "fishery_information":
             return 23
+        if label == "rti_page":
+            return 24
         return 99
 
     return sorted(filtered, key=app_order)
@@ -106,7 +109,13 @@ def custom_get_app_list(request, app_label=None):
 
 admin.site.get_app_list = custom_get_app_list
 
+from django.views.generic.base import RedirectView
+
 urlpatterns = [
+    # Graceful redirect for old / removed RTI header URL
+    path("admin/rti_page/rtiheader/<path:subpath>", RedirectView.as_view(url="/admin/rti_page/rtiofficer/", permanent=False)),
+    path("admin/rti_page/rtiheader/", RedirectView.as_view(url="/admin/rti_page/rtiofficer/", permanent=False)),
+
     path("admin/", admin.site.urls),
 
     # Global Header & Footer, Home Page & Core Content APIs
@@ -129,6 +138,7 @@ urlpatterns = [
     path("api/v1/statistics/", include("annual_statistics.urls")),
     path("api/v1/statistics/", include("export_import_statistics.urls")),
     path("api/v1/statistics/", include("fishery_information.urls")),
+    path("api/v1/rti/", include("rti_page.urls")),
     path("api/v1/about/", include("about.urls")),
     path("api/v1/minister/", include("minister_profile.urls")),
     path("api/v1/deputy-minister/", include("deputy_minister_profile.urls")),

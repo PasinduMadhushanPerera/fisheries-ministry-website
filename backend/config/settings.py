@@ -92,6 +92,7 @@ INSTALLED_APPS = [
     "annual_statistics",
     "export_import_statistics",
     "fishery_information",
+    "rti_page",
     "header_footer",
     "home_page",
     "pages",
