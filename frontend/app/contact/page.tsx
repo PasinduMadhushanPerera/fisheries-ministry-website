@@ -29,7 +29,7 @@ export default function ContactPage() {
           ]}
         />
 
-        <ContactHero />
+        {/* <ContactHero /> */}
 
         <DepartmentDirectory />
 

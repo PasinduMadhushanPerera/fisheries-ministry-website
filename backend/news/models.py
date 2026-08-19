@@ -31,11 +31,11 @@ CATEGORY_CHOICES = [
 
 CATEGORY_LABELS_MAP = {
     "ministry": ("Ministry News", "අමාත්‍යාංශ පුවත්", "அமைச்சுச் செய்திகள்"),
-    "development": ("Sector Development", "ක්ෂේත්‍ර සංවර්ධනය", "துறைசார் அபிවிருத்தி"),
-    "community": ("Fisher Community & Welfare", "ධීවර ප්‍රජාව සහ සුබසාධනය", "மீனவ சமூகம் & நலன்பුரி"),
+    "development": ("Sector Development", "ක්ෂේත්‍ර සංවර්ධනය", "துறைசார் அபிவிருத்தி"),
+    "community": ("Fisher Community & Welfare", "ධීවර ප්‍රජාව සහ සුබසාධනය", "மீனவ சமூகம் & நலன்புரி"),
     "aquaculture": ("Aquaculture & Inland", "ජලජීවී සහ මිරිදිය වගාව", "நீரியல் மற்றும் நன்னீர் வளர்ப்பு"),
     "ocean": ("Ocean Resources & Marine", "සාගර සම්පත් සහ සංරක්ෂණය", "கடல்சார் வளங்கள் & பாதுகாப்பு"),
-    "events": ("Events & Ceremonies", "විශේෂ සිදුවීම් සහ උත්සව", "நிகழ்வுகள் & வைபවங்கள்"),
+    "events": ("Events & Ceremonies", "විශේෂ සිදුවීම් සහ උත්සව", "நிகழ்வுகள் & வைபவங்கள்"),
     "other": ("General News", "පොදු පුවත්", "பொதுச் செய்திகள்"),
 }
 
@@ -44,6 +44,40 @@ FILE_TYPE_CHOICES = [
     ("DOCX", "Word Document (DOCX)"),
     ("XLSX", "Excel Spreadsheet (XLSX)"),
     ("ZIP", "ZIP Archive"),
+    ("CSV", "CSV Data Sheet"),
+    ("PPTX", "PowerPoint Presentation"),
+]
+
+BLOCK_TYPE_CHOICES = [
+    ("text", "📝 Text Paragraph"),
+    ("heading", "📌 Section Heading"),
+    ("image", "🖼️ Image with Caption"),
+    ("video", "🎬 Video Embed / Player (YouTube / Direct MP4)"),
+    ("table", "📊 Data Table / Matrix"),
+    ("quote", "💬 Key Quote / Ministerial Highlight Box"),
+    ("attachment", "📄 Downloadable Document / Attachment"),
+    ("paragraph", "📝 Text Paragraph (Legacy)"),
+    ("file", "📄 Downloadable Document (Legacy)"),
+]
+
+HEADING_LEVEL_CHOICES = [
+    ("h2", "Heading 2 (H2 - Major Section)"),
+    ("h3", "Heading 3 (H3 - Subsection)"),
+    ("h4", "Heading 4 (H4 - Minor Topic)"),
+]
+
+IMAGE_LAYOUT_CHOICES = [
+    ("full", "Full Width Card"),
+    ("centered", "Centered Standard"),
+    ("left", "Float Left / Inline"),
+    ("right", "Float Right / Inline"),
+]
+
+CALLOUT_TYPE_CHOICES = [
+    ("quote", "💬 Ministerial / Executive Quote"),
+    ("info", "ℹ️ Informational Note"),
+    ("success", "✅ Key Achievement / Milestone"),
+    ("warning", "⚠️ Important Notice / Reminder"),
 ]
 
 
@@ -237,7 +271,8 @@ class NewsArticleItem(TimeStampedModel):
     content_en = models.TextField(
         blank=True,
         default="",
-        verbose_name="Full Article Content (English - Supports HTML / paragraphs)",
+        verbose_name="Main Article Overview / Paragraphs (English)",
+        help_text="Introductory text or legacy content. You can also add rich Story Blocks below (Images, Videos, Tables, Subheadings, Documents) in any order!",
     )
     attachment_title_en = models.CharField(
         max_length=200,
@@ -273,7 +308,7 @@ class NewsArticleItem(TimeStampedModel):
     content_si = models.TextField(
         blank=True,
         default="",
-        verbose_name="Full Article Content (සිංහල)",
+        verbose_name="Main Article Overview / Paragraphs (සිංහල)",
     )
     attachment_title_si = models.CharField(
         max_length=200,
@@ -309,7 +344,7 @@ class NewsArticleItem(TimeStampedModel):
     content_ta = models.TextField(
         blank=True,
         default="",
-        verbose_name="Full Article Content (தமிழ்)",
+        verbose_name="Main Article Overview / Paragraphs (தமிழ்)",
     )
     attachment_title_ta = models.CharField(
         max_length=200,
@@ -368,6 +403,12 @@ class NewsArticleItem(TimeStampedModel):
         default="1.2 MB",
         help_text="e.g. '1.2 MB' or '850 KB'",
     )
+    attachments_data = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Multiple Cover Attachments (JSON / List)",
+        help_text="Optional multiple attachments list for main article cover",
+    )
 
     class Meta:
         ordering = ["-created_at", "-id"]
@@ -396,3 +437,296 @@ class NewsArticleItem(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.title_en} [{self.get_category_display()}]"
+
+
+# ==========================================================
+# 03. News Content Blocks (Modular Multi-block Article Body)
+# Allows inserting Text -> Image -> Table -> Video -> File -> Quote in any sequence
+# ==========================================================
+class NewsContentBlock(TimeStampedModel):
+    article = models.ForeignKey(
+        NewsArticleItem,
+        on_delete=models.CASCADE,
+        related_name="content_blocks",
+        help_text="Parent news article",
+    )
+    block_type = models.CharField(
+        max_length=30,
+        choices=BLOCK_TYPE_CHOICES,
+        default="paragraph",
+        help_text="Choose the type of content block to insert into the story",
+    )
+    order = models.PositiveIntegerField(
+        default=1,
+        help_text="Display order sequence within the article (e.g. 1, 2, 3...)",
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Display this block on live page",
+    )
+
+    # 1. Subheading / Section Title (Multilingual)
+    heading_level = models.CharField(
+        max_length=10,
+        choices=HEADING_LEVEL_CHOICES,
+        default="h2",
+        verbose_name="Heading Level (H2 / H3 / H4)",
+        help_text="Choose heading tag (H2 for main section, H3 for subsection)",
+    )
+    heading_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Subheading (English)",
+    )
+    heading_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Subheading (සිංහල)",
+    )
+    heading_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Subheading (தமிழ்)",
+    )
+
+    # 2. Rich Text / Body Paragraph (Multilingual)
+    text_en = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Paragraph Content (English)",
+        help_text="Rich text / formatted paragraphs (supports HTML and markdown)",
+    )
+    text_si = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Paragraph Content (සිංහල)",
+    )
+    text_ta = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Paragraph Content (தமிழ்)",
+    )
+
+    # 3. Image Block Details
+    image = models.ImageField(
+        upload_to=news_upload_path,
+        blank=True,
+        null=True,
+        help_text="Upload inline image",
+    )
+    image_url = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Or enter direct/fallback image URL",
+    )
+    image_caption_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Image Caption (English)",
+    )
+    image_caption_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Image Caption (සිංහල)",
+    )
+    image_caption_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Image Caption (தமிழ்)",
+    )
+    image_alt = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Image Alt Text",
+    )
+    image_layout = models.CharField(
+        max_length=20,
+        choices=IMAGE_LAYOUT_CHOICES,
+        default="full",
+        help_text="Visual layout for this image",
+    )
+
+    # 4. Video Block Details
+    video_url = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="YouTube URL, Vimeo URL, or direct MP4 video link (e.g. https://www.youtube.com/watch?v=...)",
+    )
+    video_file = models.FileField(
+        upload_to=news_upload_path,
+        blank=True,
+        null=True,
+        help_text="Or upload direct video file (.mp4)",
+    )
+    video_title_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Video Title (English)",
+    )
+    video_title_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Video Title (සිංහල)",
+    )
+    video_title_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Video Title (தமிழ்)",
+    )
+    video_caption_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Video Caption (English)",
+    )
+    video_caption_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Video Caption (සිංහල)",
+    )
+    video_caption_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Video Caption (தமிழ்)",
+    )
+
+    # 5. Table / Data Matrix Block Details
+    table_title_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Table Title / Caption (English)",
+    )
+    table_title_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Table Title / Caption (සිංහල)",
+    )
+    table_title_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Table Title / Caption (தமிழ்)",
+    )
+    table_data = models.TextField(
+        blank=True,
+        default="",
+        help_text="Enter Markdown table or comma-separated rows. e.g.:\n| Harbor Location | Modernization Scope | Budget Allocation (LKR) | Target Completion |\n| Mirissa Harbor | Deepening basin & quay wall | Rs. 450 Million | Q4 2026 |\n| Beruwala Harbor | Solar cold room & ice plant | Rs. 280 Million | Q3 2026 |",
+    )
+
+    # 6. Quote / Highlight Callout Box Details
+    quote_author_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Quote Author / Speaker (English)",
+    )
+    quote_author_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Quote Author / Speaker (සිංහල)",
+    )
+    quote_author_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Quote Author / Speaker (தமிழ்)",
+    )
+    quote_role_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Author Role / Occasion (English)",
+    )
+    quote_role_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Author Role / Occasion (සිංහල)",
+    )
+    quote_role_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Author Role / Occasion (தமிழ்)",
+    )
+    callout_type = models.CharField(
+        max_length=20,
+        choices=CALLOUT_TYPE_CHOICES,
+        default="quote",
+        help_text="Style appearance of the callout box",
+    )
+
+    # 7. File Attachment Block Details (Supports Single & Multiple File Attachments)
+    document_file = models.FileField(
+        upload_to=news_upload_path,
+        blank=True,
+        null=True,
+        help_text="Upload primary downloadable document (PDF, Word, Excel, ZIP)",
+    )
+    file_url_fallback = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Direct link or external download URL",
+    )
+    file_title_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Document File Title (English)",
+    )
+    file_title_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Document File Title (සිංහල)",
+    )
+    file_title_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Document File Title (தமிழ்)",
+    )
+    file_type = models.CharField(
+        max_length=20,
+        choices=FILE_TYPE_CHOICES,
+        default="PDF",
+    )
+    file_size = models.CharField(
+        max_length=50,
+        blank=True,
+        default="1.5 MB",
+        help_text="e.g. '1.5 MB' or '850 KB'",
+    )
+    attachments_data = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Multiple Attachments (JSON / Structured List)",
+        help_text="Allows attaching multiple downloadable files inside this attachment block.",
+    )
+
+    class Meta:
+        ordering = ["article", "order", "id"]
+        verbose_name = "03. News Content Block"
+        verbose_name_plural = "03. News Content Blocks"
+
+    def __str__(self) -> str:
+        label = self.heading_en or self.table_title_en or self.file_title_en or self.get_block_type_display()
+        return f"[{self.article.slug}] Block {self.order}: {self.get_block_type_display()} - {label[:40]}"
