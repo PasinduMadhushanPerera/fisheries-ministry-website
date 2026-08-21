@@ -100,7 +100,7 @@ export function SiteFooter({ initialFooter }: { initialFooter?: ApiFooterSetting
                   href={govPortalUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-[38px] items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 text-xs font-bold text-emerald-300 transition hover:bg-white hover:text-slate-950"
+                  className="inline-flex min-h-[38px] items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 text-xs font-bold text-emerald-300 transition hover:bg-black hover:text-slate-950"
                 >
                   <span>{govPortalLabel}</span>
                   <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
