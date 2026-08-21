@@ -51,4 +51,56 @@ export function extractYouTubeId(urlOrId?: string | null): string {
   }
 
   return ""
-}
+}
+
+/**
+ * Ensures media/image/document URLs resolve to absolute full-resolution paths in backend/media/.
+ */
+export function getAbsoluteMediaUrl(url?: string | null): string {
+  if (!url) return ""
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url
+  }
+  const backendBase = (
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    "http://127.0.0.1:8000"
+  ).replace(/\/$/, "")
+
+  // If path starts with /media/ or /static/
+  if (url.startsWith("/media/") || url.startsWith("/static/")) {
+    return `${backendBase}${url}`
+  }
+
+  const cleanPath = url.replace(/^\//, "")
+  const mediaSubfolders = [
+    "documents/",
+    "downloads/",
+    "rti/",
+    "news/",
+    "press_releases/",
+    "events/",
+    "gallery/",
+    "videos/",
+    "home/",
+    "about/",
+    "divisions/",
+    "institutions/",
+    "statistics/",
+    "notices/",
+    "general/",
+    "media/",
+  ]
+
+  if (mediaSubfolders.some((subfolder) => cleanPath.startsWith(subfolder))) {
+    if (cleanPath.startsWith("media/")) {
+      return `${backendBase}/${cleanPath}`
+    }
+    return `${backendBase}/media/${cleanPath}`
+  }
+
+  if (url.startsWith("/")) {
+    return url
+  }
+  return `/${url}`
+}

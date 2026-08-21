@@ -67,10 +67,29 @@ HEADING_LEVEL_CHOICES = [
 ]
 
 IMAGE_LAYOUT_CHOICES = [
-    ("full", "Full Width Card"),
-    ("centered", "Centered Standard"),
-    ("left", "Float Left / Inline"),
-    ("right", "Float Right / Inline"),
+    ("full", "🖼️ Full Width Banner (100% width)"),
+    ("centered", "🎯 Centered Focus Card (Balanced)"),
+    ("left", "⬅️ Float Left (Text Wraps on Right)"),
+    ("right", "➡️ Float Right (Text Wraps on Left)"),
+    ("grid-2", "👥 2-Column Grid (Side-by-Side 2 Photos)"),
+    ("grid-3", "🧱 3-Column Photo Grid (3 Photos)"),
+    ("collage", "🎨 4-Photo Collage / Quad Gallery (4 Photos)"),
+    ("slider", "🎞️ Mini Photo Carousel"),
+]
+
+IMAGE_SIZE_CHOICES = [
+    ("full", "Full Width (100%)"),
+    ("large", "Large Width (75%)"),
+    ("medium", "Medium Width (50%)"),
+    ("small", "Small / Thumbnail Width (33%)"),
+]
+
+IMAGE_ASPECT_CHOICES = [
+    ("16/9", "16:9 Widescreen (Standard)"),
+    ("4/3", "4:3 Classic Photo"),
+    ("1/1", "1:1 Square Frame"),
+    ("21/9", "21:9 Cinematic Panorama"),
+    ("auto", "Original / Natural Ratio (No Crop)"),
 ]
 
 CALLOUT_TYPE_CHOICES = [
@@ -551,7 +570,28 @@ class NewsContentBlock(TimeStampedModel):
         max_length=20,
         choices=IMAGE_LAYOUT_CHOICES,
         default="full",
-        help_text="Visual layout for this image",
+        verbose_name="Image Layout / Alignment",
+        help_text="Visual layout and alignment for this image (Full width, Centered, Float Left, Float Right, 2-Col Grid, 3-Col Grid, Collage, Slider)",
+    )
+    image_size = models.CharField(
+        max_length=20,
+        choices=IMAGE_SIZE_CHOICES,
+        default="full",
+        verbose_name="Image Display Width / Size",
+        help_text="Controls max width: Full (100%), Large (75%), Medium (50%), Small (33%)",
+    )
+    image_aspect_ratio = models.CharField(
+        max_length=20,
+        choices=IMAGE_ASPECT_CHOICES,
+        default="16/9",
+        verbose_name="Image Aspect Ratio / Frame",
+        help_text="Landscape (16:9), Standard (4:3), Square (1:1), Panoramic (21:9), or Original Auto",
+    )
+    images_data = models.TextField(
+        blank=True,
+        default="",
+        verbose_name="Multiple Images Data (JSON)",
+        help_text="JSON list for multi-photo grids, side-by-side comparisons, and collages: [{'url': '...', 'caption': '...', 'alt': '...'}]",
     )
 
     # 4. Video Block Details
@@ -730,3 +770,72 @@ class NewsContentBlock(TimeStampedModel):
     def __str__(self) -> str:
         label = self.heading_en or self.table_title_en or self.file_title_en or self.get_block_type_display()
         return f"[{self.article.slug}] Block {self.order}: {self.get_block_type_display()} - {label[:40]}"
+
+
+# ==========================================================
+# 04. Inline Multi-Photo Gallery Images for Story Content Blocks
+# ==========================================================
+class NewsBlockImage(TimeStampedModel):
+    block = models.ForeignKey(
+        NewsContentBlock,
+        on_delete=models.CASCADE,
+        related_name="gallery_images",
+        verbose_name="Content Block",
+    )
+    image = models.ImageField(
+        upload_to="news/images/%Y/%m/",
+        blank=True,
+        null=True,
+        verbose_name="📸 Upload Image File",
+        help_text="Select and upload an image file directly from your computer",
+    )
+    image_url_fallback = models.CharField(
+        max_length=500,
+        blank=True,
+        default="",
+        verbose_name="Image URL (Optional Fallback)",
+        help_text="Direct image URL if not uploading file above",
+    )
+    caption_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Caption (English)",
+    )
+    caption_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Caption (සිංහල)",
+    )
+    caption_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Caption (தமிழ்)",
+    )
+    alt_text = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Alt Text",
+    )
+    order = models.PositiveIntegerField(
+        default=1,
+        verbose_name="Display Order",
+        help_text="Order sequence (1, 2, 3...)",
+    )
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Block Gallery Photo"
+        verbose_name_plural = "Block Gallery Photos (Upload Files)"
+
+    def __str__(self) -> str:
+        return f"Photo #{self.order} for Block #{self.block_id}"
+
+    @property
+    def url(self) -> str:
+        if self.image:
+            return self.image.url
+        return self.image_url_fallback

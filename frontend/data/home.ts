@@ -71,10 +71,10 @@ export const quickActions = [
     accent: "amber" as const,
   },
   {
-    title: "Institutions",
+    title: "Divisions",
     description:
       "Connect with departments, authorities and fisheries-sector organisations.",
-    href: "/institutions",
+    href: "/about/divisions",
     icon: Building2,
     accent: "violet" as const,
   },

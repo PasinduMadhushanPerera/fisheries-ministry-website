@@ -1,8 +1,142 @@
+import os
+import uuid
+import json
 from django import forms
+from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.urls import reverse
 from .models import NewsPageHeader, NewsArticleItem, NewsContentBlock
+
+
+# ==========================================================
+# Custom Multi-Photo Upload Widget for Section 3
+# ==========================================================
+class MultiPhotoUploadWidget(forms.Widget):
+    def render(self, name, value, attrs=None, renderer=None):
+        photos = []
+        if value:
+            if isinstance(value, str):
+                try:
+                    photos = json.loads(value)
+                except Exception:
+                    photos = []
+            elif isinstance(value, list):
+                photos = value
+
+        html = [
+            '<div class="multi-photo-uploader-box" style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; margin-top: 6px;">',
+            '<div style="font-weight: 800; font-size: 13px; color: #0f172a; margin-bottom: 6px; display: flex; items-center; justify-between;">',
+            f'  <span>🖼️ Gallery Photos in this Block (<span id="photo-count-badge">{len(photos)}</span>)</span>',
+            '</div>',
+            '<p style="font-size: 11px; color: #64748b; margin-top: 0; margin-bottom: 14px;">',
+            '  💡 <strong>Multi-Photo Builder:</strong> Click <strong>"+ Add Another Photo"</strong> to select and upload image files directly from your computer for 2-Column Grid, 3-Column Grid, 4-Photo Collage, or Mini Carousel layouts.',
+            '</p>',
+            '<div id="photo-cards-container" style="display: flex; flex-direction: column; gap: 10px;">',
+        ]
+
+        if not photos:
+            html.append('<div id="no-photos-msg" style="font-size: 11px; color: #94a3b8; font-style: italic; padding: 8px 0;">No extra multiple photos added yet. (The single image uploaded below will be used by default, or click "+ Add Another Photo" to create a 2-col, 3-col grid, or collage).</div>')
+
+        for i, photo in enumerate(photos):
+            url = photo.get("url") or photo.get("image") or ""
+            caption = photo.get("caption") or photo.get("caption_en") or ""
+            
+            thumb_html = ""
+            if url:
+                display_url = url if (url.startswith("http://") or url.startswith("https://")) else f"http://127.0.0.1:8000{url if url.startswith('/') else '/' + url}"
+                thumb_html = f'<img src="{display_url}" style="height: 52px; width: 78px; object-fit: contain; background: #020617; border-radius: 6px; border: 1px solid #cbd5e1; shrink: 0;" />'
+
+            html.append(f'''
+            <div class="photo-card-item" id="photo-card-{i}" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);">
+                <input type="hidden" name="gallery_photo_existing_url_{i}" value="{url}" />
+                <input type="hidden" name="gallery_photo_deleted_{i}" id="photo-deleted-{i}" value="0" />
+                
+                {thumb_html}
+                
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px;">📸 Upload Image File:</label>
+                    <input type="file" name="gallery_photo_file_{i}" accept="image/*" style="font-size: 11px; padding: 2px;" />
+                    {f'<div style="font-size: 10px; color: #475569; margin-top: 2px; font-family: monospace;">Current: {url}</div>' if url else ''}
+                </div>
+                
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px;">📝 Image Caption:</label>
+                    <input type="text" name="gallery_photo_caption_{i}" value="{caption}" placeholder="Enter photo caption..." style="width: 100%; font-size: 12px; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px;" />
+                </div>
+                
+                <div>
+                    <button type="button" onclick="removePhotoCard({i})" style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer;">❌ Remove</button>
+                </div>
+            </div>
+            ''')
+
+        html.append(f'<input type="hidden" name="gallery_photo_count" id="gallery_photo_count" value="{len(photos)}" />')
+        html.append('</div>')
+
+        # Add Photo Button & JS script
+        html.append('''
+        <div style="margin-top: 14px;">
+            <button type="button" onclick="addPhotoCard()" style="background: #256B29; color: #ffffff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 12px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                ➕ Add Another Photo
+            </button>
+        </div>
+        
+        <script>
+        function removePhotoCard(idx) {
+            var card = document.getElementById('photo-card-' + idx);
+            var delInput = document.getElementById('photo-deleted-' + idx);
+            if (card && delInput) {
+                delInput.value = "1";
+                card.style.display = "none";
+            }
+        }
+
+        function addPhotoCard() {
+            var msg = document.getElementById('no-photos-msg');
+            if (msg) msg.style.display = 'none';
+
+            var container = document.getElementById('photo-cards-container');
+            var countInput = document.getElementById('gallery_photo_count');
+            var currentCount = parseInt(countInput.value) || 0;
+            var newIdx = currentCount;
+            
+            var newCard = document.createElement('div');
+            newCard.className = 'photo-card-item';
+            newCard.id = 'photo-card-' + newIdx;
+            newCard.style.cssText = 'background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.04);';
+            
+            newCard.innerHTML = `
+                <input type="hidden" name="gallery_photo_existing_url_${newIdx}" value="" />
+                <input type="hidden" name="gallery_photo_deleted_${newIdx}" id="photo-deleted-${newIdx}" value="0" />
+                
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px;">📸 Upload Image File:</label>
+                    <input type="file" name="gallery_photo_file_${newIdx}" accept="image/*" style="font-size: 11px; padding: 2px;" required />
+                </div>
+                
+                <div style="flex: 1; min-width: 200px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px;">📝 Image Caption:</label>
+                    <input type="text" name="gallery_photo_caption_${newIdx}" value="" placeholder="Enter photo caption..." style="width: 100%; font-size: 12px; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px;" />
+                </div>
+                
+                <div>
+                    <button type="button" onclick="removePhotoCard(${newIdx})" style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer;">❌ Remove</button>
+                </div>
+            `;
+            
+            container.appendChild(newCard);
+            countInput.value = currentCount + 1;
+            
+            var badge = document.getElementById('photo-count-badge');
+            if (badge) badge.innerText = currentCount + 1;
+        }
+        </script>
+        </div>
+        ''')
+
+        return mark_safe("".join(html))
 
 
 # ==========================================================
@@ -18,14 +152,6 @@ class NewsArticleItemAdminForm(forms.ModelForm):
     class Meta:
         model = NewsArticleItem
         fields = "__all__"
-        widgets = {
-            "summary_en": forms.Textarea(attrs={"rows": 3, "class": "vLargeTextField"}),
-            "summary_si": forms.Textarea(attrs={"rows": 3, "class": "vLargeTextField"}),
-            "summary_ta": forms.Textarea(attrs={"rows": 3, "class": "vLargeTextField"}),
-            "content_en": forms.Textarea(attrs={"rows": 4, "class": "vLargeTextField"}),
-            "content_si": forms.Textarea(attrs={"rows": 4, "class": "vLargeTextField"}),
-            "content_ta": forms.Textarea(attrs={"rows": 4, "class": "vLargeTextField"}),
-        }
 
 
 class NewsContentBlockAdminForm(forms.ModelForm):
@@ -33,11 +159,12 @@ class NewsContentBlockAdminForm(forms.ModelForm):
         model = NewsContentBlock
         fields = "__all__"
         widgets = {
-            "text_en": forms.Textarea(attrs={"rows": 4, "class": "vLargeTextField"}),
-            "text_si": forms.Textarea(attrs={"rows": 4, "class": "vLargeTextField"}),
-            "text_ta": forms.Textarea(attrs={"rows": 4, "class": "vLargeTextField"}),
-            "table_data": forms.Textarea(attrs={"rows": 6, "class": "vLargeTextField"}),
-            "attachments_data": forms.Textarea(attrs={"rows": 6, "class": "vLargeTextField"}),
+            "text_en": forms.Textarea(attrs={"rows": 6, "style": "width: 98%;"}),
+            "text_si": forms.Textarea(attrs={"rows": 4, "style": "width: 98%;"}),
+            "text_ta": forms.Textarea(attrs={"rows": 4, "style": "width: 98%;"}),
+            "table_data": forms.Textarea(attrs={"rows": 6, "style": "width: 98%; font-family: monospace;"}),
+            "images_data": MultiPhotoUploadWidget(),
+            "attachments_data": forms.Textarea(attrs={"rows": 3, "style": "width: 98%; font-family: monospace;"}),
         }
 
 
@@ -47,24 +174,41 @@ class NewsContentBlockAdminForm(forms.ModelForm):
 @admin.register(NewsPageHeader)
 class NewsPageHeaderAdmin(admin.ModelAdmin):
     form = NewsPageHeaderAdminForm
-    list_display = ["library_title_en", "catalogue_badge_en", "featured_badge_en", "updated_at"]
+    list_display = [
+        "badge_text_en",
+        "title_en",
+        "featured_badge_en",
+        "updated_at",
+    ]
+
     fieldsets = (
-        ("🇬🇧 English Section Badges & Titles", {
+        ("🇬🇧 English Main Page Header", {
             "fields": (
-                ("featured_badge_en", "catalogue_badge_en"),
-                "library_title_en",
+                ("badge_text_en", "featured_badge_en"),
+                "title_en",
+                "highlighted_title_en",
+                "description_en",
+                ("catalogue_badge_en", "library_title_en"),
             ),
         }),
-        ("🇱🇰 Sinhala Section Badges & Titles (සිංහල)", {
+        ("🇱🇰 Sinhala Main Page Header (සිංහල)", {
+            "classes": ("collapse",),
             "fields": (
-                ("featured_badge_si", "catalogue_badge_si"),
-                "library_title_si",
+                ("badge_text_si", "featured_badge_si"),
+                "title_si",
+                "highlighted_title_si",
+                "description_si",
+                ("catalogue_badge_si", "library_title_si"),
             ),
         }),
-        ("🇱🇰 Tamil Section Badges & Titles (தமிழ்)", {
+        ("🇱🇰 Tamil Main Page Header (தமிழ்)", {
+            "classes": ("collapse",),
             "fields": (
-                ("featured_badge_ta", "catalogue_badge_ta"),
-                "library_title_ta",
+                ("badge_text_ta", "featured_badge_ta"),
+                "title_ta",
+                "highlighted_title_ta",
+                "description_ta",
+                ("catalogue_badge_ta", "library_title_ta"),
             ),
         }),
     )
@@ -74,7 +218,7 @@ class NewsPageHeaderAdmin(admin.ModelAdmin):
 
 
 # ==========================================================
-# 02. News Article Items Admin (Clean Overview & Metadata)
+# 02. Main News Article Items Admin
 # ==========================================================
 @admin.register(NewsArticleItem)
 class NewsArticleItemAdmin(admin.ModelAdmin):
@@ -87,37 +231,28 @@ class NewsArticleItemAdmin(admin.ModelAdmin):
         "manage_blocks_link",
         "is_featured_badge",
         "is_active_badge",
-        "updated_at",
     ]
     list_display_links = ["title_en"]
     list_editable = ["order"]
-    list_filter = ["category", "is_featured", "is_active"]
-    search_fields = [
-        "title_en",
-        "title_si",
-        "title_ta",
-        "summary_en",
-        "publisher_en",
-        "slug",
-    ]
-    prepopulated_fields = {"slug": ("title_en",)}
+    list_filter = ["category", "is_featured", "is_active", "published_date"]
+    search_fields = ["title_en", "summary_en", "content_en", "publisher_en"]
+    ordering = ["order", "-published_date", "-id"]
 
     fieldsets = (
-        ("🏷️ Article Classification & Category", {
+        ("📌 Basic Article Info & Category", {
             "fields": (
-                ("category", "order"),
-                ("is_featured", "is_active"),
-                "slug",
+                ("slug", "category"),
+                ("order", "is_featured", "is_active"),
             ),
         }),
-        ("🇬🇧 English Content", {
+        ("🇬🇧 English Article Details", {
             "fields": (
                 "title_en",
-                "publisher_en",
-                "summary_en",
+                ("publisher_en", "summary_en"),
+                "content_en",
             ),
         }),
-        ("🇱🇰 Sinhala Content (සිංහල)", {
+        ("🇱🇰 Sinhala Details (සිංහල)", {
             "classes": ("collapse",),
             "fields": (
                 "title_si",
@@ -125,7 +260,7 @@ class NewsArticleItemAdmin(admin.ModelAdmin):
                 "summary_si",
             ),
         }),
-        ("🇱🇰 Tamil Content (தமிழ்)", {
+        ("🇱🇰 Tamil Details (தமிழ்)", {
             "classes": ("collapse",),
             "fields": (
                 "title_ta",
@@ -233,12 +368,13 @@ class NewsContentBlockAdmin(admin.ModelAdmin):
                 ("heading_ta", "text_ta"),
             ),
         }),
-        ("🖼️ 3. Inline Image Details", {
+        ("🖼️ 3. Image Layout, Sizing & Multi-Photo Details", {
             "fields": (
+                ("image_layout", "image_size", "image_aspect_ratio"),
+                "images_data",
                 ("image", "image_url"),
-                ("image_caption_en", "image_layout"),
+                ("image_caption_en", "image_alt"),
                 ("image_caption_si", "image_caption_ta"),
-                "image_alt",
             ),
         }),
         ("🎬 4. Video Details (Embed / Upload)", {
@@ -257,46 +393,77 @@ class NewsContentBlockAdmin(admin.ModelAdmin):
         }),
         ("💬 6. Quote & Callout Box Details", {
             "fields": (
-                ("callout_type", "quote_author_en", "quote_role_en"),
+                ("quote_author_en", "quote_role_en"),
                 ("quote_author_si", "quote_role_si"),
                 ("quote_author_ta", "quote_role_ta"),
             ),
         }),
-        ("📄 7. Multiple File Attachments Details", {
+        ("📄 7. Single Downloadable File / Attachment Details", {
             "fields": (
-                "attachments_data",
-                ("document_file", "file_url_fallback"),
-                ("file_title_en", "file_type", "file_size"),
+                ("file_title_en", "document_file"),
+                ("file_url_fallback", "file_type", "file_size"),
                 ("file_title_si", "file_title_ta"),
+                "attachments_data",
             ),
         }),
     )
 
+    def save_model(self, request, obj, form, change):
+        # Process multi-photo uploader files & captions from request.FILES and request.POST
+        images_list = []
+        try:
+            count = int(request.POST.get("gallery_photo_count", 0))
+        except (ValueError, TypeError):
+            count = 0
+
+        for i in range(count):
+            is_deleted = request.POST.get(f"gallery_photo_deleted_{i}", "0") == "1"
+            if is_deleted:
+                continue
+
+            file_obj = request.FILES.get(f"gallery_photo_file_{i}")
+            existing_url = request.POST.get(f"gallery_photo_existing_url_{i}", "").strip()
+            caption = request.POST.get(f"gallery_photo_caption_{i}", "").strip()
+
+            final_url = existing_url
+            if file_obj:
+                ext = os.path.splitext(file_obj.name)[1].lower() or ".jpg"
+                filename = f"block_photo_{uuid.uuid4().hex[:10]}{ext}"
+                rel_dir = os.path.join("news", "images")
+                abs_dir = os.path.join(settings.MEDIA_ROOT, rel_dir)
+                os.makedirs(abs_dir, exist_ok=True)
+                abs_path = os.path.join(abs_dir, filename)
+
+                with open(abs_path, "wb+") as destination:
+                    for chunk in file_obj.chunks():
+                        destination.write(chunk)
+
+                final_url = f"/media/news/images/{filename}"
+
+            if final_url:
+                images_list.append({
+                    "id": len(images_list) + 1,
+                    "url": final_url,
+                    "caption": caption,
+                    "alt": caption or f"Photo #{len(images_list) + 1}",
+                })
+
+        if images_list:
+            obj.images_data = json.dumps(images_list)
+
+        super().save_model(request, obj, form, change)
+
     def block_type_badge(self, obj):
-        color_map = {
-            "text": ("#eff6ff", "#1d4ed8", "📝 Text"),
-            "paragraph": ("#eff6ff", "#1d4ed8", "📝 Text"),
-            "heading": ("#f5f3ff", "#6d28d9", "📌 Heading"),
-            "image": ("#fdf2f8", "#be185d", "🖼️ Image"),
-            "video": ("#faf5ff", "#7e22ce", "🎬 Video"),
-            "table": ("#f0fdf4", "#15803d", "📊 Table"),
-            "quote": ("#fffbeb", "#b45309", "💬 Quote"),
-            "attachment": ("#f1f5f9", "#334155", "📄 Attachment"),
-            "file": ("#f1f5f9", "#334155", "📄 Attachment"),
-        }
-        bg, color, label = color_map.get(obj.block_type, ("#f1f5f9", "#475569", obj.block_type))
         return format_html(
-            '<span style="background: {}; color: {}; padding: 3px 9px; border-radius: 6px; font-weight: 800; font-size: 11px;">{}</span>',
-            bg,
-            color,
-            label,
+            '<span style="background: #f1f5f9; color: #0f172a; padding: 3px 8px; border-radius: 6px; font-weight: 700; font-size: 11px;">{}</span>',
+            obj.get_block_type_display(),
         )
-    block_type_badge.short_description = "Type"
+    block_type_badge.short_description = "Block Type"
 
     def block_label(self, obj):
-        label = obj.heading_en or obj.table_title_en or obj.video_title_en or obj.file_title_en or (obj.text_en[:55] + "..." if obj.text_en else f"Block #{obj.order}")
-        return label
-    block_label.short_description = "Block Content Summary / Title"
+        label = obj.heading_en or obj.table_title_en or obj.file_title_en or obj.get_block_type_display()
+        return label[:50]
+    block_label.short_description = "Block Identifier"
 
     def is_active_badge(self, obj):
         if obj.is_active:

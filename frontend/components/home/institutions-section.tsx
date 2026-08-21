@@ -13,6 +13,7 @@ import {
 
 import { Container } from "@/components/ui/container"
 import { ApiInstitutionsSection } from "@/lib/api/home"
+import { getAbsoluteMediaUrl } from "@/lib/utils"
 
 type InstitutionItem = {
   title: string
@@ -129,22 +130,23 @@ export function InstitutionsSection({ initialSection }: { initialSection?: ApiIn
           title: c.title,
           acronym: c.acronym,
           description: c.description,
-          image: c.image_url || "/images/institutions/dfar.jpg",
-          alt: c.image_alt || `${c.title} Logo`,
+          image: getAbsoluteMediaUrl(c.image_url || "/images/institutions/dfar.jpg"),
+          alt: c.image_alt || c.title,
           href: c.url,
-          isExternal: c.is_external,
-          fallbackIcon: Building2,
+          isExternal: Boolean(c.is_external),
+          fallbackIcon: Anchor,
         }))
       : defaultInstitutions
 
   return (
     <section
-      id="institutions"
+      id="institutions-section"
       aria-labelledby="institutions-heading"
-      className="py-16 sm:py-20 bg-slate-50 border-b border-slate-200"
+      className="py-16 sm:py-20 bg-white"
     >
       <Container>
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-wider text-[#256B29] flex items-center gap-1.5 mb-1">
               <Sparkles className="h-4 w-4 text-[#256B29]" />
@@ -162,98 +164,66 @@ export function InstitutionsSection({ initialSection }: { initialSection?: ApiIn
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {institutions.map((item) => {
+        {/* Institutions Grid */}
+        <div className="grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+          {institutions.map((inst) => {
+            const FallbackIcon = inst.fallbackIcon
+            const CardWrapper = inst.isExternal ? "a" : Link
+            const linkProps = inst.isExternal
+              ? { href: inst.href, target: "_blank", rel: "noopener noreferrer" }
+              : { href: inst.href }
+
             return (
               <article
-                key={item.acronym}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-[#256B29] hover:shadow-xl"
+                key={inst.acronym}
+                className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-2xs transition duration-300 hover:-translate-y-1 hover:border-[#256B29]/40 hover:shadow-xl"
               >
                 <div>
-                  {/* Top Bar: Acronym & Badge */}
-                  <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 mb-4">
-                    <span className="text-xs font-extrabold tracking-wider text-[#256B29] bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100">
-                      {item.acronym}
+                  {/* Top Bar: Acronym & External Icon */}
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <span className="inline-flex rounded-lg bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 text-xs font-extrabold text-[#256B29]">
+                      {inst.acronym}
                     </span>
-                    <span className="text-[11px] font-semibold text-slate-500">
-                      Official Body
-                    </span>
+                    {inst.isExternal && (
+                      <ExternalLink className="h-4 w-4 text-slate-400 transition-colors group-hover:text-[#256B29]" />
+                    )}
                   </div>
 
-                  {/* Clickable Image Banner */}
-                  {item.isExternal ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Visit ${item.title} official website`}
-                      className="relative block h-36 w-full overflow-hidden rounded-2xl bg-white border border-slate-100 p-2 mb-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
-                    >
-                      <img
-                        src={item.image}
-                        alt={item.alt}
-                        className="h-full w-full object-contain p-1 transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </a>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      aria-label={`View ${item.title}`}
-                      className="relative block h-36 w-full overflow-hidden rounded-2xl bg-white border border-slate-100 p-2 mb-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
-                    >
-                      <img
-                        src={item.image}
-                        alt={item.alt}
-                        className="h-full w-full object-contain p-1 transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </Link>
-                  )}
+                  {/* Thumbnail Image */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-950 flex items-center justify-center p-1.5 mb-4">
+                    <img
+                      src={inst.image}
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 h-full w-full object-cover blur-xl opacity-30 scale-110 pointer-events-none"
+                    />
+                    <img
+                      src={inst.image}
+                      alt={inst.alt}
+                      className="relative z-10 max-h-full w-auto max-w-full object-contain mx-auto rounded-lg shadow-xs transition-transform duration-500 group-hover:scale-[1.03]"
+                    />
+                  </div>
 
                   {/* Title */}
-                  <h3 className="text-base font-extrabold text-slate-950 transition-colors group-hover:text-[#256B29] leading-snug">
-                    {item.isExternal ? (
-                      <a
-                        href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="focus-visible:outline-none"
-                      >
-                        {item.title}
-                      </a>
-                    ) : (
-                      <Link href={item.href} className="focus-visible:outline-none">
-                        {item.title}
-                      </Link>
-                    )}
+                  <h3 className="text-base font-extrabold text-slate-900 leading-snug line-clamp-2 transition-colors group-hover:text-[#256B29]">
+                    <CardWrapper {...(linkProps as any)}>{inst.title}</CardWrapper>
                   </h3>
 
                   {/* Description */}
-                  <p className="mt-2.5 text-xs leading-relaxed text-slate-600 text-justify font-normal line-clamp-3">
-                    {item.description}
+                  <p className="mt-2 text-xs text-slate-600 leading-relaxed line-clamp-3 text-justify">
+                    {inst.description}
                   </p>
                 </div>
 
-                {/* Bottom Action CTA Button */}
-                <div className="mt-6 pt-3 border-t border-slate-100">
-                  {item.isExternal ? (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#256B29] px-4 py-2.5 text-xs font-extrabold !text-white shadow-2xs transition-colors hover:bg-[#1b4d1d] group/btn"
-                    >
-                      <span>Visit Website</span>
-                      <ExternalLink className="h-3.5 w-3.5 shrink-0 group-hover/btn:translate-x-0.5 transition-transform" aria-hidden="true" />
-                    </a>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#256B29] px-4 py-2.5 text-xs font-extrabold !text-white shadow-2xs transition-colors hover:bg-[#1b4d1d] group/btn"
-                    >
-                      <span>View Directory</span>
-                      <Building2 className="h-3.5 w-3.5 shrink-0 group-hover/btn:translate-x-0.5 transition-transform" aria-hidden="true" />
-                    </Link>
-                  )}
+                {/* Footer Action */}
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <CardWrapper
+                    {...(linkProps as any)}
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-100 px-4 py-2 text-xs font-extrabold text-slate-700 transition hover:bg-[#256B29] hover:text-white"
+                  >
+                    <span>Visit Institution</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </CardWrapper>
                 </div>
               </article>
             )

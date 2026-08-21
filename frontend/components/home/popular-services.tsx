@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -14,6 +13,7 @@ import {
 
 import { Container } from "@/components/ui/container"
 import { ApiServicesSection } from "@/lib/api/home"
+import { getAbsoluteMediaUrl } from "@/lib/utils"
 
 type ServiceCardItem = {
   id: string
@@ -94,7 +94,7 @@ export function PopularServices({ initialSection }: { initialSection?: ApiServic
           description: c.description,
           btnText: c.button_text || "Explore Portal",
           href: c.url,
-          image: c.image_url || "/images/services/local-training.jpg",
+          image: getAbsoluteMediaUrl(c.image_url || "/images/services/local-training.jpg"),
           alt: c.image_alt || c.title,
           fallbackIcon: GraduationCap,
         }))
@@ -125,74 +125,58 @@ export function PopularServices({ initialSection }: { initialSection?: ApiServic
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-          {serviceCards.map((card) => (
-            <ServiceCardItemComponent key={card.id} card={card} />
-          ))}
+        <div className="grid gap-6 sm:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+          {serviceCards.map((service) => {
+            const FallbackIcon = service.fallbackIcon
+
+            return (
+              <article
+                key={service.id}
+                className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xs transition duration-300 hover:-translate-y-1 hover:border-[#256B29]/40 hover:shadow-xl"
+              >
+                <div className="p-5 sm:p-6 flex flex-col flex-1 justify-between">
+                  <div>
+                    {/* Visual Header Thumbnail Image */}
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-950 flex items-center justify-center p-1.5 mb-4">
+                      <img
+                        src={service.image}
+                        alt=""
+                        aria-hidden="true"
+                        className="absolute inset-0 h-full w-full object-cover blur-xl opacity-30 scale-110 pointer-events-none"
+                      />
+                      <img
+                        src={service.image}
+                        alt={service.alt}
+                        className="relative z-10 max-h-full w-auto max-w-full object-contain mx-auto rounded-lg shadow-xs transition-transform duration-500 group-hover:scale-[1.03]"
+                      />
+                    </div>
+
+                    <p className="text-[11px] font-extrabold uppercase tracking-wider text-[#256B29] mb-1">
+                      {service.category}
+                    </p>
+                    <h3 className="text-lg font-extrabold text-slate-900 leading-snug line-clamp-2 transition-colors group-hover:text-[#256B29]">
+                      <Link href={service.href}>{service.title}</Link>
+                    </h3>
+                    <p className="mt-2 text-xs text-slate-600 leading-relaxed line-clamp-3 text-justify">
+                      {service.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-5 pt-4 border-t border-slate-100">
+                    <Link
+                      href={service.href}
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#256B29] px-4 py-2.5 text-xs font-extrabold text-white shadow-2xs transition group-hover:bg-[#1b4d1d]"
+                    >
+                      <span>{service.btnText}</span>
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            )
+          })}
         </div>
       </Container>
     </section>
-  )
-}
-
-function ServiceCardItemComponent({ card }: { card: ServiceCardItem }) {
-  const [imageError, setImageError] = useState(false)
-  const FallbackIcon = card.fallbackIcon
-
-  return (
-    <article className="flex flex-col h-full bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xs hover:shadow-xl hover:border-emerald-300 hover:-translate-y-1 transition-all duration-300 group">
-      {/* Card Image Header */}
-      <Link
-        href={card.href}
-        className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 shrink-0 text-left block"
-      >
-        {!imageError ? (
-          <Image
-            src={card.image}
-            alt={card.alt}
-            fill
-            unoptimized={card.image.startsWith("http")}
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            onError={() => setImageError(true)}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-emerald-50 text-[#388E3C]">
-            <FallbackIcon className="h-12 w-12 stroke-[1.5]" aria-hidden="true" />
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
-        <div className="absolute bottom-3 left-3">
-          <span className="rounded-md bg-white/90 px-2.5 py-1 text-[11px] font-extrabold text-slate-900 backdrop-blur-xs shadow-2xs">
-            {card.category}
-          </span>
-        </div>
-      </Link>
-
-      {/* Card Content Body */}
-      <div className="flex flex-col flex-1 p-6 justify-between">
-        <div>
-          <Link href={card.href} className="group/title block">
-            <h3 className="text-lg font-extrabold text-slate-900 tracking-tight group-hover/title:text-[#256B29] transition-colors leading-snug">
-              {card.title}
-            </h3>
-          </Link>
-          <p className="mt-2.5 text-xs leading-relaxed text-slate-600 text-justify font-normal line-clamp-3">
-            {card.description}
-          </p>
-        </div>
-
-        {/* Direct Link Action Button */}
-        <div className="mt-6 pt-3 border-t border-slate-100">
-          <Link
-            href={card.href}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#256B29] px-4 py-2.5 text-xs font-extrabold !text-white transition-colors hover:bg-[#1b4d1d] shadow-2xs group/btn"
-          >
-            <span>{card.btnText}</span>
-            <ArrowRight className="h-3.5 w-3.5 shrink-0 group-hover/btn:translate-x-1 transition-transform" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </article>
   )
 }

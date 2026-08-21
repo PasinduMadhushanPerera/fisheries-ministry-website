@@ -169,8 +169,9 @@ export function HomeHero({ initialSlides }: { initialSlides?: ApiHeroSlide[] }) 
             )
           })}
 
-          <div className="absolute inset-0 z-20 bg-[linear-gradient(90deg,rgba(2,20,27,0.95)_0%,rgba(3,30,35,0.88)_38%,rgba(3,30,35,0.58)_67%,rgba(3,30,35,0.38)_100%)]" />
-          <div className="absolute inset-0 z-20 bg-[linear-gradient(180deg,rgba(3,18,24,0.18)_0%,rgba(3,18,24,0.10)_45%,rgba(3,18,24,0.82)_100%)]" />
+          {/* Lightened Gradient Overlay for High Brightness & Vibrant Cover Images */}
+          <div className="absolute inset-0 z-20 bg-[linear-gradient(90deg,rgba(2,20,27,0.75)_0%,rgba(3,30,35,0.50)_45%,rgba(3,30,35,0.20)_100%)]" />
+          <div className="absolute inset-0 z-20 bg-[linear-gradient(180deg,rgba(3,18,24,0.10)_0%,transparent_50%,rgba(3,18,24,0.50)_100%)]" />
 
           <div
             aria-hidden="true"

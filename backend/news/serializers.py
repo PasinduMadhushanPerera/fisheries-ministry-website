@@ -82,6 +82,23 @@ class NewsPageHeaderSerializer(serializers.ModelSerializer):
 
 import json
 
+def normalize_file_url(url_val, request=None):
+    if not url_val:
+        return ""
+    url_val = str(url_val).strip()
+    if not url_val or url_val == "#":
+        return "#"
+    if url_val.startswith("http://") or url_val.startswith("https://"):
+        return url_val
+    if url_val.startswith("media/"):
+        url_val = "/" + url_val
+    if url_val.startswith("/media/"):
+        return request.build_absolute_uri(url_val) if request else url_val
+    if not url_val.startswith("/"):
+        url_val = "/" + url_val
+    return url_val
+
+
 class NewsContentBlockSerializer(serializers.ModelSerializer):
     type = serializers.CharField(source="block_type")
     display_order = serializers.IntegerField(source="order")
@@ -101,6 +118,7 @@ class NewsContentBlockSerializer(serializers.ModelSerializer):
     file_title = serializers.SerializerMethodField()
     download_url = serializers.SerializerMethodField()
     files = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
 
     class Meta:
         model = NewsContentBlock
@@ -121,6 +139,9 @@ class NewsContentBlockSerializer(serializers.ModelSerializer):
             "image_caption",
             "image_alt",
             "image_layout",
+            "image_size",
+            "image_aspect_ratio",
+            "images",
             # Video fields
             "video_url",
             "video_title",
@@ -170,22 +191,76 @@ class NewsContentBlockSerializer(serializers.ModelSerializer):
         return ""
 
     def get_image_url(self, obj):
+        request = self.context.get("request")
         if obj.image:
-            request = self.context.get("request")
             return request.build_absolute_uri(obj.image.url) if request else obj.image.url
-        return obj.image_url or ""
+        return normalize_file_url(obj.image_url, request)
+
+    def get_images(self, obj):
+        images_list = []
+        request = self.context.get("request")
+
+        # 1. Fetch inline uploaded images (NewsBlockImage)
+        if hasattr(obj, "gallery_images"):
+            for img_obj in obj.gallery_images.all().order_by("order", "id"):
+                img_url = ""
+                if img_obj.image:
+                    img_url = request.build_absolute_uri(img_obj.image.url) if request else img_obj.image.url
+                elif img_obj.image_url_fallback:
+                    img_url = normalize_file_url(img_obj.image_url_fallback, request)
+
+                if img_url:
+                    caption = resolve_lang(img_obj, "caption", self.context) or ""
+                    images_list.append({
+                        "id": img_obj.id,
+                        "url": img_url,
+                        "caption": caption,
+                        "alt": img_obj.alt_text or caption or f"Gallery image #{img_obj.order}",
+                    })
+
+        # 2. Parse images_data if present and no inline images
+        if not images_list and getattr(obj, "images_data", None) and str(obj.images_data).strip():
+            raw = str(obj.images_data).strip()
+            try:
+                data = json.loads(raw)
+                if isinstance(data, list):
+                    for idx, item in enumerate(data):
+                        if isinstance(item, dict) and (item.get("url") or item.get("image")):
+                            url_val = normalize_file_url(item.get("url") or item.get("image"), request)
+                            images_list.append({
+                                "id": idx + 1,
+                                "url": url_val,
+                                "caption": item.get("caption") or item.get("caption_en") or "",
+                                "alt": item.get("alt") or item.get("caption") or f"Gallery image {idx + 1}",
+                            })
+            except Exception:
+                pass
+
+        # 3. Add primary image if present and not already first in list
+        primary_url = self.get_image_url(obj)
+        primary_caption = self.get_image_caption(obj) or ""
+        primary_alt = obj.image_alt or primary_caption or "News Image"
+        if primary_url and not any(img["url"] == primary_url for img in images_list):
+            images_list.insert(0, {
+                "id": 0,
+                "url": primary_url,
+                "caption": primary_caption,
+                "alt": primary_alt,
+            })
+
+        return images_list
 
     def get_video_url(self, obj):
         if obj.video_file:
             request = self.context.get("request")
             return request.build_absolute_uri(obj.video_file.url) if request else obj.video_file.url
-        return obj.video_url or ""
+        return normalize_file_url(obj.video_url, self.context.get("request"))
 
     def get_download_url(self, obj):
+        request = self.context.get("request")
         if obj.document_file:
-            request = self.context.get("request")
             return request.build_absolute_uri(obj.document_file.url) if request else obj.document_file.url
-        return obj.file_url_fallback or ""
+        return normalize_file_url(obj.file_url_fallback, request)
 
     def get_files(self, obj):
         files_list = []
@@ -199,9 +274,7 @@ class NewsContentBlockSerializer(serializers.ModelSerializer):
                 if isinstance(data, list):
                     for idx, item in enumerate(data):
                         if isinstance(item, dict) and (item.get("title") or item.get("url")):
-                            url_val = item.get("url") or item.get("download_url") or ""
-                            if url_val.startswith("/media/") and request:
-                                url_val = request.build_absolute_uri(url_val)
+                            url_val = normalize_file_url(item.get("url") or item.get("download_url"), request)
                             files_list.append({
                                 "id": idx + 1,
                                 "title": item.get("title") or f"Document #{idx + 1}",
@@ -214,7 +287,7 @@ class NewsContentBlockSerializer(serializers.ModelSerializer):
                     if line.strip():
                         parts = line.strip().split("|")
                         title = parts[0].strip()
-                        url = parts[1].strip() if len(parts) > 1 else ""
+                        url = normalize_file_url(parts[1].strip() if len(parts) > 1 else "", request)
                         ftype = parts[2].strip() if len(parts) > 2 else "PDF"
                         fsize = parts[3].strip() if len(parts) > 3 else "1.5 MB"
                         files_list.append({
