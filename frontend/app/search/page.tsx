@@ -267,7 +267,7 @@ const searchResults: SearchResult[] = [
     title: "Frequently Asked Questions",
     summary:
       "Find answers to common questions about Ministry services, applications and public information.",
-    href: "/frequently-asked-questions",
+    href: "/contact#contact-faq",
     category: "Support",
     keywords: [
       "faq",

@@ -56,7 +56,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       </main>
 
       {/* Global Footer */}
-      <SiteFooter initialFooter={headerFooterData?.footer} />
+      <SiteFooter initialFooter={headerFooterData?.footer} initialViews={headerFooterData?.total_views} />
     </>
   )
 }

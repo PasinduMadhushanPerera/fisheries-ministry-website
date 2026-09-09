@@ -50,7 +50,7 @@ export function CitizenHelp() {
             </LinkButton>
 
             <LinkButton
-              href="/frequently-asked-questions"
+              href="/contact#contact-faq"
               variant="outline"
               className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white"
             >

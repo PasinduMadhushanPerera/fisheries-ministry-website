@@ -1,14 +1,13 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 
 import { SiteHeader } from "@/components/layout/site-header"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
-import { ContactHero } from "@/components/contact/contact-hero"
-import { DepartmentDirectory } from "@/components/contact/department-directory"
-import { OfficeLocation } from "@/components/contact/office-location"
-import { ContactForm } from "@/components/contact/contact-form"
-import { ContactFaq } from "@/components/contact/contact-faq"
-import { CommunicationChannels } from "@/components/contact/communication-channels"
+import { ContactPageContent } from "@/components/contact/contact-page-content"
+import { fetchContactPageData } from "@/lib/api/contact"
+import { fetchHeaderFooterData } from "@/lib/api/header-footer"
+import { getServerLanguage } from "@/lib/get-server-language"
 
 export const metadata: Metadata = {
   title: "Contact Us - Ministry of Fisheries",
@@ -16,10 +15,26 @@ export const metadata: Metadata = {
     "Official contact portal of the Ministry of Fisheries. Access departmental directories, headquarters address, office map, inquiry submission form, and public FAQs.",
 }
 
-export default function ContactPage() {
+interface ContactPageProps {
+  searchParams?: Promise<{ lang?: string }>
+}
+
+export default async function ContactPage(props: ContactPageProps) {
+  const resolvedSearchParams = props.searchParams ? await props.searchParams : null
+  const langFromUrl = resolvedSearchParams?.lang && ["en", "si", "ta"].includes(resolvedSearchParams.lang.toLowerCase())
+    ? resolvedSearchParams.lang.toLowerCase()
+    : null
+
+  const initialLang = langFromUrl || await getServerLanguage(props.searchParams)
+
+  const [initialData, headerFooterData] = await Promise.all([
+    fetchContactPageData(initialLang),
+    fetchHeaderFooterData(initialLang),
+  ])
+
   return (
     <>
-      <SiteHeader />
+      <SiteHeader initialHeader={headerFooterData?.header} />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
         <Breadcrumb
@@ -29,20 +44,16 @@ export default function ContactPage() {
           ]}
         />
 
-        {/* <ContactHero /> */}
-
-        <DepartmentDirectory />
-
-        <OfficeLocation />
-
-        <ContactForm />
-
-        <ContactFaq />
-
-        <CommunicationChannels />
+        <Suspense fallback={
+          <div className="py-16 text-center text-slate-500 font-semibold">
+            Loading contact directory...
+          </div>
+        }>
+          <ContactPageContent initialData={initialData} />
+        </Suspense>
       </main>
 
-      <SiteFooter />
+      <SiteFooter initialFooter={headerFooterData?.footer} />
     </>
   )
 }

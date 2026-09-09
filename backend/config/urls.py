@@ -48,6 +48,7 @@ def custom_get_app_list(request, app_label=None):
         "fishery_information",
         "rti_page",
         "downloads_page",
+        "contact_page",
     }
     filtered = [app for app in app_list if app.get("app_label") in allowed_apps]
     
@@ -105,6 +106,8 @@ def custom_get_app_list(request, app_label=None):
             return 24
         if label == "downloads_page":
             return 25
+        if label == "contact_page":
+            return 26
         return 99
 
     return sorted(filtered, key=app_order)
@@ -143,6 +146,7 @@ urlpatterns = [
     path("api/v1/statistics/", include("fishery_information.urls")),
     path("api/v1/rti/", include("rti_page.urls")),
     path("api/v1/downloads/", include("downloads_page.urls")),
+    path("api/v1/contact/", include("contact_page.urls")),
     path("api/v1/about/", include("about.urls")),
     path("api/v1/minister/", include("minister_profile.urls")),
     path("api/v1/deputy-minister/", include("deputy_minister_profile.urls")),

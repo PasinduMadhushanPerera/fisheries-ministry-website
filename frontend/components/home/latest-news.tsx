@@ -283,13 +283,13 @@ export function LatestNews({
                       </div>
 
                       {/* 2. COVER IMAGE CONTAINER (UNDER TAGS, 100% UNCROPPED & CRYSTAL CLEAR) */}
-                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-950 flex items-center justify-center p-1.5">
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-white flex items-center justify-center p-1.5 border-b border-slate-100">
                         {/* Ambient Blurred Background Fill */}
                         <img
                           src={fullImageUrl}
                           alt=""
                           aria-hidden="true"
-                          className="absolute inset-0 h-full w-full object-cover blur-xl opacity-30 scale-110 pointer-events-none"
+                          className="absolute inset-0 h-full w-full object-cover blur-xl opacity-15 scale-110 pointer-events-none"
                         />
 
                         {/* 100% Complete & Uncropped Foreground Image */}

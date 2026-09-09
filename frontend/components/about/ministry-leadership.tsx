@@ -78,7 +78,7 @@ function LeadershipCardComponent({
       interactive
       className="group flex flex-col h-full overflow-hidden border border-slate-200 bg-white rounded-2xl shadow-2xs hover:shadow-md transition-all duration-200"
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100 shrink-0">
+      <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-900 shrink-0">
         {!imageError ? (
           <Image
             src={leader.image}
@@ -86,7 +86,7 @@ function LeadershipCardComponent({
             fill
             unoptimized
             sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
             onError={() => setImageError(true)}
           />
         ) : (
@@ -95,7 +95,12 @@ function LeadershipCardComponent({
           </div>
         )}
 
-        <span className="absolute bottom-3 left-3 rounded-full bg-slate-900/90 text-white px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] backdrop-blur-xs">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-90"
+        />
+
+        <span className="absolute bottom-3 left-3 rounded-full bg-[#256B29] text-white px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] shadow-sm backdrop-blur-xs">
           {leader.role}
         </span>
       </div>
@@ -115,16 +120,18 @@ function LeadershipCardComponent({
           </p>
         </div>
 
-        <div className="mt-6 pt-3 border-t border-slate-100">
+        <div className="mt-6 pt-4 border-t border-slate-100">
           <Link
             href={leader.href}
-            className="inline-flex items-center gap-2 text-sm font-bold text-[#256B29] hover:underline"
+            className="inline-flex w-full items-center justify-between rounded-xl border border-[#256B29]/25 bg-emerald-50/60 px-4 py-2.5 text-sm font-bold text-[#256B29] transition-all duration-200 hover:bg-[#256B29] hover:text-white hover:border-[#256B29] hover:shadow-sm group/btn"
           >
             <span>View leadership profile</span>
-            <ArrowRight
-              aria-hidden="true"
-              className="h-4 w-4 transition-transform group-hover:translate-x-1"
-            />
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#256B29]/15 text-[#256B29] group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors">
+              <ArrowRight
+                aria-hidden="true"
+                className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5"
+              />
+            </div>
           </Link>
         </div>
       </div>

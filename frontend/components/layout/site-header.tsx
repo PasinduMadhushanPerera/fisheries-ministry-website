@@ -9,6 +9,7 @@ import { AlertCircle, Search } from "lucide-react"
 import { Container } from "@/components/ui/container"
 import { siteConfig } from "@/config/site"
 import { ApiHeaderSetting } from "@/lib/api/header-footer"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 
 import { DesktopNavigation } from "./desktop-navigation"
 import { MobileNavigation } from "./mobile-navigation"
@@ -19,29 +20,34 @@ const EXPAND_SCROLL_POSITION = 40
 
 export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting }) {
   const pathname = usePathname()
+  const { language, t } = useLanguage()
   const [scrolled, setScrolled] = useState(false)
 
   const scrolledRef = useRef(false)
   const animationFrameRef = useRef<number | null>(null)
 
-  const governmentName = initialHeader?.government_name || siteConfig.governmentName || "Government of Sri Lanka"
-  const ministryName = initialHeader?.ministry_name || "Ministry of Fisheries, Aquatic and Ocean Resources"
-  const tagline = initialHeader?.tagline || "Sustainable fisheries, aquatic resources and public services"
+  const isTranslated = language === "si" || language === "ta"
+
+  const governmentName = isTranslated ? t.header.governmentName : (initialHeader?.government_name || t.header.governmentName || siteConfig.governmentName || "Government of Sri Lanka")
+  const ministryName = isTranslated ? t.header.ministryName : (initialHeader?.ministry_name || t.header.ministryName || "Ministry of Fisheries, Aquatic and Ocean Resources")
+  const tagline = isTranslated ? t.header.ministryDescription : (initialHeader?.tagline || t.header.ministryDescription || "Sustainable fisheries, aquatic resources and public services")
   const logoUrl = initialHeader?.logo_url || "/images/government/logo.jpg"
-  const logoAlt = initialHeader?.logo_alt || "Emblem of the Government of Sri Lanka"
-  const searchPlaceholder = initialHeader?.search_placeholder || "Search this website"
+  const logoAlt = isTranslated ? t.header.emblemAlt : (initialHeader?.logo_alt || t.header.emblemAlt || "Emblem of the Government of Sri Lanka")
+  const searchPlaceholder = isTranslated ? t.header.searchPlaceholder : (initialHeader?.search_placeholder || t.header.searchPlaceholder || "Search this website")
 
   const showEmergency = initialHeader?.enable_emergency_banner && initialHeader?.emergency_banner_text
 
   /*
-   * Return to the top whenever the route changes.
+   * Return to the top whenever the route changes (unless hash navigation is present).
    */
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "auto",
-    })
+    if (typeof window !== "undefined" && !window.location.hash) {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto",
+      })
+    }
 
     scrolledRef.current = false
     setScrolled(false)

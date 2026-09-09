@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import {
   CircleHelp,
@@ -10,14 +12,20 @@ import { Container } from "@/components/ui/container"
 import { AccessibilityMenu } from "./accessibility-menu"
 import { LanguageSwitcher } from "./language-switcher"
 import { ApiHeaderSetting } from "@/lib/api/header-footer"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 
 export function UtilityBar({ initialHeader }: { initialHeader?: ApiHeaderSetting }) {
+  const { language, t } = useLanguage()
+
+  const isTranslated = language === "si" || language === "ta"
+
   const hotlinePhone = initialHeader?.hotline_phone || "+94 112 327 060"
   const email = initialHeader?.email || "info@fisheries.gov.lk"
-  const helpLinkText = initialHeader?.help_link_text || "Get help & contact"
+  const helpLinkText = isTranslated ? t.utilityBar.getHelp : (initialHeader?.help_link_text || t.utilityBar.getHelp || "Get help & contact")
   const helpLinkUrl = initialHeader?.help_link_url || "/contact"
-  const govLinkText = initialHeader?.gov_link_text || "Gov.lk"
+  const govLinkText = isTranslated ? t.utilityBar.governmentPortal : (initialHeader?.gov_link_text || t.utilityBar.governmentPortal || "Gov.lk")
   const govLinkUrl = initialHeader?.gov_link_url || "https://www.gov.lk/"
+  const governmentName = t.header.governmentName || "Government of Sri Lanka"
 
   const phoneTel = `tel:${hotlinePhone.replace(/[^0-9+]/g, "")}`
 
@@ -60,7 +68,7 @@ export function UtilityBar({ initialHeader }: { initialHeader?: ApiHeaderSetting
         </div>
 
         <p className="hidden text-xs font-semibold text-slate-600 md:block lg:hidden">
-          Government of Sri Lanka
+          {governmentName}
         </p>
 
         <div className="ml-auto flex items-center gap-1">

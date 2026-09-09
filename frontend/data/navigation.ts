@@ -188,6 +188,50 @@ export const mainNavigation: NavigationItem[] = [
     label_si: "බාගත කිරීම්",
     label_ta: "பதிவிறக்கங்கள்",
     href: "/downloads",
+    children: [
+      {
+        label: "Human Resource Development Plan",
+        label_si: "මානව සම්පත් සංවර්ධන සැලැස්ම",
+        label_ta: "மனித வள அபிவிருத்தித் திட்டம்",
+        href: "/downloads?category=hr-development",
+      },
+      {
+        label: "Performance Report",
+        label_si: "කාර්යසාධන වාර්තාව",
+        label_ta: "செயல்திறன் அறிக்கை",
+        href: "/downloads?category=performance-report",
+      },
+      {
+        label: "Progress Report",
+        label_si: "ප්‍රගති වාර්තාව",
+        label_ta: "முன்னேற்ற அறிக்கை",
+        href: "/downloads?category=progress-report",
+      },
+      {
+        label: "Annual Statistics",
+        label_si: "වාර්ෂික සංඛ්‍යාලේඛන",
+        label_ta: "வருடாந்த புள்ளிவிவரங்கள்",
+        href: "/downloads?category=annual-statistics",
+      },
+      {
+        label: "Action Plan",
+        label_si: "ක්‍රියාකාරී සැලැස්ම",
+        label_ta: "செயற்பாட்டுத் திட்டம்",
+        href: "/downloads?category=action-plan",
+      },
+      {
+        label: "Physical and Financial Progress Report",
+        label_si: "භෞතික හා මුදල් ප්‍රගති වාර්තාව",
+        label_ta: "பௌதீக සහ මුදල් ප්‍රගති වාර්තාව",
+        href: "/downloads?category=physical-financial-progress",
+      },
+      {
+        label: "Others",
+        label_si: "වෙනත්",
+        label_ta: "மற்றவை",
+        href: "/downloads?category=others",
+      },
+    ],
   },
   {
     label: "Contact Us",
