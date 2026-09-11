@@ -11,7 +11,7 @@ import { Container } from "@/components/ui/container"
 import { fetchDynamicPageBySlug } from "@/lib/api/pages"
 
 type Props = {
-  params: Promise<{ slug?: string | string[] }> | { slug?: string | string[] }
+  params: Promise<{ slug?: string | string[] }>
 }
 
 async function resolveSlug(paramsPromise: Props["params"]): Promise<string> {
