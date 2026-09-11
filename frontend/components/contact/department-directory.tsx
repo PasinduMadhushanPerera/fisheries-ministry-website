@@ -323,7 +323,7 @@ export function DepartmentDirectory({
                                 }
 
                                 // Dynamic Lookup for Newly Added Custom Columns (Notes1, Notes2, Extension, Specialization, etc.)
-                                const extraData = officer.extra_data || {}
+                                const extraData = (officer as any).extra_data || {}
                                 const extraValue =
                                   extraData[colName] ||
                                   extraData[colName.trim()] ||

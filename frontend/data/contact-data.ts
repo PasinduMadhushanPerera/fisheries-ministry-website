@@ -7,6 +7,7 @@ export type ContactOfficer = {
   fax?: string
   email: string
   location?: string
+  extra_data?: Record<string, any>
 }
 
 export type DepartmentContact = {
