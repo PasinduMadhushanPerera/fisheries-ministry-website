@@ -90,6 +90,25 @@ class MultiPhotoUploadWidget(forms.Widget):
             if (card && delInput) {
                 delInput.value = "1";
                 card.style.display = "none";
+                var fileInp = card.querySelector('input[type="file"]');
+                if (fileInp) fileInp.removeAttribute('required');
+            }
+            updatePhotoCountBadge();
+        }
+
+        function updatePhotoCountBadge() {
+            var container = document.getElementById('photo-cards-container');
+            if (!container) return;
+            var cards = container.querySelectorAll('.photo-card-item');
+            var visibleCount = 0;
+            cards.forEach(function(c) {
+                if (c.style.display !== 'none') visibleCount++;
+            });
+            var badge = document.getElementById('photo-count-badge');
+            if (badge) badge.innerText = visibleCount;
+            var msg = document.getElementById('no-photos-msg');
+            if (msg) {
+                msg.style.display = visibleCount === 0 ? 'block' : 'none';
             }
         }
 
@@ -113,7 +132,7 @@ class MultiPhotoUploadWidget(forms.Widget):
                 
                 <div style="flex: 1; min-width: 200px;">
                     <label style="display: block; font-size: 11px; font-weight: 700; color: #334155; margin-bottom: 3px;">📸 Upload Image File:</label>
-                    <input type="file" name="gallery_photo_file_${newIdx}" accept="image/*" style="font-size: 11px; padding: 2px;" required />
+                    <input type="file" name="gallery_photo_file_${newIdx}" accept="image/*" style="font-size: 11px; padding: 2px;" />
                 </div>
                 
                 <div style="flex: 1; min-width: 200px;">
@@ -128,9 +147,7 @@ class MultiPhotoUploadWidget(forms.Widget):
             
             container.appendChild(newCard);
             countInput.value = currentCount + 1;
-            
-            var badge = document.getElementById('photo-count-badge');
-            if (badge) badge.innerText = currentCount + 1;
+            updatePhotoCountBadge();
         }
         </script>
         </div>
@@ -409,7 +426,9 @@ class NewsContentBlockAdmin(admin.ModelAdmin):
     )
 
     def save_model(self, request, obj, form, change):
-        # Process multi-photo uploader files & captions from request.FILES and request.POST
+        super().save_model(request, obj, form, change)
+
+        # Process multi-photo uploader files, captions, and deletions from request.FILES and request.POST
         images_list = []
         try:
             count = int(request.POST.get("gallery_photo_count", 0))
@@ -448,10 +467,10 @@ class NewsContentBlockAdmin(admin.ModelAdmin):
                     "alt": caption or f"Photo #{len(images_list) + 1}",
                 })
 
-        if images_list:
-            obj.images_data = json.dumps(images_list)
-
-        super().save_model(request, obj, form, change)
+        new_json = json.dumps(images_list) if images_list else ""
+        if obj.images_data != new_json:
+            obj.images_data = new_json
+            obj.save(update_fields=["images_data"])
 
     def block_type_badge(self, obj):
         return format_html(

@@ -50,6 +50,9 @@ def custom_get_app_list(request, app_label=None):
         "downloads_page",
         "contact_page",
     }
+    if request.user.is_superuser:
+        allowed_apps.add("auth")
+
     filtered = [app for app in app_list if app.get("app_label") in allowed_apps]
     
     def app_order(a):
@@ -108,6 +111,8 @@ def custom_get_app_list(request, app_label=None):
             return 25
         if label == "contact_page":
             return 26
+        if label == "auth":
+            return 90
         return 99
 
     return sorted(filtered, key=app_order)

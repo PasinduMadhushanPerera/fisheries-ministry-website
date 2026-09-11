@@ -147,19 +147,19 @@ export function NewsDetail({ article }: NewsDetailProps) {
           },
         ]
 
-    // 1. Multi-Image Grid Layouts (2-Col, 3-Col, Collage) - Generous Large Heights
+    // 1. Multi-Image Grid Layouts (2-Col, 3-Col, Collage) - Uniform Frame Heights
     if (layout === "grid-2" || blockPhotos.length === 2) {
       return (
-        <div key={block.id} className="my-10 space-y-3">
+        <div key={block.id} className="my-8 space-y-3">
           {block.heading && (
             <h3 className="text-lg font-extrabold text-slate-950">{block.heading}</h3>
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-stretch">
             {blockPhotos.map((photo, pIdx) => {
               const fullUrl = getAbsoluteMediaUrl(photo.url)
               return (
-                <figure key={photo.id || pIdx} className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md group">
-                  <div className="relative min-h-[320px] max-h-[480px] w-full flex items-center justify-center p-2.5 overflow-hidden">
+                <figure key={photo.id || pIdx} className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md group">
+                  <div className="relative h-64 sm:h-80 w-full flex items-center justify-center p-3 overflow-hidden bg-slate-950">
                     <img
                       src={fullUrl}
                       alt=""
@@ -169,13 +169,13 @@ export function NewsDetail({ article }: NewsDetailProps) {
                     <img
                       src={fullUrl}
                       alt={photo.alt || `Photo ${pIdx + 1}`}
-                      className="relative z-10 max-h-[460px] w-auto max-w-full object-contain mx-auto rounded-xl shadow-xl transition-transform duration-300 group-hover:scale-[1.02]"
+                      className="relative z-10 max-h-full max-w-full h-auto w-auto object-contain mx-auto rounded-xl shadow-xl transition-transform duration-300 group-hover:scale-[1.02]"
                     />
                   </div>
                   {photo.caption && (
-                    <figcaption className="bg-white p-3.5 text-xs font-semibold text-slate-700 italic border-t border-slate-100 flex items-center gap-2">
+                    <figcaption className="mt-auto bg-white p-3.5 text-xs font-semibold text-slate-700 italic border-t border-slate-100 flex items-center gap-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#256B29] shrink-0" />
-                      <span>{photo.caption}</span>
+                      <span className="line-clamp-2">{photo.caption}</span>
                     </figcaption>
                   )}
                 </figure>
@@ -188,16 +188,16 @@ export function NewsDetail({ article }: NewsDetailProps) {
 
     if (layout === "grid-3" || blockPhotos.length === 3) {
       return (
-        <div key={block.id} className="my-10 space-y-3">
+        <div key={block.id} className="my-8 space-y-3">
           {block.heading && (
             <h3 className="text-lg font-extrabold text-slate-950">{block.heading}</h3>
           )}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-stretch">
             {blockPhotos.map((photo, pIdx) => {
               const fullUrl = getAbsoluteMediaUrl(photo.url)
               return (
-                <figure key={photo.id || pIdx} className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md group">
-                  <div className="relative min-h-[260px] max-h-[400px] w-full flex items-center justify-center p-2 overflow-hidden">
+                <figure key={photo.id || pIdx} className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md group">
+                  <div className="relative h-52 sm:h-64 w-full flex items-center justify-center p-2.5 overflow-hidden bg-slate-950">
                     <img
                       src={fullUrl}
                       alt=""
@@ -207,11 +207,11 @@ export function NewsDetail({ article }: NewsDetailProps) {
                     <img
                       src={fullUrl}
                       alt={photo.alt || `Photo ${pIdx + 1}`}
-                      className="relative z-10 max-h-[380px] w-auto max-w-full object-contain mx-auto rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-[1.02]"
+                      className="relative z-10 max-h-full max-w-full h-auto w-auto object-contain mx-auto rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-[1.02]"
                     />
                   </div>
                   {photo.caption && (
-                    <figcaption className="bg-white p-3 text-xs font-semibold text-slate-700 italic border-t border-slate-100 line-clamp-2">
+                    <figcaption className="mt-auto bg-white p-3 text-xs font-semibold text-slate-700 italic border-t border-slate-100 line-clamp-2">
                       {photo.caption}
                     </figcaption>
                   )}
@@ -225,16 +225,16 @@ export function NewsDetail({ article }: NewsDetailProps) {
 
     if (layout === "collage" || blockPhotos.length >= 4) {
       return (
-        <div key={block.id} className="my-10 space-y-3">
+        <div key={block.id} className="my-8 space-y-3">
           {block.heading && (
             <h3 className="text-lg font-extrabold text-slate-950">{block.heading}</h3>
           )}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 items-stretch">
             {blockPhotos.map((photo, pIdx) => {
               const fullUrl = getAbsoluteMediaUrl(photo.url)
               return (
-                <figure key={photo.id || pIdx} className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-sm group">
-                  <div className="relative aspect-square w-full flex items-center justify-center p-1.5 overflow-hidden">
+                <figure key={photo.id || pIdx} className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-sm group">
+                  <div className="relative h-40 sm:h-48 w-full flex items-center justify-center p-2 overflow-hidden bg-slate-950">
                     <img
                       src={fullUrl}
                       alt=""
@@ -244,11 +244,11 @@ export function NewsDetail({ article }: NewsDetailProps) {
                     <img
                       src={fullUrl}
                       alt={photo.alt || `Photo ${pIdx + 1}`}
-                      className="relative z-10 max-h-full w-auto max-w-full object-contain mx-auto rounded-md shadow-md transition-transform duration-300 group-hover:scale-[1.03]"
+                      className="relative z-10 max-h-full max-w-full h-auto w-auto object-contain mx-auto rounded-md shadow-md transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                   </div>
                   {photo.caption && (
-                    <figcaption className="bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 italic border-t border-slate-100 truncate">
+                    <figcaption className="mt-auto bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 italic border-t border-slate-100 truncate">
                       {photo.caption}
                     </figcaption>
                   )}
@@ -272,9 +272,9 @@ export function NewsDetail({ article }: NewsDetailProps) {
       return (
         <figure
           key={block.id}
-          className="float-left mr-6 mb-6 w-full sm:w-[460px] max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md clear-left group"
+          className="float-left mr-6 mb-6 w-full sm:w-[440px] max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md clear-left group"
         >
-          <div className="relative min-h-[300px] max-h-[480px] w-full flex items-center justify-center p-2.5 overflow-hidden">
+          <div className="relative h-64 sm:h-80 w-full flex items-center justify-center p-3 overflow-hidden bg-slate-950">
             <img
               src={singleFullUrl}
               alt=""
@@ -284,7 +284,7 @@ export function NewsDetail({ article }: NewsDetailProps) {
             <img
               src={singleFullUrl}
               alt={singlePhoto.alt}
-              className="relative z-10 max-h-[460px] w-auto max-w-full object-contain mx-auto rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-[1.01]"
+              className="relative z-10 max-h-full max-w-full h-auto w-auto object-contain mx-auto rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-[1.01]"
             />
           </div>
           {singlePhoto.caption && (
@@ -300,9 +300,9 @@ export function NewsDetail({ article }: NewsDetailProps) {
       return (
         <figure
           key={block.id}
-          className="float-right ml-6 mb-6 w-full sm:w-[460px] max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md clear-right group"
+          className="float-right ml-6 mb-6 w-full sm:w-[440px] max-w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 shadow-md clear-right group"
         >
-          <div className="relative min-h-[300px] max-h-[480px] w-full flex items-center justify-center p-2.5 overflow-hidden">
+          <div className="relative h-64 sm:h-80 w-full flex items-center justify-center p-3 overflow-hidden bg-slate-950">
             <img
               src={singleFullUrl}
               alt=""
@@ -312,7 +312,7 @@ export function NewsDetail({ article }: NewsDetailProps) {
             <img
               src={singleFullUrl}
               alt={singlePhoto.alt}
-              className="relative z-10 max-h-[460px] w-auto max-w-full object-contain mx-auto rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-[1.01]"
+              className="relative z-10 max-h-full max-w-full h-auto w-auto object-contain mx-auto rounded-xl shadow-lg transition-transform duration-300 group-hover:scale-[1.01]"
             />
           </div>
           {singlePhoto.caption && (
@@ -328,7 +328,7 @@ export function NewsDetail({ article }: NewsDetailProps) {
       return (
         <div key={block.id} className="my-10 flex flex-col items-center">
           <figure className="w-full max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-xl group">
-            <div className="relative min-h-[380px] max-h-[640px] w-full flex items-center justify-center p-3 sm:p-4 overflow-hidden">
+            <div className="relative h-72 sm:h-96 md:h-[480px] w-full flex items-center justify-center p-3 sm:p-4 overflow-hidden bg-slate-950">
               <img
                 src={singleFullUrl}
                 alt=""
@@ -338,7 +338,7 @@ export function NewsDetail({ article }: NewsDetailProps) {
               <img
                 src={singleFullUrl}
                 alt={singlePhoto.alt}
-                className="relative z-10 max-h-[620px] w-auto max-w-full object-contain mx-auto rounded-2xl shadow-2xl transition-transform duration-300 group-hover:scale-[1.01]"
+                className="relative z-10 max-h-full max-w-full h-auto w-auto object-contain mx-auto rounded-2xl shadow-2xl transition-transform duration-300 group-hover:scale-[1.01]"
               />
             </div>
             {singlePhoto.caption && (
@@ -358,7 +358,7 @@ export function NewsDetail({ article }: NewsDetailProps) {
         key={block.id}
         className="my-10 w-full overflow-hidden rounded-3xl border border-slate-200 bg-slate-950 shadow-lg group"
       >
-        <div className="relative min-h-[400px] max-h-[680px] w-full flex items-center justify-center p-3 sm:p-4 overflow-hidden">
+        <div className="relative h-72 sm:h-96 md:h-[480px] w-full flex items-center justify-center p-3 sm:p-4 overflow-hidden bg-slate-950">
           <img
             src={singleFullUrl}
             alt=""
@@ -368,7 +368,7 @@ export function NewsDetail({ article }: NewsDetailProps) {
           <img
             src={singleFullUrl}
             alt={singlePhoto.alt}
-            className="relative z-10 max-h-[650px] w-auto max-w-full object-contain mx-auto rounded-2xl shadow-2xl transition-transform duration-300 group-hover:scale-[1.01]"
+            className="relative z-10 max-h-full max-w-full h-auto w-auto object-contain mx-auto rounded-2xl shadow-2xl transition-transform duration-300 group-hover:scale-[1.01]"
           />
         </div>
         {singlePhoto.caption && (
