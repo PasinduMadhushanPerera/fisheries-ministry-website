@@ -116,7 +116,7 @@ export type HomePageData = {
 }
 
 export async function fetchHomePageData(lang: string = "en"): Promise<HomePageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/home/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 

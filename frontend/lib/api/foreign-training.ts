@@ -37,7 +37,7 @@ export interface ApiForeignTrainingPageData {
 export async function fetchForeignTrainingPageData(
   lang: string = "en"
 ): Promise<ApiForeignTrainingPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/foreign-training/?lang=${encodeURIComponent(lang)}`
 

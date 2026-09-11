@@ -106,7 +106,7 @@ export async function fetchNewsPageData(
     process.env.NEXT_PUBLIC_API_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "http://127.0.0.1:8000"
+    "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/news/?lang=${encodeURIComponent(
     lang
@@ -132,7 +132,7 @@ export async function fetchNewsArticleBySlug(
     process.env.NEXT_PUBLIC_API_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "http://127.0.0.1:8000"
+    "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/news/${encodeURIComponent(
     slug

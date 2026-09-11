@@ -42,7 +42,7 @@ export interface ApiDownloadsPageData {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "http://127.0.0.1:8000"
+  "https://pasiperera.pythonanywhere.com"
 
 export async function fetchDownloadsPageData(
   language = "en"

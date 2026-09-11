@@ -45,7 +45,7 @@ export interface ApiGalleryPageData {
 export async function fetchGalleryPageData(
   lang: string = "en"
 ): Promise<ApiGalleryPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/gallery/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
@@ -65,7 +65,7 @@ export async function fetchGalleryAlbumBySlug(
   slug: string,
   lang: string = "en"
 ): Promise<ApiGalleryAlbum | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/gallery/${encodeURIComponent(slug)}/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 

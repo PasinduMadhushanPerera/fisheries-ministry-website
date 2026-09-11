@@ -64,7 +64,7 @@ export function getAbsoluteMediaUrl(url?: string | null): string {
   const backendBase = (
     process.env.NEXT_PUBLIC_API_BASE_URL ||
     process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "http://127.0.0.1:8000"
+    "https://pasiperera.pythonanywhere.com"
   ).replace(/\/$/, "")
 
   // If path starts with /media/ or /static/

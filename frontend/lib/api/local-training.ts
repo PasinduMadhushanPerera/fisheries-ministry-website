@@ -36,7 +36,7 @@ export interface ApiLocalTrainingPageData {
 export async function fetchLocalTrainingPageData(
   lang: string = "en"
 ): Promise<ApiLocalTrainingPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/local-training/?lang=${encodeURIComponent(lang)}`
 

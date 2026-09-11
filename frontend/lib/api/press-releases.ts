@@ -41,7 +41,7 @@ export interface ApiPressReleasesPageData {
 export async function fetchPressReleasesPageData(
   lang: string = "en"
 ): Promise<ApiPressReleasesPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/press-releases/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
@@ -61,7 +61,7 @@ export async function fetchPressReleaseBySlug(
   slug: string,
   lang: string = "en"
 ): Promise<ApiPressReleaseItem | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
   const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
   const endpoint = `${baseUrl}/api/v1/press-releases/${encodeURIComponent(slug)}/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 

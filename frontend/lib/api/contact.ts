@@ -85,7 +85,7 @@ export interface ContactSubmissionResponse {
 }
 
 export async function fetchContactPageData(lang: string = "en"): Promise<ApiContactPageData | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com/api/v1"
   const endpoint = `${baseUrl}/contact/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {
@@ -109,7 +109,7 @@ export async function fetchContactPageData(lang: string = "en"): Promise<ApiCont
 export async function submitContactMessage(
   payload: ContactSubmissionPayload
 ): Promise<ContactSubmissionResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com/api/v1"
   const endpoint = `${baseUrl}/contact/submit/`
 
   try {
