@@ -1,0 +1,80 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block bodyclass %}{{ block.super }} app-{{ app_list.0.app_label }}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  {% if app_list %}
+    {% for app in app_list %}
+      <!-- App Header Banner -->
+      <div class="cms-hero-banner" style="margin-bottom: 24px; padding: 24px 28px;">
+        <div class="cms-hero-badge">
+          <span>●</span> Page Content Management
+        </div>
+        <h2 class="cms-hero-title" style="font-size: 1.6rem !important;">
+          {% if app.app_label == 'header_footer' %}
+            <span>⚙️</span>
+          {% elif app.app_label == 'home_page' %}
+            <span>🏠</span>
+          {% elif app.app_label == 'about' %}
+            <span>🏛️</span>
+          {% elif app.app_label == 'minister_profile' %}
+            <span>👔</span>
+          {% else %}
+            <span>📁</span>
+          {% endif %}
+          {{ app.name }}
+        </h2>
+        <p class="cms-hero-subtitle" style="margin-bottom: 0 !important; font-size: 0.92rem !important;">
+          Manage all sections, components, and content for this page. Select <strong>Change</strong> to edit an existing section or <strong>+ Add</strong> to create new items.
+        </p>
+      </div>
+
+      <!-- Sections Module List -->
+      <div class="app-{{ app.app_label }} module">
+        <table>
+          <caption>
+            <span class="section">
+              Sections &amp; Components in {{ app.name }}
+            </span>
+          </caption>
+          {% for model in app.models %}
+            <tr class="model-{{ model.object_name|lower }}">
+              <th scope="row">
+                {% if model.admin_url %}
+                  <a href="{{ model.admin_url }}" style="font-weight: 800; font-size: 0.94rem; color: #0f172a;">
+                    {{ model.name }}
+                  </a>
+                {% else %}
+                  <span style="font-weight: 800; font-size: 0.94rem; color: #0f172a;">{{ model.name }}</span>
+                {% endif %}
+              </th>
+
+              <td style="text-align: right; white-space: nowrap;">
+                {% if model.add_url %}
+                  <a href="{{ model.add_url }}" class="addlink">
+                    + Add
+                  </a>
+                {% endif %}
+
+                {% if model.admin_url %}
+                  {% if model.view_only %}
+                    <a href="{{ model.admin_url }}" class="viewlink">View</a>
+                  {% else %}
+                    <a href="{{ model.admin_url }}" class="changelink">Change</a>
+                  {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>{% translate "You don’t have permission to view or edit anything." %}</p>
+  {% endif %}
+
+</div>
+{% endblock %}

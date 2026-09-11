@@ -1,0 +1,197 @@
+{% load i18n static %}
+<!-- Sidebar Backdrop for Mobile Screens -->
+<div id="sidebar-backdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+<nav class="sticky" id="nav-sidebar" aria-label="{% translate 'Sidebar' %}" tabindex="-1">
+  <!-- Mobile-only Sidebar Header with Close button -->
+  <div class="sidebar-mobile-top">
+    <div class="sidebar-mobile-title">
+      <span>🏛️</span>
+      <strong>CMS Pages</strong>
+    </div>
+    <button type="button" id="sidebar-close-btn" class="sidebar-close-button" aria-label="Close Sidebar">
+      ✕
+    </button>
+  </div>
+
+  <input type="search" id="nav-filter"
+         placeholder="{% translate 'Filter main pages...' %}"
+         aria-label="{% translate 'Filter main pages' %}"
+         aria-controls="nav-sidebar"
+         autocomplete="off">
+
+  <div id="sidebar-modules-container">
+    <div class="app-dashboard module {% if request.path == '/admin/' or request.path == '/admin' %}active-sidebar-module{% endif %}" data-filter-title="dashboard overview main home">
+      <table>
+        <caption>
+          <a href="{% url 'admin:index' %}" class="section" title="Dashboard Overview">
+            <span class="sidebar-icon">📊</span>
+            <span class="sidebar-page-title">Dashboard Overview</span>
+          </a>
+        </caption>
+      </table>
+    </div>
+
+    {% for app in available_apps %}
+      <div class="app-{{ app.app_label }} module {% if app.app_label in request.path %}active-sidebar-module{% endif %}" data-filter-title="{{ app.name|lower }} {{ app.app_label }}">
+        <table>
+          <caption>
+            <a href="{{ app.app_url }}" class="section" title="Manage {{ app.name }}">
+              <span class="sidebar-icon">
+                {% if app.app_label == 'header_footer' %}
+                  ⚙️
+                {% elif app.app_label == 'home_page' %}
+                  🏠
+                {% elif app.app_label == 'about' %}
+                  🏛️
+                {% elif app.app_label == 'minister_profile' %}
+                  👔
+                {% elif app.app_label == 'deputy_minister_profile' %}
+                  👥
+                {% elif app.app_label == 'secretary_profile' %}
+                  📜
+                {% elif app.app_label == 'divisions_page' %}
+                  📂
+                {% elif app.app_label == 'organization_structure' %}
+                  🌳
+                {% elif app.app_label == 'local_training' %}
+                  🎓
+                {% elif app.app_label == 'foreign_training' %}
+                  ✈️
+                {% elif app.app_label == 'procurement_page' %}
+                  📑
+                {% elif app.app_label == 'recruitment_page' %}
+                  💼
+                {% elif app.app_label == 'news' %}
+                  📰
+                {% elif app.app_label == 'notices' %}
+                  📌
+                {% elif app.app_label == 'press_releases' %}
+                  📣
+                {% elif app.app_label == 'events' %}
+                  📅
+                {% elif app.app_label == 'gallery' %}
+                  🖼️
+                {% elif app.app_label == 'videos' %}
+                  🎬
+                {% elif app.app_label == 'fisheries_statistics' %}
+                  📊
+                {% elif app.app_label == 'weekly_fish_prices' %}
+                  🏷️
+                {% elif app.app_label == 'monthly_fish_production' %}
+                  📈
+                {% elif app.app_label == 'annual_statistics' %}
+                  📘
+                {% elif app.app_label == 'export_import_statistics' %}
+                  🚢
+                {% elif app.app_label == 'fishery_information' %}
+                  🗺️
+                {% elif app.app_label == 'rti_page' %}
+                  ⚖️
+                {% elif app.app_label == 'downloads_page' %}
+                  📥
+                {% else %}
+                  📁
+                {% endif %}
+              </span>
+              <span class="sidebar-page-title">{{ app.name }}</span>
+            </a>
+          </caption>
+        </table>
+      </div>
+    {% endfor %}
+
+    <!-- No results message -->
+    <div id="sidebar-no-results" style="display: none; padding: 14px 10px; text-align: center; color: #94a3b8; font-size: 0.78rem; font-weight: 600;">
+      No matching main pages found
+    </div>
+  </div>
+</nav>
+
+<script>
+  (function() {
+    function initSidebar() {
+      // 1. Force layout expand (.shifted)
+      var main = document.querySelector('.main') || document.getElementById('main');
+      if (main && !main.classList.contains('shifted')) {
+        main.classList.add('shifted');
+      }
+
+      // 2. Real-time Main Pages Search Filter
+      var filterInput = document.getElementById('nav-filter');
+      var modules = document.querySelectorAll('#nav-sidebar .module');
+      var noResults = document.getElementById('sidebar-no-results');
+
+      if (filterInput && modules.length) {
+        function performFilter() {
+          var query = (filterInput.value || '').trim().toLowerCase();
+          var matchCount = 0;
+
+          modules.forEach(function(mod) {
+            var title = (mod.getAttribute('data-filter-title') || mod.textContent || '').toLowerCase();
+            if (!query || title.indexOf(query) !== -1) {
+              mod.style.display = '';
+              matchCount++;
+            } else {
+              mod.style.display = 'none';
+            }
+          });
+
+          if (noResults) {
+            noResults.style.display = (matchCount === 0 && query) ? 'block' : 'none';
+          }
+
+          if (query && matchCount === 0) {
+            filterInput.style.borderColor = '#f59e0b';
+          } else {
+            filterInput.style.borderColor = '';
+          }
+        }
+
+        filterInput.addEventListener('input', performFilter);
+        filterInput.addEventListener('keyup', function(e) {
+          if (e.key === 'Escape') {
+            filterInput.value = '';
+            performFilter();
+          }
+        });
+        filterInput.addEventListener('search', performFilter);
+      }
+
+      // 3. Mobile Drawer Toggle Handlers
+      var sidebar = document.getElementById('nav-sidebar');
+      var backdrop = document.getElementById('sidebar-backdrop');
+      var mobileBtn = document.getElementById('mobile-sidebar-toggle');
+      var closeBtn = document.getElementById('sidebar-close-btn');
+
+      function openMobileSidebar() {
+        if (sidebar) sidebar.classList.add('mobile-open');
+        if (backdrop) backdrop.classList.add('mobile-open');
+        document.body.classList.add('sidebar-drawer-active');
+      }
+
+      function closeMobileSidebar() {
+        if (sidebar) sidebar.classList.remove('mobile-open');
+        if (backdrop) backdrop.classList.remove('mobile-open');
+        document.body.classList.remove('sidebar-drawer-active');
+      }
+
+      if (mobileBtn) mobileBtn.addEventListener('click', openMobileSidebar);
+      if (closeBtn) closeBtn.addEventListener('click', closeMobileSidebar);
+      if (backdrop) backdrop.addEventListener('click', closeMobileSidebar);
+
+      // Close mobile sidebar on window resize back to desktop
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+          closeMobileSidebar();
+        }
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSidebar);
+    } else {
+      initSidebar();
+    }
+  })();
+</script>

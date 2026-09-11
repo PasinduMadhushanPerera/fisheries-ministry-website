@@ -1,0 +1,1 @@
+"""Organization Structure Django App."""

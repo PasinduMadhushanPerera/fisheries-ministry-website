@@ -1,0 +1,673 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+  /* ==========================================================
+     News Content Block Admin Page Styling
+     ========================================================== */
+  .block-helper-banner {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+    border-radius: 14px;
+    padding: 18px 22px;
+    margin-bottom: 22px;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(6, 78, 59, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+  .block-helper-banner h3 {
+    margin: 0 0 4px 0;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .block-helper-banner p {
+    margin: 0;
+    color: #a7f3d0;
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+
+  /* ==========================================================
+     Visual Table Grid Editor Styles
+     ========================================================== */
+  .visual-table-editor-container {
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 14px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+  .vte-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .vte-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .vte-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+  }
+  .vte-btn-preset {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+  }
+  .vte-btn-preset:hover {
+    background: #dcfce7;
+    border-color: #86efac;
+  }
+  .vte-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .vte-grid-table th, .vte-grid-table td {
+    border: 1px solid #cbd5e1;
+    padding: 6px;
+  }
+  .vte-grid-table th {
+    background: #f1f5f9;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: #0f172a;
+  }
+  .vte-cell-input {
+    width: 100%;
+    border: 1px solid transparent !important;
+    background: transparent !important;
+    padding: 6px 8px !important;
+    font-size: 0.84rem !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  .vte-cell-input:focus {
+    border-color: #10b981 !important;
+    background: #ffffff !important;
+    border-radius: 4px !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+  }
+  .vte-header-input {
+    font-weight: 800 !important;
+    color: #0f172a !important;
+  }
+  .vte-del-btn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .vte-del-btn:hover {
+    background: #fee2e2;
+  }
+
+  /* ==========================================================
+     Multi-File & Multi-Photo Manager Styles
+     ========================================================== */
+  .multi-file-manager-container, .multi-photo-manager-container {
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 14px 0;
+  }
+  .mf-item-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+  }
+  .mf-item-card input, .mf-item-card select {
+    margin: 0 !important;
+    padding: 6px 10px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .mp-item-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: 80px 2fr 2fr 1.5fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .mp-item-card input {
+    margin: 0 !important;
+    padding: 6px 10px !important;
+    font-size: 0.82rem !important;
+  }
+  .mp-preview-thumb {
+    width: 80px;
+    height: 52px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #e2e8f0;
+    border: 1px solid #cbd5e1;
+  }
+
+  /* Layout Helper Pill Tags */
+  .layout-helper-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+    color: #166534;
+    line-height: 1.45;
+  }
+</style>
+{% endblock %}
+
+{% block field_sets %}
+  <div class="block-helper-banner">
+    <h3>
+      <span>🧩</span>
+      <span>03. News Content Block Editor</span>
+    </h3>
+    <p>
+      Customize this individual story block. Select the target News Article, choose the Block Type (Text, Heading, Image, Video, Table, Quote, Attachment), and customize layout alignments and sizes with rich controls.
+    </p>
+  </div>
+
+  {{ block.super }}
+
+  <script>
+    (function() {
+      // ==========================================================
+      // 1. Visual Table Editor
+      // ==========================================================
+      function initTableEditor() {
+        var textarea = document.getElementById('id_table_data');
+        if (!textarea || textarea.getAttribute('data-vte-attached') === 'true') return;
+        textarea.setAttribute('data-vte-attached', 'true');
+
+        var container = document.createElement('div');
+        container.className = 'visual-table-editor-container';
+
+        function parseMd(text) {
+          if (!text || !text.trim()) {
+            return {
+              headers: ['Project Component', 'Location / Scope', 'Budget (LKR)', 'Target Timeline'],
+              rows: [
+                ['Lagoon Mouth Dredging', 'Valaichchenai & Batticaloa Estuary', 'Rs. 85 Million', 'Q2 2026'],
+                ['Solar Cold Storage Unit', 'Kallady Coastal Landing Site', 'Rs. 42 Million', 'Q3 2026'],
+                ['Artisanal Gear Subsidies', '450 Registered Fisher Families', 'Rs. 38 Million', 'Q2 2026'],
+              ]
+            };
+          }
+          var lines = text.trim().split('\n').map(function(l) { return l.trim(); }).filter(Boolean);
+          var contentLines = lines.filter(function(l) { return !l.match(/^\|?(\s*:?-+:?\s*\|?)+$/); });
+          if (contentLines.length === 0) {
+            return { headers: ['Column 1', 'Column 2'], rows: [['', '']] };
+          }
+          function parseRow(l) {
+            return l.replace(/^\|/, '').replace(/\|$/, '').split('|').map(function(c) { return c.trim(); });
+          }
+          var headers = parseRow(contentLines[0]);
+          var rows = contentLines.slice(1).map(parseRow);
+          return { headers: headers, rows: rows };
+        }
+
+        function serializeToMd(model) {
+          var out = '| ' + model.headers.join(' | ') + ' |\n';
+          out += '| ' + model.headers.map(function() { return '---'; }).join(' | ') + ' |\n';
+          model.rows.forEach(function(r) {
+            while (r.length < model.headers.length) r.push('');
+            out += '| ' + r.slice(0, model.headers.length).join(' | ') + ' |\n';
+          });
+          return out.trim();
+        }
+
+        var tableModel = parseMd(textarea.value);
+
+        function renderGrid() {
+          container.innerHTML = '';
+
+          // Toolbar
+          var toolbar = document.createElement('div');
+          toolbar.className = 'vte-toolbar';
+          toolbar.innerHTML = 
+            '<div style="display: flex; gap: 8px; flex-wrap: wrap;">' +
+              '<button type="button" class="vte-btn" id="vte-add-row">➕ Add Row</button>' +
+              '<button type="button" class="vte-btn" id="vte-add-col">➕ Add Column</button>' +
+              '<button type="button" class="vte-btn" id="vte-del-col">➖ Remove Last Column</button>' +
+            '</div>' +
+            '<div style="display: flex; gap: 6px; flex-wrap: wrap;">' +
+              '<span style="font-size: 0.76rem; font-weight: bold; color: #64748b; align-self: center;">Quick Templates:</span>' +
+              '<button type="button" class="vte-btn vte-btn-preset" id="vte-p1">🏢 4-Col Projects</button>' +
+              '<button type="button" class="vte-btn vte-btn-preset" id="vte-p2">📊 3-Col Stats</button>' +
+              '<button type="button" class="vte-btn vte-btn-preset" id="vte-p3">📄 2-Col Specs</button>' +
+            '</div>';
+
+          container.appendChild(toolbar);
+
+          // Grid Table
+          var tableWrap = document.createElement('div');
+          tableWrap.style.overflowX = 'auto';
+
+          var tbl = document.createElement('table');
+          tbl.className = 'vte-grid-table';
+
+          // Headers
+          var thead = document.createElement('thead');
+          var trHead = document.createElement('tr');
+          tableModel.headers.forEach(function(h, colIdx) {
+            var th = document.createElement('th');
+            var inp = document.createElement('input');
+            inp.type = 'text';
+            inp.className = 'vte-cell-input vte-header-input';
+            inp.value = h;
+            inp.placeholder = 'Column ' + (colIdx + 1);
+            inp.oninput = function() {
+              tableModel.headers[colIdx] = inp.value;
+              textarea.value = serializeToMd(tableModel);
+            };
+            th.appendChild(inp);
+            trHead.appendChild(th);
+          });
+
+          var thAct = document.createElement('th');
+          thAct.style.width = '45px';
+          thAct.textContent = 'Action';
+          trHead.appendChild(thAct);
+          thead.appendChild(trHead);
+          tbl.appendChild(thead);
+
+          // Body Rows
+          var tbody = document.createElement('tbody');
+          tableModel.rows.forEach(function(row, rIdx) {
+            var tr = document.createElement('tr');
+            while (row.length < tableModel.headers.length) row.push('');
+
+            tableModel.headers.forEach(function(_, cIdx) {
+              var td = document.createElement('td');
+              var inp = document.createElement('input');
+              inp.type = 'text';
+              inp.className = 'vte-cell-input';
+              inp.value = row[cIdx] || '';
+              inp.placeholder = 'Value...';
+              inp.oninput = function() {
+                row[cIdx] = inp.value;
+                textarea.value = serializeToMd(tableModel);
+              };
+              td.appendChild(inp);
+              tr.appendChild(td);
+            });
+
+            // Delete row button
+            var tdDel = document.createElement('td');
+            tdDel.style.textAlign = 'center';
+            var delBtn = document.createElement('button');
+            delBtn.type = 'button';
+            delBtn.className = 'vte-del-btn';
+            delBtn.title = 'Delete this row';
+            delBtn.textContent = '✖';
+            delBtn.onclick = function() {
+              tableModel.rows.splice(rIdx, 1);
+              textarea.value = serializeToMd(tableModel);
+              renderGrid();
+            };
+            tdDel.appendChild(delBtn);
+            tr.appendChild(tdDel);
+
+            tbody.appendChild(tr);
+          });
+          tbl.appendChild(tbody);
+          tableWrap.appendChild(tbl);
+          container.appendChild(tableWrap);
+
+          // Toggle Raw Markdown View
+          var toggleLink = document.createElement('div');
+          toggleLink.style.marginTop = '10px';
+          toggleLink.style.fontSize = '0.76rem';
+          toggleLink.innerHTML = '<a href="#" style="color: #059669; font-weight: bold; text-decoration: underline;">📝 Show / Hide Raw Markdown Editor</a>';
+          toggleLink.querySelector('a').onclick = function(e) {
+            e.preventDefault();
+            textarea.style.display = textarea.style.display === 'none' ? 'block' : 'none';
+          };
+          container.appendChild(toggleLink);
+
+          // Toolbar event listeners
+          toolbar.querySelector('#vte-add-row').onclick = function() {
+            var newRow = tableModel.headers.map(function() { return ''; });
+            tableModel.rows.push(newRow);
+            textarea.value = serializeToMd(tableModel);
+            renderGrid();
+          };
+
+          toolbar.querySelector('#vte-add-col').onclick = function() {
+            var colNum = tableModel.headers.length + 1;
+            tableModel.headers.push('Column ' + colNum);
+            tableModel.rows.forEach(function(r) { r.push(''); });
+            textarea.value = serializeToMd(tableModel);
+            renderGrid();
+          };
+
+          toolbar.querySelector('#vte-del-col').onclick = function() {
+            if (tableModel.headers.length <= 1) return;
+            tableModel.headers.pop();
+            tableModel.rows.forEach(function(r) { r.pop(); });
+            textarea.value = serializeToMd(tableModel);
+            renderGrid();
+          };
+
+          toolbar.querySelector('#vte-p1').onclick = function() {
+            tableModel = {
+              headers: ['Project / Scope', 'Executing Division', 'Allocated Budget', 'Delivery Timeline'],
+              rows: [
+                ['Lagoon Mouth Dredging', 'Harbour Corp (CFHC)', 'Rs. 85 Million', 'Q2 2026'],
+                ['Solar Cold Storage Unit', 'Cey-Nor Foundation', 'Rs. 42 Million', 'Q3 2026'],
+                ['Artisanal Gear Subsidies', 'Dept. of Fisheries', 'Rs. 38 Million', 'Q2 2026'],
+              ]
+            };
+            textarea.value = serializeToMd(tableModel);
+            renderGrid();
+          };
+
+          toolbar.querySelector('#vte-p2').onclick = function() {
+            tableModel = {
+              headers: ['District / Zone', 'Active Fishing Craft', 'Weekly Yield (MT)'],
+              rows: [
+                ['Batticaloa Coastal', '1,420 Vessels', '380 MT'],
+                ['Trincomalee Bay', '980 Vessels', '290 MT'],
+              ]
+            };
+            textarea.value = serializeToMd(tableModel);
+            renderGrid();
+          };
+
+          toolbar.querySelector('#vte-p3').onclick = function() {
+            tableModel = {
+              headers: ['Parameter / Specification', 'Standard Value'],
+              rows: [
+                ['Harbour Anchorage Depth', '4.5 Meters (Low Tide)'],
+                ['Ice Plant Capacity', '25 Metric Tons / Day'],
+              ]
+            };
+            textarea.value = serializeToMd(tableModel);
+            renderGrid();
+          };
+        }
+
+        renderGrid();
+        textarea.parentNode.insertBefore(container, textarea);
+        textarea.style.display = 'none';
+      }
+
+      // ==========================================================
+      // 2. Multi-Photo Gallery & Grid Manager
+      // ==========================================================
+      function initMultiPhotoManager() {
+        var textarea = document.getElementById('id_images_data');
+        if (!textarea || textarea.getAttribute('data-mp-attached') === 'true') return;
+        textarea.setAttribute('data-mp-attached', 'true');
+
+        var container = document.createElement('div');
+        container.className = 'multi-photo-manager-container';
+
+        function parseImages(val) {
+          if (!val || !val.trim()) return [];
+          try {
+            var data = JSON.parse(val);
+            if (Array.isArray(data)) return data;
+          } catch(e) {}
+          return [];
+        }
+
+        var photosList = parseImages(textarea.value);
+
+        function syncJson() {
+          textarea.value = JSON.stringify(photosList, null, 2);
+        }
+
+        function renderPhotosList() {
+          container.innerHTML = 
+            '<div class="layout-helper-box">' +
+              '<strong>💡 Multi-Photo Gallery & Grid Builder:</strong> Attach 2, 3, 4 or more photos to this block. When you select <em>2-Column Grid</em>, <em>3-Column Grid</em>, <em>4-Photo Collage</em>, or <em>Mini Carousel</em>, all photos listed here will be rendered in that custom visual format on the website!' +
+            '</div>' +
+            '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">' +
+              '<h4 style="margin: 0; font-size: 0.9rem; font-weight: 800; color: #0f172a;">🖼️ Gallery Photos in this Block (' + photosList.length + ')</h4>' +
+              '<button type="button" class="vte-btn vte-btn-preset" id="mp-add-btn">➕ Add Another Photo</button>' +
+            '</div>';
+
+          var listWrap = document.createElement('div');
+          if (photosList.length === 0) {
+            listWrap.innerHTML = '<p style="font-size: 0.8rem; color: #64748b; font-style: italic; margin: 8px 0;">No extra multiple photos added yet. (The single image uploaded below will be used by default, or click "+ Add Another Photo" to create a 2-col, 3-col grid, or collage).</p>';
+          } else {
+            photosList.forEach(function(p, idx) {
+              var card = document.createElement('div');
+              card.className = 'mp-item-card';
+              var thumbSrc = p.url || '/images/home/hero-fishing-harbour.jpg';
+              card.innerHTML = 
+                '<img src="' + thumbSrc + '" class="mp-preview-thumb" onerror="this.src=\'/images/home/hero-fishing-harbour.jpg\'" alt="Preview" />' +
+                '<input type="text" class="mp-url" placeholder="Image URL / Media Path (e.g. /media/... or URL)" value="' + (p.url || '') + '" />' +
+                '<input type="text" class="mp-caption" placeholder="Photo Caption (e.g. Harbor Quay Wall Inspection)" value="' + (p.caption || '') + '" />' +
+                '<input type="text" class="mp-alt" placeholder="Alt Description" value="' + (p.alt || '') + '" />' +
+                '<button type="button" class="vte-del-btn" title="Remove photo">🗑</button>';
+
+              var urlInp = card.querySelector('.mp-url');
+              var captionInp = card.querySelector('.mp-caption');
+              var altInp = card.querySelector('.mp-alt');
+              var imgThumb = card.querySelector('.mp-preview-thumb');
+              var delBtn = card.querySelector('.vte-del-btn');
+
+              urlInp.oninput = function() {
+                p.url = urlInp.value;
+                imgThumb.src = urlInp.value || '/images/home/hero-fishing-harbour.jpg';
+                syncJson();
+              };
+              captionInp.oninput = function() { p.caption = captionInp.value; syncJson(); };
+              altInp.oninput = function() { p.alt = altInp.value; syncJson(); };
+              delBtn.onclick = function() {
+                photosList.splice(idx, 1);
+                syncJson();
+                renderPhotosList();
+              };
+
+              listWrap.appendChild(card);
+            });
+          }
+
+          container.appendChild(listWrap);
+
+          container.querySelector('#mp-add-btn').onclick = function() {
+            photosList.push({
+              url: '/images/home/hero-fishing-harbour.jpg',
+              caption: 'Story Photo #' + (photosList.length + 1),
+              alt: 'Ministry news event photo'
+            });
+            syncJson();
+            renderPhotosList();
+          };
+        }
+
+        renderPhotosList();
+        textarea.parentNode.insertBefore(container, textarea);
+        textarea.style.display = 'none';
+      }
+
+      // ==========================================================
+      // 3. Multi-File Attachment Manager
+      // ==========================================================
+      function initMultiFileManager() {
+        var textarea = document.getElementById('id_attachments_data');
+        if (!textarea || textarea.getAttribute('data-mf-attached') === 'true') return;
+        textarea.setAttribute('data-mf-attached', 'true');
+
+        var container = document.createElement('div');
+        container.className = 'multi-file-manager-container';
+
+        function parseFiles(val) {
+          if (!val || !val.trim()) return [];
+          try {
+            var data = JSON.parse(val);
+            if (Array.isArray(data)) return data;
+          } catch(e) {}
+          return [];
+        }
+
+        var filesList = parseFiles(textarea.value);
+
+        function syncJson() {
+          textarea.value = JSON.stringify(filesList, null, 2);
+        }
+
+        function renderFilesList() {
+          container.innerHTML = 
+            '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">' +
+              '<h4 style="margin: 0; font-size: 0.9rem; font-weight: 800; color: #0f172a;">📁 Multiple Document Attachments</h4>' +
+              '<button type="button" class="vte-btn vte-btn-preset" id="mf-add-btn">➕ Add Another Document</button>' +
+            '</div>';
+
+          var listWrap = document.createElement('div');
+          if (filesList.length === 0) {
+            listWrap.innerHTML = '<p style="font-size: 0.8rem; color: #64748b; font-style: italic; margin: 8px 0;">No multiple files added yet. Click "+ Add Another Document" above to attach multiple reports, spreadsheets, or gazettes.</p>';
+          } else {
+            filesList.forEach(function(f, idx) {
+              var card = document.createElement('div');
+              card.className = 'mf-item-card';
+              card.innerHTML = 
+                '<input type="text" class="mf-title" placeholder="Document Title (e.g. Action Plan PDF)" value="' + (f.title || '') + '" />' +
+                '<input type="text" class="mf-url" placeholder="File URL / Media Path (e.g. /media/... or URL)" value="' + (f.url || '') + '" />' +
+                '<select class="mf-type">' +
+                  '<option value="PDF"' + (f.type === 'PDF' ? ' selected' : '') + '>PDF Document</option>' +
+                  '<option value="DOCX"' + (f.type === 'DOCX' ? ' selected' : '') + '>Word (DOCX)</option>' +
+                  '<option value="XLSX"' + (f.type === 'XLSX' ? ' selected' : '') + '>Excel (XLSX)</option>' +
+                  '<option value="ZIP"' + (f.type === 'ZIP' ? ' selected' : '') + '>ZIP Archive</option>' +
+                  '<option value="CSV"' + (f.type === 'CSV' ? ' selected' : '') + '>CSV Sheet</option>' +
+                '</select>' +
+                '<input type="text" class="mf-size" placeholder="Size (1.5 MB)" value="' + (f.size || '1.5 MB') + '" />' +
+                '<button type="button" class="vte-del-btn" title="Remove file">🗑</button>';
+
+              var titleInp = card.querySelector('.mf-title');
+              var urlInp = card.querySelector('.mf-url');
+              var typeSel = card.querySelector('.mf-type');
+              var sizeInp = card.querySelector('.mf-size');
+              var delBtn = card.querySelector('.vte-del-btn');
+
+              titleInp.oninput = function() { f.title = titleInp.value; syncJson(); };
+              urlInp.oninput = function() { f.url = urlInp.value; syncJson(); };
+              typeSel.onchange = function() { f.type = typeSel.value; syncJson(); };
+              sizeInp.oninput = function() { f.size = sizeInp.value; syncJson(); };
+              delBtn.onclick = function() {
+                filesList.splice(idx, 1);
+                syncJson();
+                renderFilesList();
+              };
+
+              listWrap.appendChild(card);
+            });
+          }
+
+          container.appendChild(listWrap);
+
+          container.querySelector('#mf-add-btn').onclick = function() {
+            filesList.push({
+              title: 'Attached Document #' + (filesList.length + 1),
+              url: '#',
+              type: 'PDF',
+              size: '1.5 MB'
+            });
+            syncJson();
+            renderFilesList();
+          };
+        }
+
+        renderFilesList();
+        textarea.parentNode.insertBefore(container, textarea);
+        textarea.style.display = 'none';
+      }
+
+      // ==========================================================
+      // 4. Conditional Fieldset Highlighting based on block_type
+      // ==========================================================
+      function updateFieldsetVisibility() {
+        var typeSelect = document.getElementById('id_block_type');
+        if (!typeSelect) return;
+
+        var selected = typeSelect.value;
+        var fieldsets = document.querySelectorAll('fieldset');
+
+        fieldsets.forEach(function(fs) {
+          var h2 = fs.querySelector('h2');
+          if (!h2) return;
+          var title = h2.textContent.toLowerCase();
+
+          if (title.includes('identity')) {
+            fs.style.display = 'block';
+          } else if (title.includes('text') || title.includes('heading')) {
+            fs.style.display = (selected === 'text' || selected === 'heading' || selected === 'paragraph') ? 'block' : 'none';
+          } else if (title.includes('image')) {
+            fs.style.display = (selected === 'image') ? 'block' : 'none';
+          } else if (title.includes('video')) {
+            fs.style.display = (selected === 'video') ? 'block' : 'none';
+          } else if (title.includes('table')) {
+            fs.style.display = (selected === 'table') ? 'block' : 'none';
+          } else if (title.includes('quote')) {
+            fs.style.display = (selected === 'quote') ? 'block' : 'none';
+          } else if (title.includes('file') || title.includes('attachment')) {
+            fs.style.display = (selected === 'attachment' || selected === 'file') ? 'block' : 'none';
+          }
+        });
+      }
+
+      function init() {
+        initTableEditor();
+        initMultiPhotoManager();
+        initMultiFileManager();
+        updateFieldsetVisibility();
+
+        var typeSelect = document.getElementById('id_block_type');
+        if (typeSelect) {
+          typeSelect.addEventListener('change', updateFieldsetVisibility);
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+{% endblock %}

@@ -1,0 +1,344 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  /* Hero Welcome Banner */
+  .cms-hero-banner {
+    background: linear-gradient(135deg, #09261f 0%, #103c30 50%, #155442 100%);
+    border-radius: 20px;
+    padding: 32px 36px;
+    color: #ffffff;
+    margin-bottom: 32px;
+    box-shadow: 0 10px 30px rgba(9, 38, 31, 0.2);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .cms-hero-banner::after {
+    content: "";
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 320px;
+    height: 320px;
+    background: radial-gradient(circle, rgba(74, 222, 128, 0.15) 0%, rgba(74, 222, 128, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .cms-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(134, 239, 172, 0.4);
+    padding: 5px 14px;
+    border-radius: 9999px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #86efac;
+    margin-bottom: 12px;
+  }
+
+  .cms-hero-title {
+    font-size: 1.85rem !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    margin: 0 0 8px 0 !important;
+    letter-spacing: -0.03em !important;
+  }
+
+  .cms-hero-subtitle {
+    font-size: 0.98rem !important;
+    color: #d1fae5 !important;
+    max-width: 820px;
+    margin: 0 0 20px 0 !important;
+    line-height: 1.6 !important;
+    font-weight: 500;
+  }
+
+  .cms-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cms-quick-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .cms-btn-primary {
+    background: #22c55e;
+    color: #06261c !important;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.4);
+  }
+
+  .cms-btn-primary:hover {
+    background: #4ade80;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(34, 197, 94, 0.5);
+  }
+
+  .cms-btn-secondary {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+  }
+
+  .cms-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.24);
+    transform: translateY(-2px);
+  }
+
+  /* Quick Metric / Status Pills */
+  .cms-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .cms-stat-card {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 18px 22px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cms-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .cms-stat-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .cms-stat-icon.green {
+    background: #dcfce7;
+    color: #15803d;
+  }
+
+  .cms-stat-icon.blue {
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+
+  .cms-stat-icon.amber {
+    background: #fef3c7;
+    color: #b45309;
+  }
+
+  .cms-stat-icon.purple {
+    background: #f3e8ff;
+    color: #7e22ce;
+  }
+
+  .cms-stat-info h4 {
+    margin: 0;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+  }
+
+  .cms-stat-info p {
+    margin: 2px 0 0 0;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #0f172a;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <!-- 1. Hero Welcome Banner -->
+  <div class="cms-hero-banner">
+    <div class="cms-hero-badge">
+      <span>●</span> Official Government CMS Portal
+    </div>
+    <h2 class="cms-hero-title">
+      Ministry of Fisheries & Aquatic Resources
+    </h2>
+    <p class="cms-hero-subtitle">
+      Welcome to the official content management portal. All changes made to headers, hero carousels, latest news, services, and statutory bodies synchronize with the live website in real-time.
+    </p>
+    <div class="cms-hero-actions">
+      <a href="http://localhost:3000/" target="_blank" rel="noopener noreferrer" class="cms-quick-action-btn cms-btn-primary">
+        <span>🌐</span> Open Live Website
+      </a>
+      <a href="{% url 'admin:news_newsarticleitem_add' %}" class="cms-quick-action-btn cms-btn-secondary">
+        <span>➕</span> Publish News Article
+      </a>
+      <a href="{% url 'admin:home_page_homeheroslide_changelist' %}" class="cms-quick-action-btn cms-btn-secondary">
+        <span>🖼️</span> Hero Banner Slides
+      </a>
+    </div>
+  </div>
+
+  <!-- 2. Quick Status Cards -->
+  <div class="cms-stats-grid">
+    <div class="cms-stat-card">
+      <div class="cms-stat-icon green">⚡</div>
+      <div class="cms-stat-info">
+        <h4>Live Sync</h4>
+        <p>Instant Real-Time</p>
+      </div>
+    </div>
+    <div class="cms-stat-card">
+      <div class="cms-stat-icon blue">🏛️</div>
+      <div class="cms-stat-info">
+        <h4>Active Modules</h4>
+        <p>Header & Home CMS</p>
+      </div>
+    </div>
+    <div class="cms-stat-card">
+      <div class="cms-stat-icon amber">📰</div>
+      <div class="cms-stat-info">
+        <h4>News & Portals</h4>
+        <p>Fully Editable</p>
+      </div>
+    </div>
+    <div class="cms-stat-card">
+      <div class="cms-stat-icon purple">🛡️</div>
+      <div class="cms-stat-info">
+        <h4>Access Role</h4>
+        <p>Administrator</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Active App Modules -->
+  {% if app_list %}
+    {% for app in app_list %}
+      <div class="app-{{ app.app_label }} module">
+        <table>
+          <caption>
+            <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">
+              {% if app.app_label == 'header_footer' %}
+                <span>⚙️</span>
+              {% elif app.app_label == 'home_page' %}
+                <span>🏠</span>
+              {% elif app.app_label == 'about' %}
+                <span>🏛️</span>
+              {% elif app.app_label == 'minister_profile' %}
+                <span>👔</span>
+              {% elif app.app_label == 'deputy_minister_profile' %}
+                <span>👥</span>
+              {% elif app.app_label == 'secretary_profile' %}
+                <span>📜</span>
+              {% elif app.app_label == 'divisions_page' %}
+                <span>📂</span>
+              {% elif app.app_label == 'organization_structure' %}
+                <span>🌳</span>
+              {% elif app.app_label == 'local_training' %}
+                <span>🎓</span>
+              {% elif app.app_label == 'foreign_training' %}
+                <span>✈️</span>
+              {% elif app.app_label == 'procurement_page' %}
+                <span>📑</span>
+              {% elif app.app_label == 'recruitment_page' %}
+                <span>💼</span>
+              {% elif app.app_label == 'news' %}
+                <span>📰</span>
+              {% elif app.app_label == 'notices' %}
+                <span>📌</span>
+              {% elif app.app_label == 'press_releases' %}
+                <span>📣</span>
+              {% elif app.app_label == 'events' %}
+                <span>📅</span>
+              {% elif app.app_label == 'gallery' %}
+                <span>🖼️</span>
+              {% elif app.app_label == 'videos' %}
+                <span>🎬</span>
+              {% elif app.app_label == 'fisheries_statistics' %}
+                <span>📊</span>
+              {% elif app.app_label == 'weekly_fish_prices' %}
+                <span>🏷️</span>
+              {% elif app.app_label == 'monthly_fish_production' %}
+                <span>📈</span>
+              {% elif app.app_label == 'annual_statistics' %}
+                <span>📘</span>
+              {% elif app.app_label == 'export_import_statistics' %}
+                <span>🚢</span>
+              {% elif app.app_label == 'fishery_information' %}
+                <span>🗺️</span>
+              {% elif app.app_label == 'rti_page' %}
+                <span>⚖️</span>
+              {% elif app.app_label == 'downloads_page' %}
+                <span>📥</span>
+              {% else %}
+                <span>📁</span>
+              {% endif %}
+              {{ app.name }}
+            </a>
+          </caption>
+          {% for model in app.models %}
+            <tr class="model-{{ model.object_name|lower }}">
+              <th scope="row">
+                {% if model.admin_url %}
+                  <a href="{{ model.admin_url }}">
+                    {{ model.name }}
+                  </a>
+                {% else %}
+                  {{ model.name }}
+                {% endif %}
+              </th>
+
+              <td style="text-align: right; white-space: nowrap;">
+                {% if model.add_url %}
+                  <a href="{{ model.add_url }}" class="addlink">
+                    + Add
+                  </a>
+                {% endif %}
+
+                {% if model.admin_url %}
+                  {% if model.view_only %}
+                    <a href="{{ model.admin_url }}" class="viewlink">View</a>
+                  {% else %}
+                    <a href="{{ model.admin_url }}" class="changelink">Change</a>
+                  {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>{% translate "You don’t have permission to view or edit anything." %}</p>
+  {% endif %}
+
+</div>
+{% endblock %}

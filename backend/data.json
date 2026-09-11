@@ -1,0 +1,83 @@
+[
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$QlD4sYnMsOuZhjPGPaxtqf$lXqgydo38AJHjYxK6MQLsd923cgsqW0S53Snw+39MM8=",
+    "last_login": "2026-08-01T20:44:54.958Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@fisheries.gov.lk",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-08-01T20:43:05.803Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "8lwocamqj8hm5w2wmx018esorcto1rsv",
+  "fields": {
+    "session_data": ".eJxVjMsOgjAQAP9lz6bZsn1Yjt75BtKyW0FNm1A4Gf_dkHDQ68xk3jDGfZvHvck6Lgw9aLj8shSnp5RD8COWe1VTLdu6JHUk6rRNDZXldTvbv8Ec2ww9SE5OkzPXyI4Dps7wxJbQYhYJGIQoEGrdGRfE687ljN4aZEvehyjw-QLXuDcY:1wqGZi:rzw4KsAtnbmycT_FqzvEJ9r6ebXX62pxyYyTB1jyo5Y",
+    "expire_date": "2026-08-15T20:44:54.968Z"
+  }
+},
+{
+  "model": "notices.noticecategory",
+  "pk": 1,
+  "fields": {
+    "created_at": "2026-08-01T20:58:56.062Z",
+    "updated_at": "2026-08-01T20:58:56.062Z",
+    "name": "CaT 1",
+    "slug": "cat-1",
+    "description": "Category 01",
+    "is_active": true
+  }
+},
+{
+  "model": "notices.notice",
+  "pk": 1,
+  "fields": {
+    "created_at": "2026-08-01T21:02:52.467Z",
+    "updated_at": "2026-08-01T21:02:52.467Z",
+    "category": 1,
+    "status": "published",
+    "priority": "urgent",
+    "is_featured": true,
+    "published_at": "2026-07-29T21:00:04Z",
+    "expires_at": "2026-08-02T21:00:10Z",
+    "created_by": [
+      "admin"
+    ],
+    "updated_by": [
+      "admin"
+    ]
+  }
+},
+{
+  "model": "notices.noticetranslation",
+  "pk": 1,
+  "fields": {
+    "created_at": "2026-08-01T21:02:52.478Z",
+    "updated_at": "2026-08-01T21:02:52.478Z",
+    "notice": 1,
+    "language": "en",
+    "title": "NOTICE-001",
+    "slug": "notice-001",
+    "summary": "Dummy data is mock or placeholder data created to simulate real-world information in a safe and controlled way. It is commonly used in software development, testing, product demos, training, and data analysis to ensure systems function correctly without risking real data privacy or integrity \r\nsupademo.com\r\n+2\r\n. For example, in a database test, dummy data can include names, emails, and transaction records that resemble real entries but are entirely fictitious \r\nsupademo.com\r\nsupademo.co",
+    "content": "Dummy data is mock or placeholder data created to simulate real-world information in a safe and controlled way. It is commonly used in software development, testing, product demos, training, and data analysis to ensure systems function correctly without risking real data privacy or integrity \r\nsupademo.com\r\nsupademo.com\r\n+2\r\n. For example, in a database test, dummy data can include names, emails, and transaction records that resemble real entries but are entirely fictitious \r\nsupademo.com\r\nsupademo.com\r\n+1\r\n.Dummy data is mock or placeholder data created to simulate real-world information in a safe and controlled way. It is commonly used in software development, testing, product demos, training, and data analysis to ensure systems function correctly without risking real data privacy or integrity \r\nsupademo.com\r\nsupademo.com\r\n+2\r\n. For example, in a database test, dummy data can include names, emails, and transaction records that resemble real entries but are entirely fictitious \r\nsupademo.com\r\nsupademo.com\r\n+1\r\n.",
+    "seo_title": "",
+    "seo_description": ""
+  }
+},
+{
+  "model": "notices.noticetranslation",
+  "pk": 2,
+  "fields": {
+    "created_at": "2026-08-01T21:02:52.486Z",
+    "updated_at": "2026-08-01T21:02:52.486Z",
+    "notice": 1,
+    "language": "si",
+    "title": 

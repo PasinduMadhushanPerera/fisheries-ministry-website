@@ -1,0 +1,373 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{% if form.errors %}{% translate "Error:" %} {% endif %}CMS Administrative Login | Ministry of Fisheries{% endblock %}
+
+{% block bodyclass %}{{ block.super }} cms-login-page{% endblock %}
+
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block branding %}
+<div id="branding" style="justify-content: center; width: 100%;">
+  <div class="branding-brand-wrap" style="justify-content: center;">
+    <span class="branding-emblem">🏛️</span>
+    <div class="branding-text-col" style="text-align: center;">
+      <span class="branding-govt-title">Democratic Socialist Republic of Sri Lanka</span>
+      <h1 style="justify-content: center;">
+        <a href="{% url 'admin:index' %}">
+          Ministry of Fisheries, Aquatic &amp; Ocean Resources
+        </a>
+      </h1>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+  /* Login Page Full-Viewport Experience: Perfect Center */
+  body.cms-login-page,
+  body.login {
+    background: radial-gradient(circle at 50% 20%, #0d382c 0%, #061f18 45%, #020f0b 100%) !important;
+    min-height: 100vh !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.cms-login-page #container,
+  body.login #container {
+    background: transparent !important;
+    flex: 1 1 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.cms-login-page #header,
+  body.login #header {
+    background: rgba(4, 23, 17, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(34, 197, 94, 0.3) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    width: 100% !important;
+  }
+
+  body.cms-login-page #main,
+  body.login #main,
+  body.cms-login-page .main,
+  body.login .main,
+  body.cms-login-page main.content,
+  body.login main.content,
+  body.cms-login-page #content-start,
+  body.login #content-start {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body.cms-login-page #content,
+  body.login #content {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 30px 16px 50px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .login-card-wrapper {
+    width: 100%;
+    max-width: 440px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    margin: 0 auto !important;
+    animation: loginFadeIn 0.35s ease-out;
+  }
+
+  @keyframes loginFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .login-card-header {
+    background: linear-gradient(135deg, #07271e 0%, #0d4233 100%);
+    color: #ffffff;
+    padding: 28px 24px 24px;
+    text-align: center;
+    position: relative;
+    border-bottom: 3px solid #22c55e;
+  }
+
+  .login-emblem-badge {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(74, 222, 128, 0.4);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-bottom: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .login-card-title,
+  .login-card-header h2,
+  h2.login-card-title {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    font-size: 1.28rem !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    margin: 0 0 4px 0 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .login-card-subtitle {
+    font-size: 0.82rem !important;
+    color: #86efac !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    margin: 0 0 12px 0 !important;
+  }
+
+  .login-security-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(34, 197, 94, 0.18);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: #86efac;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .login-card-body {
+    padding: 28px 26px;
+    background: #ffffff;
+  }
+
+  .login-errornote {
+    background: #fef2f2;
+    border: 1.5px solid #fecaca;
+    color: #991b1b;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 0.86rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .login-field-group {
+    margin-bottom: 18px;
+  }
+
+  .login-field-group label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+
+  .login-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .login-input-icon {
+    position: absolute;
+    left: 14px;
+    font-size: 1.05rem;
+    color: #64748b;
+    pointer-events: none;
+  }
+
+  .login-input-wrap input[type="text"],
+  .login-input-wrap input[type="password"] {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 11px 14px 11px 42px !important;
+    font-size: 0.92rem !important;
+    font-weight: 600 !important;
+    color: #0f172a !important;
+    background: #f8fafc !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 10px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .login-input-wrap input[type="text"]:focus,
+  .login-input-wrap input[type="password"]:focus {
+    background: #ffffff !important;
+    border-color: #16a34a !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2) !important;
+  }
+
+  .login-submit-btn {
+    width: 100% !important;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 13px 20px !important;
+    border-radius: 10px !important;
+    font-weight: 900 !important;
+    font-size: 0.96rem !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4) !important;
+    transition: all 0.2s ease !important;
+    margin-top: 22px !important;
+  }
+
+  .login-submit-btn:hover {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.5) !important;
+  }
+
+  .login-card-footer {
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    text-align: center;
+  }
+
+  .login-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #0f172a;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 800;
+    transition: color 0.2s ease;
+  }
+
+  .login-back-link:hover {
+    color: #16a34a;
+  }
+
+  .login-copyright {
+    margin-top: 14px;
+    font-size: 0.72rem;
+    color: #94a3b8;
+    text-align: center;
+  }
+</style>
+
+<div class="login-card-wrapper">
+  <!-- Card Header -->
+  <div class="login-card-header">
+    <div class="login-emblem-badge">
+      🏛️
+    </div>
+    <h2 class="login-card-title">Ministry of Fisheries</h2>
+    <p class="login-card-subtitle">CMS Administration Portal</p>
+    <span class="login-security-pill">
+      🔒 Authorized Personnel Only
+    </span>
+  </div>
+
+  <!-- Card Form Body -->
+  <div class="login-card-body">
+    {% if form.errors and not form.non_field_errors %}
+      <div class="login-errornote">
+        <span>⚠️</span>
+        <span>Please correct the errors in the fields below.</span>
+      </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+      {% for error in form.non_field_errors %}
+        <div class="login-errornote">
+          <span>⚠️</span>
+          <span>{{ error }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if user.is_authenticated %}
+      <div class="login-errornote">
+        <span>⚠️</span>
+        <span>You are signed in as <strong>{{ username }}</strong>, but not authorized for this view.</span>
+      </div>
+    {% endif %}
+
+    <form action="{{ app_path }}" method="post" id="login-form">
+      {% csrf_token %}
+
+      <div class="login-field-group">
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        <div class="login-input-wrap">
+          <span class="login-input-icon">👤</span>
+          {{ form.username }}
+        </div>
+      </div>
+
+      <div class="login-field-group">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        <div class="login-input-wrap">
+          <span class="login-input-icon">🔑</span>
+          {{ form.password }}
+          <input type="hidden" name="next" value="{{ next }}">
+        </div>
+      </div>
+
+      <button type="submit" class="login-submit-btn">
+        <span>🔐 Sign In to Console</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- Card Footer -->
+  <div class="login-card-footer">
+    <a href="http://localhost:3000/" target="_blank" rel="noopener noreferrer" class="login-back-link">
+      <span>🌐</span>
+      <span>Return to Public Website</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

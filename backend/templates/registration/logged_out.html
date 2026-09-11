@@ -1,0 +1,289 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Logged Out | Ministry of Fisheries CMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} cms-logout-page{% endblock %}
+
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block branding %}
+<div id="branding" style="justify-content: center; width: 100%;">
+  <div class="branding-brand-wrap" style="justify-content: center;">
+    <span class="branding-emblem">🏛️</span>
+    <div class="branding-text-col" style="text-align: center;">
+      <span class="branding-govt-title">Democratic Socialist Republic of Sri Lanka</span>
+      <h1 style="justify-content: center;">
+        <a href="{% url 'admin:index' %}">
+          Ministry of Fisheries, Aquatic &amp; Ocean Resources
+        </a>
+      </h1>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+  /* Logout Page Full-Viewport Experience: Perfect Center */
+  body.cms-logout-page {
+    background: radial-gradient(circle at 50% 20%, #0d382c 0%, #061f18 45%, #020f0b 100%) !important;
+    min-height: 100vh !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.cms-logout-page #container {
+    background: transparent !important;
+    flex: 1 1 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body.cms-logout-page #header {
+    background: rgba(4, 23, 17, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(34, 197, 94, 0.3) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    width: 100% !important;
+  }
+
+  body.cms-logout-page #main,
+  body.cms-logout-page .main,
+  body.cms-logout-page main.content,
+  body.cms-logout-page #content-start {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body.cms-logout-page #content {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 30px 16px 50px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+
+  .logout-card-wrapper {
+    width: 100%;
+    max-width: 480px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    margin: 0 auto !important;
+    animation: logoutFadeIn 0.35s ease-out;
+    text-align: center;
+  }
+
+  @keyframes logoutFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .logout-card-header {
+    background: linear-gradient(135deg, #07271e 0%, #0d4233 100%);
+    color: #ffffff;
+    padding: 36px 24px 28px;
+    position: relative;
+    border-bottom: 3px solid #22c55e;
+  }
+
+  .logout-shield-badge {
+    width: 72px;
+    height: 72px;
+    background: rgba(34, 197, 94, 0.18);
+    border: 2.5px solid rgba(74, 222, 128, 0.5);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  .logout-card-title,
+  .logout-card-header h2,
+  h2.logout-card-title {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    font-size: 1.35rem !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    margin: 0 0 6px 0 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .logout-card-subtitle {
+    font-size: 0.88rem !important;
+    color: #a7f3d0 !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    line-height: 1.5 !important;
+  }
+
+  .logout-card-body {
+    padding: 28px 28px 32px;
+    background: #ffffff;
+  }
+
+  .logout-security-notice {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 0.84rem;
+    color: #475569;
+    line-height: 1.55;
+    margin-bottom: 26px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    text-align: left;
+  }
+
+  .logout-security-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .logout-action-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .logout-btn-primary {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 13px 20px !important;
+    border-radius: 10px !important;
+    font-weight: 900 !important;
+    font-size: 0.96rem !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+  }
+
+  .logout-btn-primary:hover {
+    background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.5) !important;
+    color: #ffffff !important;
+  }
+
+  .logout-btn-secondary {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1.5px solid #cbd5e1 !important;
+    padding: 12px 20px !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    font-size: 0.90rem !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+  }
+
+  .logout-btn-secondary:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .logout-card-footer {
+    padding: 14px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.74rem;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+</style>
+
+<div class="logout-card-wrapper">
+  <!-- Card Header -->
+  <div class="logout-card-header">
+    <div class="logout-shield-badge">
+      🛡️
+    </div>
+    <h2 class="logout-card-title">Session Securely Ended</h2>
+    <p class="logout-card-subtitle">
+      You have been successfully signed out of the CMS portal.
+    </p>
+  </div>
+
+  <!-- Card Body -->
+  <div class="logout-card-body">
+    <div class="logout-security-notice">
+      <span class="logout-security-icon">🔒</span>
+      <div>
+        <strong>Security Recommendation:</strong>
+        <br>
+        For security reasons, please close your browser window if you are using a shared or public terminal.
+      </div>
+    </div>
+
+    <div class="logout-action-group">
+      <a href="{% url 'admin:index' %}" class="logout-btn-primary">
+        <span>🔑</span>
+        <span>Log In Again</span>
+      </a>
+      <a href="http://localhost:3000/" target="_blank" rel="noopener noreferrer" class="logout-btn-secondary">
+        <span>🌐</span>
+        <span>Return to Public Website</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Card Footer -->
+  <div class="logout-card-footer">
+    Democratic Socialist Republic of Sri Lanka • Ministry of Fisheries CMS
+  </div>
+</div>
+{% endblock %}
