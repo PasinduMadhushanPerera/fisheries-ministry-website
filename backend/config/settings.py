@@ -170,27 +170,32 @@ ASGI_APPLICATION = "config.asgi.application"
 #     },
 # }
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": get_required_env("DB_NAME"),
-        "USER": get_required_env("DB_USER"),
-        "PASSWORD": get_required_env("DB_PASSWORD"),
-        "HOST": os.getenv(
-            "DB_HOST",
-            "127.0.0.1",
-        ),
-        "PORT": os.getenv(
-            "DB_PORT",
-            "3306",
-        ),
-        "CONN_MAX_AGE": 60,
-        "OPTIONS": {
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-            "charset": "utf8mb4",
-        },
-    },
-}
+DB_ENGINE = os.getenv("DB_ENGINE", "django.db.backends.mysql")
+
+if DB_ENGINE == "django.db.backends.sqlite3":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": os.getenv("DB_NAME", "ministry_db"),
+            "USER": os.getenv("DB_USER", "root"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("DB_PORT", "3306"),
+            "CONN_MAX_AGE": 60,
+            "OPTIONS": {
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                "charset": "utf8mb4",
+            } if "mysql" in DB_ENGINE else {},
+        }
+    }
+
 
 
 AUTH_PASSWORD_VALIDATORS = [
