@@ -84,9 +84,11 @@ export interface ContactSubmissionResponse {
   errors?: Record<string, string[]>
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchContactPageData(lang: string = "en"): Promise<ApiContactPageData | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com/api/v1"
-  const endpoint = `${baseUrl}/contact/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
+  const baseUrl = getApiBaseUrl()
+  const endpoint = `${baseUrl}/api/v1/contact/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {
     const res = await fetch(endpoint, {
@@ -109,8 +111,8 @@ export async function fetchContactPageData(lang: string = "en"): Promise<ApiCont
 export async function submitContactMessage(
   payload: ContactSubmissionPayload
 ): Promise<ContactSubmissionResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com/api/v1"
-  const endpoint = `${baseUrl}/contact/submit/`
+  const baseUrl = getApiBaseUrl()
+  const endpoint = `${baseUrl}/api/v1/contact/submit/`
 
   try {
     const res = await fetch(endpoint, {

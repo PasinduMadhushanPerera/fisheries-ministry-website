@@ -64,9 +64,10 @@ export type HeaderFooterData = {
   total_views?: number
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchHeaderFooterData(lang: string = "en"): Promise<HeaderFooterData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/header-footer/?lang=${encodeURIComponent(lang)}`
 
   try {
@@ -82,8 +83,7 @@ export async function fetchHeaderFooterData(lang: string = "en"): Promise<Header
 }
 
 export async function incrementVisitorCount(): Promise<number | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/header-footer/visitor-count/`
 
   try {
@@ -102,8 +102,7 @@ export async function incrementVisitorCount(): Promise<number | null> {
 }
 
 export async function fetchVisitorCount(): Promise<number | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/header-footer/visitor-count/`
 
   try {

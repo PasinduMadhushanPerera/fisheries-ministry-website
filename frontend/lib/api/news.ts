@@ -99,15 +99,12 @@ export interface ApiNewsPageData {
   articles: ApiNewsArticleItem[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchNewsPageData(
   lang: string = "en"
 ): Promise<ApiNewsPageData | null> {
-  const rawUrl =
-    process.env.NEXT_PUBLIC_API_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/news/?lang=${encodeURIComponent(
     lang
   )}&_t=${Date.now()}`
@@ -128,12 +125,7 @@ export async function fetchNewsArticleBySlug(
   slug: string,
   lang: string = "en"
 ): Promise<ApiNewsArticleItem | null> {
-  const rawUrl =
-    process.env.NEXT_PUBLIC_API_URL ||
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/news/${encodeURIComponent(
     slug
   )}/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`

@@ -71,6 +71,8 @@ const defaultHeroSlides: HeroSlide[] = [
   },
 ]
 
+import { getAbsoluteMediaUrl } from "@/lib/utils"
+
 export function HomeHero({ initialSlides }: { initialSlides?: ApiHeroSlide[] }) {
   const heroSlides: HeroSlide[] =
     initialSlides && initialSlides.length > 0
@@ -80,7 +82,7 @@ export function HomeHero({ initialSlides }: { initialSlides?: ApiHeroSlide[] }) 
           title: s.title,
           highlightedTitle: s.highlighted_title,
           description: s.description,
-          image: s.image_url || "/images/home/hero-fishing-harbour.jpg",
+          image: getAbsoluteMediaUrl(s.image_url) || "/images/home/hero-fishing-harbour.jpg",
           imageAlt: s.image_alt || "Ministry of Fisheries Hero Banner",
           imagePosition: "center",
         }))

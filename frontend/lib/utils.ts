@@ -54,18 +54,43 @@ export function extractYouTubeId(urlOrId?: string | null): string {
 }
 
 /**
+ * Dynamically resolves the API base URL depending on whether code runs in browser or server.
+ * On browser, adapts host automatically (localhost vs LAN IP).
+ */
+export function getApiBaseUrl(): string {
+  const envUrl =
+    process.env.NEXT_PUBLIC_API_URL ||
+    process.env.NEXT_PUBLIC_API_BASE_URL ||
+    process.env.NEXT_PUBLIC_BACKEND_URL
+
+  if (envUrl) {
+    return envUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  }
+
+  if (typeof window !== "undefined" && window.location?.hostname) {
+    const host = window.location.hostname
+    if (/^(localhost|127\.0\.0\.1|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.test(host)) {
+      return `http://${host}:8000`
+    }
+  }
+
+  return "http://127.0.0.1:8000"
+}
+
+/**
  * Ensures media/image/document URLs resolve to absolute full-resolution paths in backend/media/.
  */
 export function getAbsoluteMediaUrl(url?: string | null): string {
   if (!url) return ""
+  const backendBase = getApiBaseUrl()
+
   if (url.startsWith("http://") || url.startsWith("https://")) {
+    // If URL targets backend port 8000 (e.g. 127.0.0.1:8000 or localhost:8000), rewrite to active LAN host
+    if (url.includes(":8000/")) {
+      return url.replace(/^https?:\/\/[^/]+:8000/, backendBase)
+    }
     return url
   }
-  const backendBase = (
-    process.env.NEXT_PUBLIC_API_BASE_URL ||
-    process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "https://pasiperera.pythonanywhere.com"
-  ).replace(/\/$/, "")
 
   // If path starts with /media/ or /static/
   if (url.startsWith("/media/") || url.startsWith("/static/")) {

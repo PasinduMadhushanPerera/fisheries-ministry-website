@@ -115,9 +115,10 @@ export type HomePageData = {
   institutions_section: ApiInstitutionsSection
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchHomePageData(lang: string = "en"): Promise<HomePageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/home/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {

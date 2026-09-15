@@ -14,7 +14,7 @@ import {
   Hash,
   X,
 } from "lucide-react"
-import { stripHtml } from "@/lib/utils"
+import { stripHtml, getAbsoluteMediaUrl } from "@/lib/utils"
 import type { ApiNoticeItem } from "@/lib/api/notices"
 
 interface NoticesPreviewProps {
@@ -22,22 +22,12 @@ interface NoticesPreviewProps {
   onClose: () => void
 }
 
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL ??
-  "https://pasiperera.pythonanywhere.com/api/v1"
-).replace(/\/$/, "")
-
 function getAbsoluteFileUrl(fileUrl: string): string {
   if (!fileUrl) return ""
   if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
     return fileUrl
   }
-  try {
-    const backendOrigin = new URL(API_BASE_URL).origin
-    return new URL(fileUrl, backendOrigin).toString()
-  } catch {
-    return fileUrl
-  }
+  return getAbsoluteMediaUrl(fileUrl)
 }
 
 export function NoticesPreview({ notice, onClose }: NoticesPreviewProps) {

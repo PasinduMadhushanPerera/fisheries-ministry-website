@@ -129,9 +129,10 @@ export type ApiAboutData = {
   timeline: ApiTimelineEvent[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchAboutPageData(lang: string = "en"): Promise<ApiAboutData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/about/?lang=${encodeURIComponent(lang)}`
 
   try {
@@ -147,8 +148,7 @@ export async function fetchAboutPageData(lang: string = "en"): Promise<ApiAboutD
 }
 
 export async function fetchLeaderDetail(roleType: string, lang: string = "en"): Promise<ApiLeader | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/about/leaders/${roleType}/?lang=${encodeURIComponent(lang)}`
 
   try {

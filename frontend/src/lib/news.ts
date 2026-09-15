@@ -43,15 +43,14 @@ export interface NewsApiResponse {
   results: NewsArticle[];
 }
 
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL ?? "https://pasiperera.pythonanywhere.com/api/v1"
-).replace(/\/$/, "");
+import { getApiBaseUrl } from "@/lib/utils";
 
 function buildApiUrl(
   path: string,
   parameters: Record<string, string | undefined>,
 ): string {
-  const url = new URL(`${API_BASE_URL}${path}`);
+  const baseUrl = getApiBaseUrl() + "/api/v1";
+  const url = new URL(`${baseUrl}${path}`);
 
   Object.entries(parameters).forEach(([key, value]) => {
     if (value) {

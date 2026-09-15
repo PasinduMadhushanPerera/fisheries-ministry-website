@@ -90,10 +90,7 @@ type LatestNoticesProps = {
   language?: LanguageCode
 }
 
-const API_BASE_URL = (
-  process.env.NEXT_PUBLIC_API_URL ??
-  "https://pasiperera.pythonanywhere.com/api/v1"
-).replace(/\/$/, "")
+import { getApiBaseUrl, getAbsoluteMediaUrl } from "@/lib/utils"
 
 function formatPublishedDate(date: string) {
   return new Intl.DateTimeFormat("en-US", {
@@ -111,11 +108,7 @@ function getAttachmentUrl(fileUrl: string) {
     return fileUrl
   }
 
-  try {
-    return new URL(fileUrl, API_BASE_URL).toString()
-  } catch {
-    return fileUrl
-  }
+  return getAbsoluteMediaUrl(fileUrl)
 }
 
 function getFileType(fileUrl: string) {
@@ -166,8 +159,9 @@ export function LatestNotices({
     setError(null)
 
     try {
+      const apiBase = getApiBaseUrl()
       const response = await fetch(
-        `${API_BASE_URL}/notices/notices/?lang=${language}`,
+        `${apiBase}/api/v1/notices/notices/?lang=${language}`,
         {
           method: "GET",
           headers: {
