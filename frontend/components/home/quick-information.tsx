@@ -145,17 +145,11 @@ export function QuickInformation({ initialSection }: { initialSection?: ApiQuick
                   </div>
 
                   {/* THUMBNAIL IMAGE BOX */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-950 flex items-center justify-center p-1.5 mb-4">
-                    <img
-                      src={card.image}
-                      alt=""
-                      aria-hidden="true"
-                      className="absolute inset-0 h-full w-full object-cover blur-xl opacity-30 scale-110 pointer-events-none"
-                    />
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-[#faf8f5] border border-amber-100/80 flex items-center justify-center p-2 mb-4 shadow-xs">
                     <img
                       src={card.image}
                       alt={card.imageAlt}
-                      className="relative z-10 max-h-full w-auto max-w-full object-contain mx-auto rounded-lg shadow-md transition-transform duration-500 group-hover:scale-[1.03]"
+                      className="relative z-10 max-h-full w-auto max-w-full object-contain mx-auto rounded-xl shadow-xs transition-transform duration-500 group-hover:scale-[1.02]"
                     />
                   </div>
 
@@ -172,18 +166,18 @@ export function QuickInformation({ initialSection }: { initialSection?: ApiQuick
                       href={card.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold text-white shadow-2xs transition hover:bg-[#1b4d1d]"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold !text-white shadow-2xs transition hover:bg-[#1b4d1d] group-hover:bg-[#1b4d1d]"
                     >
-                      <span>{card.primaryButtonLabel}</span>
-                      <ExternalLink className="h-4 w-4" />
+                      <span className="!text-white">{card.primaryButtonLabel}</span>
+                      <ExternalLink className="h-4 w-4 !text-white" />
                     </a>
                   ) : (
                     <Link
                       href={card.href}
-                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold text-white shadow-2xs transition hover:bg-[#1b4d1d]"
+                      className="inline-flex min-h-[40px] items-center justify-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold !text-white shadow-2xs transition hover:bg-[#1b4d1d] group-hover:bg-[#1b4d1d]"
                     >
-                      <span>{card.primaryButtonLabel}</span>
-                      <ArrowRight className="h-4 w-4" />
+                      <span className="!text-white">{card.primaryButtonLabel}</span>
+                      <ArrowRight className="h-4 w-4 !text-white" />
                     </Link>
                   )}
                 </div>

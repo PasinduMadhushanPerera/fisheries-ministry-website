@@ -190,13 +190,7 @@ export function InstitutionsSection({ initialSection }: { initialSection?: ApiIn
                   </div>
 
                   {/* Thumbnail Image */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-950 flex items-center justify-center p-1.5 mb-4">
-                    <img
-                      src={inst.image}
-                      alt=""
-                      aria-hidden="true"
-                      className="absolute inset-0 h-full w-full object-cover blur-xl opacity-30 scale-110 pointer-events-none"
-                    />
+                  <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-[#faf8f5] border border-amber-100/80 flex items-center justify-center p-2 mb-4 shadow-xs">
                     <img
                       src={inst.image}
                       alt={inst.alt}
@@ -219,10 +213,10 @@ export function InstitutionsSection({ initialSection }: { initialSection?: ApiIn
                 <div className="mt-5 pt-4 border-t border-slate-100">
                   <CardWrapper
                     {...(linkProps as any)}
-                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-100 px-4 py-2 text-xs font-extrabold text-slate-700 transition hover:bg-[#256B29] hover:text-white"
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-slate-100 px-4 py-2 text-xs font-extrabold text-slate-700 transition hover:bg-[#256B29] hover:!text-white group-hover:bg-[#256B29] group-hover:!text-white"
                   >
-                    <span>Visit Institution</span>
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span className="transition-colors hover:!text-white group-hover:!text-white">Visit Institution</span>
+                    <ExternalLink className="h-3.5 w-3.5 transition-colors hover:!text-white group-hover:!text-white" />
                   </CardWrapper>
                 </div>
               </article>

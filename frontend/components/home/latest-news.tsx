@@ -224,10 +224,10 @@ export function LatestNews({
 
               <LinkButton
                 href={buttonUrl}
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold text-white shadow-xs transition hover:bg-[#1b4d1d] hover:shadow-md cursor-pointer"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold !text-white shadow-xs transition hover:bg-[#1b4d1d] hover:shadow-md cursor-pointer group-hover:!text-white"
               >
-                <span>{buttonText}</span>
-                <ArrowRight className="h-4 w-4" />
+                <span className="!text-white">{buttonText}</span>
+                <ArrowRight className="h-4 w-4 !text-white" />
               </LinkButton>
             </div>
           </div>

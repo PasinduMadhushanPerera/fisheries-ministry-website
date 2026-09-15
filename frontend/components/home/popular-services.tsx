@@ -137,13 +137,7 @@ export function PopularServices({ initialSection }: { initialSection?: ApiServic
                 <div className="p-5 sm:p-6 flex flex-col flex-1 justify-between">
                   <div>
                     {/* Visual Header Thumbnail Image */}
-                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-slate-950 flex items-center justify-center p-1.5 mb-4">
-                      <img
-                        src={service.image}
-                        alt=""
-                        aria-hidden="true"
-                        className="absolute inset-0 h-full w-full object-cover blur-xl opacity-30 scale-110 pointer-events-none"
-                      />
+                    <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-[#faf8f5] border border-amber-100/80 flex items-center justify-center p-2 mb-4 shadow-xs">
                       <img
                         src={service.image}
                         alt={service.alt}
@@ -165,10 +159,10 @@ export function PopularServices({ initialSection }: { initialSection?: ApiServic
                   <div className="mt-5 pt-4 border-t border-slate-100">
                     <Link
                       href={service.href}
-                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#256B29] px-4 py-2.5 text-xs font-extrabold text-white shadow-2xs transition group-hover:bg-[#1b4d1d]"
+                      className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#256B29] px-4 py-2.5 text-xs font-extrabold !text-white shadow-2xs transition hover:bg-[#1b4d1d] group-hover:bg-[#1b4d1d]"
                     >
-                      <span>{service.btnText}</span>
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                      <span className="!text-white">{service.btnText}</span>
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1 !text-white" />
                     </Link>
                   </div>
                 </div>
