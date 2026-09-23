@@ -50,6 +50,10 @@ class DownloadDocumentItemSerializer(serializers.ModelSerializer):
     fileSize = serializers.CharField(source="file_size")
     fileUrl = serializers.SerializerMethodField()
     downloadUrl = serializers.SerializerMethodField()
+    fileUrlEn = serializers.SerializerMethodField()
+    fileUrlSi = serializers.SerializerMethodField()
+    fileUrlTa = serializers.SerializerMethodField()
+    availableLanguages = serializers.SerializerMethodField()
     publishedDate = serializers.SerializerMethodField()
     featured = serializers.BooleanField(source="is_featured")
 
@@ -65,6 +69,10 @@ class DownloadDocumentItemSerializer(serializers.ModelSerializer):
             "fileSize",
             "fileUrl",
             "downloadUrl",
+            "fileUrlEn",
+            "fileUrlSi",
+            "fileUrlTa",
+            "availableLanguages",
             "publishedDate",
             "language",
             "featured",
@@ -73,6 +81,14 @@ class DownloadDocumentItemSerializer(serializers.ModelSerializer):
 
     def _get_lang(self):
         return self.context.get("language", "en")
+
+    def _build_url(self, file_field):
+        if not file_field:
+            return None
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(file_field.url)
+        return file_field.url
 
     def get_title(self, obj):
         lang = self._get_lang()
@@ -91,15 +107,36 @@ class DownloadDocumentItemSerializer(serializers.ModelSerializer):
         return obj.description_en
 
     def get_fileUrl(self, obj):
-        if obj.document_file:
-            request = self.context.get("request")
-            if request:
-                return request.build_absolute_uri(obj.document_file.url)
-            return obj.document_file.url
+        lang = self._get_lang()
+        target_file = obj.get_file_for_lang(lang)
+        if target_file:
+            return self._build_url(target_file)
         return obj.file_url_fallback or "#"
 
     def get_downloadUrl(self, obj):
         return self.get_fileUrl(obj)
+
+    def get_fileUrlEn(self, obj):
+        target = obj.document_file_en or obj.document_file
+        return self._build_url(target)
+
+    def get_fileUrlSi(self, obj):
+        return self._build_url(obj.document_file_si)
+
+    def get_fileUrlTa(self, obj):
+        return self._build_url(obj.document_file_ta)
+
+    def get_availableLanguages(self, obj):
+        langs = []
+        if obj.document_file_en or obj.document_file:
+            langs.append("en")
+        if obj.document_file_si:
+            langs.append("si")
+        if obj.document_file_ta:
+            langs.append("ta")
+        if not langs:
+            langs.append("en")
+        return langs
 
     def get_publishedDate(self, obj):
         if obj.display_date:

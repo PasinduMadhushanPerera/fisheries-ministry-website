@@ -15,16 +15,13 @@ import { DesktopNavigation } from "./desktop-navigation"
 import { MobileNavigation } from "./mobile-navigation"
 import { UtilityBar } from "./utility-bar"
 
-const COLLAPSE_SCROLL_POSITION = 140
-const EXPAND_SCROLL_POSITION = 40
+const COLLAPSE_SCROLL_POSITION = 30
+const EXPAND_SCROLL_POSITION = 10
 
 export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting }) {
   const pathname = usePathname()
   const { language, t } = useLanguage()
   const [scrolled, setScrolled] = useState(false)
-
-  const scrolledRef = useRef(false)
-  const animationFrameRef = useRef<number | null>(null)
 
   const isTranslated = language === "si" || language === "ta"
 
@@ -48,62 +45,20 @@ export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting
         behavior: "auto",
       })
     }
-
-    scrolledRef.current = false
-    setScrolled(false)
   }, [pathname])
 
   /*
-   * Collapse and expand the header using different scroll
-   * positions. This prevents flickering when the header
-   * height changes near the scroll threshold.
+   * Detect scroll to toggle subtle elevation shadow (Zero height thrashing).
    */
   useEffect(() => {
-    function updateHeader() {
-      const scrollPosition = window.scrollY
-      const isCurrentlyScrolled = scrolledRef.current
-
-      if (
-        !isCurrentlyScrolled &&
-        scrollPosition >= COLLAPSE_SCROLL_POSITION
-      ) {
-        scrolledRef.current = true
-        setScrolled(true)
-      } else if (
-        isCurrentlyScrolled &&
-        scrollPosition <= EXPAND_SCROLL_POSITION
-      ) {
-        scrolledRef.current = false
-        setScrolled(false)
-      }
-
-      animationFrameRef.current = null
-    }
-
     function handleScroll() {
-      if (animationFrameRef.current !== null) {
-        return
-      }
-
-      animationFrameRef.current =
-        window.requestAnimationFrame(updateHeader)
+      const isScrolledNow = window.scrollY > 20
+      setScrolled((prev) => (prev !== isScrolledNow ? isScrolledNow : prev))
     }
 
-    updateHeader()
-
-    window.addEventListener("scroll", handleScroll, {
-      passive: true,
-    })
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-
-      if (animationFrameRef.current !== null) {
-        window.cancelAnimationFrame(
-          animationFrameRef.current,
-        )
-      }
-    }
+    handleScroll()
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   return (
@@ -126,43 +81,27 @@ export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting
         </div>
       )}
 
+      {/* Top Utility Bar (Scrolls naturally above sticky header, zero layout jitter) */}
+      <div className="relative z-[120] border-b border-slate-200/80 bg-slate-50/95 text-slate-700">
+        <UtilityBar initialHeader={initialHeader} />
+      </div>
+
+      {/* Main Sticky Header & Navigation (Rock-Solid 60FPS Sticky Header) */}
       <header
         id="site-header"
-        className={`sticky top-0 z-[100] bg-white/95 backdrop-blur-md transition-shadow duration-300 ${
-          scrolled ? "shadow-lg" : "shadow-sm"
+        className={`sticky top-0 z-[100] bg-white/95 backdrop-blur-md transition-shadow duration-300 border-b border-slate-200/80 ${
+          scrolled ? "shadow-md shadow-slate-900/10" : "shadow-xs"
         }`}
       >
-        {/* Utility bar */}
-        <div
-          aria-hidden={scrolled}
-          className={`relative z-[120] overflow-visible transition-[height,opacity,transform] duration-300 ease-in-out ${
-            scrolled
-              ? "pointer-events-none h-0 -translate-y-2 opacity-0"
-              : "h-10 translate-y-0 opacity-100"
-          }`}
-        >
-          <UtilityBar initialHeader={initialHeader} />
-        </div>
-
         {/* Logo and search section */}
-        <div className="relative z-[110] border-b border-slate-200 bg-white/95">
-          <Container
-            className={`flex items-center justify-between gap-5 transition-[min-height,padding] duration-300 ease-in-out ${
-              scrolled
-                ? "min-h-20 py-2"
-                : "min-h-28 py-4"
-            }`}
-          >
+        <div className="relative z-[110] bg-white/95 backdrop-blur-md">
+          <Container className="flex items-center justify-between gap-5 py-3.5 min-h-[90px] sm:min-h-[100px]">
             <Link
               href="/"
               aria-label={`${siteConfig.shortName} homepage`}
               className="flex min-w-0 items-center gap-4 rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200"
             >
-              <div
-                className={`relative flex shrink-0 items-center justify-center transition-[height,width] duration-300 ease-in-out ${
-                  scrolled ? "h-14 w-12" : "h-20 w-16"
-                }`}
-              >
+              <div className="relative flex shrink-0 items-center justify-center h-16 w-14 sm:h-20 sm:w-16 transition-transform duration-300 hover:scale-105">
                 <Image
                   src={logoUrl}
                   alt={logoAlt}
@@ -175,44 +114,26 @@ export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting
               </div>
 
               <div className="min-w-0">
-                <p
-                  className={`font-semibold uppercase text-[#256B29] transition-[font-size,letter-spacing] duration-300 ${
-                    scrolled
-                      ? "text-[10px] tracking-[0.1em] sm:text-xs"
-                      : "text-xs tracking-[0.12em] sm:text-sm"
-                  }`}
-                >
+                <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#256B29] sm:text-sm">
                   {governmentName}
                 </p>
 
-                <p
-                  className={`mt-1 max-w-2xl font-bold leading-tight text-slate-950 transition-[font-size] duration-300 ${
-                    scrolled
-                      ? "text-sm sm:text-lg lg:text-xl"
-                      : "text-base sm:text-xl lg:text-2xl"
-                  }`}
-                >
+                <p className="mt-0.5 max-w-2xl text-base font-extrabold leading-tight text-slate-950 sm:text-xl lg:text-2xl">
                   {ministryName}
                 </p>
 
-                <p
-                  className={`mt-1 overflow-hidden text-sm text-slate-600 transition-[max-height,opacity] duration-300 ${
-                    scrolled
-                      ? "max-h-0 opacity-0"
-                      : "max-h-6 opacity-100"
-                  } hidden sm:block`}
-                >
+                <p className="mt-1 hidden text-xs text-slate-600 sm:block">
                   {tagline}
                 </p>
               </div>
             </Link>
 
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-3">
               <form
                 role="search"
                 action="/search"
                 method="get"
-                className="hidden w-72 overflow-hidden rounded-lg border border-slate-300 bg-white focus-within:border-blue-600 focus-within:ring-2 focus-within:ring-blue-200 xl:flex"
+                className="hidden w-72 overflow-hidden rounded-xl border border-slate-300 bg-white focus-within:border-[#256B29] focus-within:ring-2 focus-within:ring-emerald-200 xl:flex shadow-2xs"
               >
                 <label
                   htmlFor="desktop-site-search"
@@ -228,17 +149,17 @@ export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting
                   maxLength={100}
                   autoComplete="off"
                   placeholder={searchPlaceholder}
-                  className="min-h-12 min-w-0 flex-1 border-0 px-4 text-base text-slate-950 outline-none placeholder:text-slate-500"
+                  className="min-h-11 min-w-0 flex-1 border-0 px-4 text-xs font-medium text-slate-950 outline-none placeholder:text-slate-400"
                 />
 
                 <button
                   type="submit"
                   aria-label="Submit website search"
-                  className="inline-flex min-h-12 min-w-12 items-center justify-center bg-[#388E3C] text-white transition hover:bg-[#256B29] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-emerald-200"
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center bg-[#256B29] text-white transition hover:bg-[#1b4d1d] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-emerald-200"
                 >
                   <Search
                     aria-hidden="true"
-                    className="h-5 w-5"
+                    className="h-4 w-4"
                   />
                 </button>
               </form>
@@ -246,7 +167,7 @@ export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting
               <Link
                 href="/search"
                 aria-label="Search the website"
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-slate-300 text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 xl:hidden"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-slate-300 text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 xl:hidden"
               >
                 <Search
                   aria-hidden="true"
@@ -259,16 +180,12 @@ export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting
           </Container>
         </div>
 
-        {/* Primary navigation bar (Dark Charcoal Background) */}
+        {/* Primary navigation bar (Dark Navy Background) */}
         <nav
           aria-label="Primary navigation"
-          className="relative z-[105] border-b border-slate-800 bg-[#150c39] text-white shadow-md"
+          className="relative z-[105] border-t border-slate-100 border-b border-slate-900 bg-[#150c39] text-white shadow-sm"
         >
-          <Container
-            className={`flex items-center justify-center transition-[min-height] duration-300 ease-in-out ${
-              scrolled ? "min-h-[48px]" : "min-h-14"
-            }`}
-          >
+          <Container className="flex items-center justify-center min-h-12 sm:min-h-14">
             <DesktopNavigation />
           </Container>
         </nav>

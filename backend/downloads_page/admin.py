@@ -46,9 +46,9 @@ class DownloadDocumentItemInline(admin.StackedInline):
     fields = (
         ("order", "is_active", "is_featured"),
         ("item_id", "year", "language"),
-        ("title_en", "description_en"),
-        ("title_si", "description_si"),
-        ("title_ta", "description_ta"),
+        ("title_en", "description_en", "document_file_en"),
+        ("title_si", "description_si", "document_file_si"),
+        ("title_ta", "description_ta", "document_file_ta"),
         ("file_type", "file_size"),
         ("document_file", "file_url_fallback"),
         ("published_date", "display_date"),
@@ -131,7 +131,7 @@ class DownloadDocumentItemAdmin(admin.ModelAdmin):
         "title_en",
         "category_badge",
         "format_badge",
-        "language",
+        "uploaded_files_badge",
         "year",
         "file_size",
         "is_featured_badge",
@@ -150,32 +150,36 @@ class DownloadDocumentItemAdmin(admin.ModelAdmin):
                 ("item_id", "year", "language"),
             ),
         }),
-        ("🇬🇧 English Details", {
+        ("🇬🇧 English Details & File Upload", {
             "fields": (
                 "title_en",
                 "description_en",
+                "document_file_en",
             ),
         }),
-        ("🇱🇰 Sinhala Details (සිංහල)", {
+        ("🇱🇰 Sinhala Details & File Upload (සිංහල)", {
             "classes": ("collapse",),
             "fields": (
                 "title_si",
                 "description_si",
+                "document_file_si",
             ),
         }),
-        ("🇱🇰 Tamil Details (தமிழ்)", {
+        ("🇱🇰 Tamil Details & File Upload (தமிழ்)", {
             "classes": ("collapse",),
             "fields": (
                 "title_ta",
                 "description_ta",
+                "document_file_ta",
             ),
         }),
-        ("📂 Document File & Publication Date", {
+        ("📂 General File & Publication Date Settings", {
             "fields": (
                 ("file_type", "file_size"),
                 ("document_file", "file_url_fallback"),
                 ("published_date", "display_date"),
             ),
+            "description": "Optional: Upload a default general file or external fallback URL if language-specific files are not uploaded separately.",
         }),
     )
 
@@ -196,6 +200,19 @@ class DownloadDocumentItemAdmin(admin.ModelAdmin):
             obj.file_type,
         )
     format_badge.short_description = "Format"
+
+    def uploaded_files_badge(self, obj):
+        badges = []
+        if obj.document_file_en or obj.document_file:
+            badges.append('<span style="background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇬🇧 EN</span>')
+        if obj.document_file_si:
+            badges.append('<span style="background: #fef3c7; color: #b45309; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇱🇰 SI</span>')
+        if obj.document_file_ta:
+            badges.append('<span style="background: #fce7f3; color: #be185d; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇱🇰 TA</span>')
+        if not badges:
+            return format_html('<span style="color: #94a3b8; font-size: 11px;">(Default / Fallback)</span>')
+        return format_html(" ".join(badges))
+    uploaded_files_badge.short_description = "Uploaded Files"
 
     def is_featured_badge(self, obj):
         if obj.is_featured:

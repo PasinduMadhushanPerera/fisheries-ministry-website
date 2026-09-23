@@ -27,6 +27,10 @@ export interface ApiDownloadDocumentItem {
   fileSize: string
   fileUrl: string
   downloadUrl: string
+  fileUrlEn?: string | null
+  fileUrlSi?: string | null
+  fileUrlTa?: string | null
+  availableLanguages?: string[]
   publishedDate?: string
   language?: string
   featured?: boolean

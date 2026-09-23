@@ -145,6 +145,7 @@ class RtiLegalDocumentAdmin(admin.ModelAdmin):
         "order",
         "title_en",
         "format_badge",
+        "uploaded_files_badge",
         "file_size",
         "display_date",
         "is_active_badge",
@@ -162,27 +163,30 @@ class RtiLegalDocumentAdmin(admin.ModelAdmin):
                 ("document_id",),
             ),
         }),
-        ("🇬🇧 English Details", {
+        ("🇬🇧 English Details & File Upload", {
             "fields": (
                 "title_en",
                 "description_en",
+                "document_file_en",
             ),
         }),
-        ("🇱🇰 Sinhala Details (සිංහල)", {
+        ("🇱🇰 Sinhala Details & File Upload (සිංහල)", {
             "classes": ("collapse",),
             "fields": (
                 "title_si",
                 "description_si",
+                "document_file_si",
             ),
         }),
-        ("🇱🇰 Tamil Details (தமிழ்)", {
+        ("🇱🇰 Tamil Details & File Upload (தமிழ்)", {
             "classes": ("collapse",),
             "fields": (
                 "title_ta",
                 "description_ta",
+                "document_file_ta",
             ),
         }),
-        ("📁 File Upload & Enactment Date", {
+        ("📂 General File & Enactment Date Settings", {
             "fields": (
                 ("file_type", "file_size"),
                 ("document_file", "file_url_fallback"),
@@ -197,6 +201,19 @@ class RtiLegalDocumentAdmin(admin.ModelAdmin):
             obj.file_type,
         )
     format_badge.short_description = "Format"
+
+    def uploaded_files_badge(self, obj):
+        badges = []
+        if obj.document_file_en or obj.document_file:
+            badges.append('<span style="background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇬🇧 EN</span>')
+        if obj.document_file_si:
+            badges.append('<span style="background: #fef3c7; color: #b45309; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇱🇰 SI</span>')
+        if obj.document_file_ta:
+            badges.append('<span style="background: #fce7f3; color: #be185d; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇱🇰 TA</span>')
+        if not badges:
+            return format_html('<span style="color: #94a3b8; font-size: 11px;">(Default / Fallback)</span>')
+        return format_html(" ".join(badges))
+    uploaded_files_badge.short_description = "Uploaded Files"
 
     def is_active_badge(self, obj):
         if obj.is_active:
@@ -219,9 +236,9 @@ class RtiDocumentItemInline(admin.StackedInline):
     fields = (
         ("order", "is_active", "is_featured"),
         ("item_id", "year", "published_date"),
-        ("title_en", "description_en"),
-        ("title_si", "description_si"),
-        ("title_ta", "description_ta"),
+        ("title_en", "subheading_en", "description_en", "document_file_en"),
+        ("title_si", "subheading_si", "description_si", "document_file_si"),
+        ("title_ta", "subheading_ta", "description_ta", "document_file_ta"),
         ("file_type", "file_size"),
         ("document_file", "file_url_fallback"),
     )
@@ -302,7 +319,9 @@ class RtiDocumentItemAdmin(admin.ModelAdmin):
         "order",
         "title_en",
         "category_badge",
+        "subheading_en",
         "format_badge",
+        "uploaded_files_badge",
         "year",
         "file_size",
         "is_featured_badge",
@@ -311,7 +330,7 @@ class RtiDocumentItemAdmin(admin.ModelAdmin):
     ]
     list_display_links = ["title_en"]
     list_filter = ["category", "file_type", "year", "is_featured", "is_active"]
-    search_fields = ["title_en", "title_si", "title_ta", "description_en", "item_id"]
+    search_fields = ["title_en", "subheading_en", "title_si", "title_ta", "description_en", "item_id"]
     ordering = ["category__order", "order", "id"]
 
     fieldsets = (
@@ -321,32 +340,39 @@ class RtiDocumentItemAdmin(admin.ModelAdmin):
                 ("item_id", "year"),
             ),
         }),
-        ("🇬🇧 English Details", {
+        ("🇬🇧 English Details & File Upload", {
             "fields": (
                 "title_en",
+                "subheading_en",
                 "description_en",
+                "document_file_en",
             ),
         }),
-        ("🇱🇰 Sinhala Details (සිංහල)", {
+        ("🇱🇰 Sinhala Details & File Upload (සිංහල)", {
             "classes": ("collapse",),
             "fields": (
                 "title_si",
+                "subheading_si",
                 "description_si",
+                "document_file_si",
             ),
         }),
-        ("🇱🇰 Tamil Details (தமிழ்)", {
+        ("🇱🇰 Tamil Details & File Upload (தமிழ்)", {
             "classes": ("collapse",),
             "fields": (
                 "title_ta",
+                "subheading_ta",
                 "description_ta",
+                "document_file_ta",
             ),
         }),
-        ("📂 Document File & Publication Date", {
+        ("📂 General File & Publication Date Settings", {
             "fields": (
                 ("file_type", "file_size"),
                 ("document_file", "file_url_fallback"),
                 ("published_date", "display_date"),
             ),
+            "description": "Optional: Upload a default general file or external fallback URL if language-specific files are not uploaded separately.",
         }),
     )
 
@@ -367,6 +393,19 @@ class RtiDocumentItemAdmin(admin.ModelAdmin):
             obj.file_type,
         )
     format_badge.short_description = "Format"
+
+    def uploaded_files_badge(self, obj):
+        badges = []
+        if obj.document_file_en or obj.document_file:
+            badges.append('<span style="background: #e0f2fe; color: #0369a1; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇬🇧 EN</span>')
+        if obj.document_file_si:
+            badges.append('<span style="background: #fef3c7; color: #b45309; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇱🇰 SI</span>')
+        if obj.document_file_ta:
+            badges.append('<span style="background: #fce7f3; color: #be185d; padding: 1px 4px; border-radius: 4px; font-weight: 700; font-size: 10px;">🇱🇰 TA</span>')
+        if not badges:
+            return format_html('<span style="color: #94a3b8; font-size: 11px;">(Default / Fallback)</span>')
+        return format_html(" ".join(badges))
+    uploaded_files_badge.short_description = "Uploaded Files"
 
     def is_featured_badge(self, obj):
         if obj.is_featured:

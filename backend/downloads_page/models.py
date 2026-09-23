@@ -198,11 +198,41 @@ class DownloadDocumentItem(TimeStampedModel):
         default="PDF",
         help_text="Document file format",
     )
+
+    # 🇬🇧 English File Upload (Optional)
+    document_file_en = models.FileField(
+        upload_to="downloads/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (English)",
+        help_text="Upload official English version of document (PDF, Word, Excel, PowerPoint, ZIP)",
+    )
+
+    # 🇱🇰 Sinhala File Upload (සිංහල - Optional)
+    document_file_si = models.FileField(
+        upload_to="downloads/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (සිංහල)",
+        help_text="Upload official Sinhala version of document (PDF, Word, Excel, PowerPoint, ZIP)",
+    )
+
+    # 🇱🇰 Tamil File Upload (தமிழ் - Optional)
+    document_file_ta = models.FileField(
+        upload_to="downloads/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (தமிழ்)",
+        help_text="Upload official Tamil version of document (PDF, Word, Excel, PowerPoint, ZIP)",
+    )
+
+    # Legacy / General File fallback
     document_file = models.FileField(
         upload_to="downloads/%Y/",
         blank=True,
         null=True,
-        help_text="Upload official document file (PDF, Word, Excel, PowerPoint, ZIP)",
+        verbose_name="General / Default File",
+        help_text="Upload general document file if language-specific files are not separate",
     )
     file_url_fallback = models.CharField(
         max_length=500,
@@ -254,6 +284,16 @@ class DownloadDocumentItem(TimeStampedModel):
         verbose_name = "02. Download Document / File"
         verbose_name_plural = "02. Download Documents & Files"
 
+    def get_file_for_lang(self, lang="en"):
+        if lang == "si" and self.document_file_si:
+            return self.document_file_si
+        if lang == "ta" and self.document_file_ta:
+            return self.document_file_ta
+        if lang == "en" and self.document_file_en:
+            return self.document_file_en
+        # Fallbacks: try English -> Sinhala -> Tamil -> Default file
+        return self.document_file_en or self.document_file_si or self.document_file_ta or self.document_file
+
     def save(self, *args, **kwargs):
         if not self.item_id or not str(self.item_id).strip():
             base = slugify(self.title_en) if self.title_en else f"doc-{uuid.uuid4().hex[:6]}"
@@ -270,9 +310,10 @@ class DownloadDocumentItem(TimeStampedModel):
             else:
                 self.display_date = str(self.published_date)
 
-        if self.document_file and (not self.file_size or self.file_size == "500 KB"):
+        active_file = self.document_file_en or self.document_file_si or self.document_file_ta or self.document_file
+        if active_file and (not self.file_size or self.file_size == "500 KB"):
             try:
-                size_bytes = self.document_file.size
+                size_bytes = active_file.size
                 if size_bytes < 1024 * 1024:
                     self.file_size = f"{round(size_bytes / 1024)} KB"
                 else:

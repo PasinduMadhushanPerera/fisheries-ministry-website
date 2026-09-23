@@ -64,11 +64,32 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
                     <FileText className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700 border border-slate-200/80">
-                    <span>{doc.fileType}</span>
-                    <span className="text-slate-400">•</span>
-                    <span>{doc.fileSize}</span>
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700 border border-slate-200/80">
+                      <span>{doc.fileType}</span>
+                      <span className="text-slate-400">•</span>
+                      <span>{doc.fileSize}</span>
+                    </span>
+                    {doc.availableLanguages && doc.availableLanguages.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        {doc.availableLanguages.includes("en") && (
+                          <span className="rounded bg-sky-50 px-1 py-0.5 text-[9px] font-extrabold text-sky-700 border border-sky-200/80">
+                            EN
+                          </span>
+                        )}
+                        {doc.availableLanguages.includes("si") && (
+                          <span className="rounded bg-amber-50 px-1 py-0.5 text-[9px] font-extrabold text-amber-700 border border-amber-200/80">
+                            SI
+                          </span>
+                        )}
+                        {doc.availableLanguages.includes("ta") && (
+                          <span className="rounded bg-rose-50 px-1 py-0.5 text-[9px] font-extrabold text-rose-700 border border-rose-200/80">
+                            TA
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Title */}
@@ -125,14 +146,14 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
         {/* View Details Modal */}
         {selectedDoc && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs"
+            className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-md overflow-y-auto"
             onClick={() => setSelectedDoc(null)}
           >
             <div
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-legal-title"
-              className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 text-left"
+              className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 text-left my-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -182,6 +203,47 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                   <span className="font-bold text-[#256B29]">Parliament of Sri Lanka / Ministry of Fisheries</span>
                 </div>
               </div>
+
+              {/* Language Specific File Versions */}
+              {(selectedDoc.fileUrlEn || selectedDoc.fileUrlSi || selectedDoc.fileUrlTa) && (
+                <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 p-3.5">
+                  <span className="block text-xs font-extrabold text-emerald-950 mb-2">
+                    📄 Available Language File Versions:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedDoc.fileUrlEn && (
+                      <a
+                        href={selectedDoc.fileUrlEn}
+                        download
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-emerald-300 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100 transition"
+                      >
+                        <Download className="h-3.5 w-3.5 text-emerald-600" />
+                        <span>English (EN)</span>
+                      </a>
+                    )}
+                    {selectedDoc.fileUrlSi && (
+                      <a
+                        href={selectedDoc.fileUrlSi}
+                        download
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-emerald-300 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100 transition"
+                      >
+                        <Download className="h-3.5 w-3.5 text-emerald-600" />
+                        <span>සිංහල (SI)</span>
+                      </a>
+                    )}
+                    {selectedDoc.fileUrlTa && (
+                      <a
+                        href={selectedDoc.fileUrlTa}
+                        download
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-emerald-300 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100 transition"
+                      >
+                        <Download className="h-3.5 w-3.5 text-emerald-600" />
+                        <span>தமிழ் (TA)</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button

@@ -21,6 +21,10 @@ export interface ApiRtiLegalDocument {
   fileSize: string
   fileUrl: string
   downloadUrl: string
+  fileUrlEn?: string | null
+  fileUrlSi?: string | null
+  fileUrlTa?: string | null
+  availableLanguages?: string[]
   publishedDate?: string
   order?: number
 }
@@ -37,12 +41,17 @@ export interface ApiRtiDocumentItem {
   id: string
   category: string
   title: string
+  subheading?: string | null
   description: string
   year?: number | null
   fileType: "PDF" | "XLSX" | "XLS" | "CSV" | "DOCX" | "DOC" | "PPTX" | "ZIP"
   fileSize: string
   fileUrl: string
   downloadUrl: string
+  fileUrlEn?: string | null
+  fileUrlSi?: string | null
+  fileUrlTa?: string | null
+  availableLanguages?: string[]
   publishedDate?: string
   featured?: boolean
   order?: number

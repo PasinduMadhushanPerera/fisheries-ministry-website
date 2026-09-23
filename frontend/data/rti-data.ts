@@ -31,6 +31,7 @@ export type RtiDocument = {
   id: string
   category: RtiCategory
   title: string
+  subheading?: string
   description: string
   year?: number
   fileType:
@@ -45,6 +46,10 @@ export type RtiDocument = {
   fileSize: string
   fileUrl: string
   downloadUrl?: string
+  fileUrlEn?: string | null
+  fileUrlSi?: string | null
+  fileUrlTa?: string | null
+  availableLanguages?: string[]
   publishedDate?: string
   featured?: boolean
 }

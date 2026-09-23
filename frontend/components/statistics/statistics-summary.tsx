@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import {
   TrendingUp,
   Anchor,
@@ -27,6 +28,93 @@ const iconMap: Record<string, LucideIcon> = {
 
 interface StatisticsSummaryProps {
   cards?: ApiSummaryCard[]
+}
+
+function parseNumericString(val: string) {
+  const match = val.match(/^([^\d.]*)([\d,]+(?:\.\d+)?)(.*)$/)
+  if (!match) return null
+
+  const prefix = match[1]
+  const rawNumStr = match[2]
+  const suffix = match[3]
+
+  const hasCommas = rawNumStr.includes(",")
+  const decimalMatch = rawNumStr.match(/\.(\d+)/)
+  const decimalPlaces = decimalMatch ? decimalMatch[1].length : 0
+  const targetNum = parseFloat(rawNumStr.replace(/,/g, ""))
+
+  if (isNaN(targetNum)) return null
+
+  return { prefix, targetNum, suffix, hasCommas, decimalPlaces }
+}
+
+function formatNumber(num: number, hasCommas: boolean, decimalPlaces: number): string {
+  if (decimalPlaces > 0) {
+    const fixed = num.toFixed(decimalPlaces)
+    if (hasCommas) {
+      const parts = fixed.split(".")
+      parts[0] = parseInt(parts[0], 10).toLocaleString("en-US")
+      return parts.join(".")
+    }
+    return fixed
+  } else {
+    const rounded = Math.round(num)
+    if (hasCommas) {
+      return rounded.toLocaleString("en-US")
+    }
+    return rounded.toString()
+  }
+}
+
+function CountUpNumber({ value }: { value: string | number }) {
+  const strVal = String(value)
+  const parsed = parseNumericString(strVal)
+  const [displayValue, setDisplayValue] = useState<string>(() => {
+    if (!parsed) return strVal
+    return `${parsed.prefix}${formatNumber(0, parsed.hasCommas, parsed.decimalPlaces)}${parsed.suffix}`
+  })
+
+  useEffect(() => {
+    if (!parsed) {
+      setDisplayValue(strVal)
+      return
+    }
+
+    const { prefix, targetNum, suffix, hasCommas, decimalPlaces } = parsed
+    let animationFrameId: number
+    const startTime = performance.now()
+    const duration = 1800 // 1.8s count up duration
+
+    const easeOutExpo = (t: number): number => {
+      return t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+    }
+
+    const updateFrame = (now: number) => {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const easedProgress = easeOutExpo(progress)
+      const currentNum = targetNum * easedProgress
+
+      const formattedCurrent = formatNumber(currentNum, hasCommas, decimalPlaces)
+      setDisplayValue(`${prefix}${formattedCurrent}${suffix}`)
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(updateFrame)
+      } else {
+        setDisplayValue(`${prefix}${formatNumber(targetNum, hasCommas, decimalPlaces)}${suffix}`)
+      }
+    }
+
+    animationFrameId = requestAnimationFrame(updateFrame)
+
+    return () => {
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+      }
+    }
+  }, [strVal])
+
+  return <span>{displayValue}</span>
 }
 
 export function StatisticsSummary({ cards }: StatisticsSummaryProps) {
@@ -86,8 +174,8 @@ export function StatisticsSummary({ cards }: StatisticsSummaryProps) {
                   <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 line-clamp-1">
                     {card.title}
                   </p>
-                  <p className="mt-1 text-2xl font-black text-slate-900 tracking-tight group-hover:text-[#256B29] transition-colors">
-                    {card.value}
+                  <p className="mt-1 text-2xl sm:text-3xl font-black text-slate-900 tracking-tight group-hover:text-[#256B29] transition-colors">
+                    <CountUpNumber value={card.value} />
                   </p>
                   <div className="mt-1.5 flex items-center">
                     <span className="inline-block rounded-md bg-white/90 border border-slate-200/80 px-2 py-0.5 text-[11px] font-semibold text-slate-600 truncate max-w-full shadow-2xs">

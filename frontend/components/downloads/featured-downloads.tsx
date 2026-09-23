@@ -200,6 +200,47 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                 </div>
               </div>
 
+              {/* Language Specific File Versions */}
+              {(selectedDoc.fileUrlEn || selectedDoc.fileUrlSi || selectedDoc.fileUrlTa) && (
+                <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 p-3.5">
+                  <span className="block text-xs font-extrabold text-emerald-950 mb-2">
+                    📄 Available Language File Versions:
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedDoc.fileUrlEn && (
+                      <a
+                        href={selectedDoc.fileUrlEn}
+                        download
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-emerald-300 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100 transition"
+                      >
+                        <Download className="h-3.5 w-3.5 text-emerald-600" />
+                        <span>English (EN)</span>
+                      </a>
+                    )}
+                    {selectedDoc.fileUrlSi && (
+                      <a
+                        href={selectedDoc.fileUrlSi}
+                        download
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-emerald-300 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100 transition"
+                      >
+                        <Download className="h-3.5 w-3.5 text-emerald-600" />
+                        <span>සිංහල (SI)</span>
+                      </a>
+                    )}
+                    {selectedDoc.fileUrlTa && (
+                      <a
+                        href={selectedDoc.fileUrlTa}
+                        download
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-white border border-emerald-300 px-3 py-1.5 text-xs font-bold text-emerald-800 shadow-2xs hover:bg-emerald-100 transition"
+                      >
+                        <Download className="h-3.5 w-3.5 text-emerald-600" />
+                        <span>தமிழ் (TA)</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
                 <button
                   type="button"

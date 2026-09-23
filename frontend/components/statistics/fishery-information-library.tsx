@@ -532,7 +532,7 @@ export function FisheryInformationLibrary({
         {/* Modal: Item Details */}
         {selectedItem && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-in fade-in duration-200"
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
             role="dialog"
             aria-modal="true"
             aria-labelledby="fishery-item-modal-title"

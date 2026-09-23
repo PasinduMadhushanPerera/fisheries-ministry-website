@@ -232,11 +232,41 @@ class RtiLegalDocument(TimeStampedModel):
         default="PDF",
         help_text="Document file format",
     )
+
+    # 🇬🇧 English File Upload (Optional)
+    document_file_en = models.FileField(
+        upload_to="rti/legal/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (English)",
+        help_text="Upload official English version of Act / Regulation (PDF, Word)",
+    )
+
+    # 🇱🇰 Sinhala File Upload (සිංහල - Optional)
+    document_file_si = models.FileField(
+        upload_to="rti/legal/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (සිංහල)",
+        help_text="Upload official Sinhala version of Act / Regulation (PDF, Word)",
+    )
+
+    # 🇱🇰 Tamil File Upload (தமிழ் - Optional)
+    document_file_ta = models.FileField(
+        upload_to="rti/legal/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (தமிழ்)",
+        help_text="Upload official Tamil version of Act / Regulation (PDF, Word)",
+    )
+
+    # Legacy / Default File
     document_file = models.FileField(
         upload_to="rti/legal/%Y/",
         blank=True,
         null=True,
-        help_text="Upload official PDF / Word copy of the Act or Gazette",
+        verbose_name="General / Default File",
+        help_text="Upload general document file if language-specific files are not separate",
     )
     file_url_fallback = models.CharField(
         max_length=500,
@@ -277,6 +307,16 @@ class RtiLegalDocument(TimeStampedModel):
         verbose_name = "02. RTI Legislation & Regulation"
         verbose_name_plural = "02. RTI Legislation & Regulations"
 
+    def get_file_for_lang(self, lang="en"):
+        if lang == "si" and self.document_file_si:
+            return self.document_file_si
+        if lang == "ta" and self.document_file_ta:
+            return self.document_file_ta
+        if lang == "en" and self.document_file_en:
+            return self.document_file_en
+        # Fallbacks: try English -> Sinhala -> Tamil -> Default file
+        return self.document_file_en or self.document_file_si or self.document_file_ta or self.document_file
+
     def save(self, *args, **kwargs):
         if not self.document_id or not str(self.document_id).strip():
             base = slugify(self.title_en) if self.title_en else f"legal-{uuid.uuid4().hex[:6]}"
@@ -293,9 +333,10 @@ class RtiLegalDocument(TimeStampedModel):
             else:
                 self.display_date = str(self.published_date)
 
-        if self.document_file and (not self.file_size or self.file_size == "120 KB"):
+        active_file = self.document_file_en or self.document_file_si or self.document_file_ta or self.document_file
+        if active_file and (not self.file_size or self.file_size == "120 KB"):
             try:
-                size_bytes = self.document_file.size
+                size_bytes = active_file.size
                 if size_bytes < 1024 * 1024:
                     self.file_size = f"{round(size_bytes / 1024)} KB"
                 else:
@@ -416,6 +457,13 @@ class RtiDocumentItem(TimeStampedModel):
         default="",
         verbose_name="Document Title (English)",
     )
+    subheading_en = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Sub-heading / Group (English)",
+        help_text="Optional sub-heading to group files within category (e.g. 'Public Petition Committee', 'Cabinet Memorandums')",
+    )
     description_en = models.TextField(
         blank=True,
         default="",
@@ -429,6 +477,13 @@ class RtiDocumentItem(TimeStampedModel):
         default="",
         verbose_name="Document Title (සිංහල)",
     )
+    subheading_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Sub-heading / Group (සිංහල)",
+        help_text="Optional sub-heading in Sinhala (e.g. 'මහජන පෙත්සම් කාරක සභාව')",
+    )
     description_si = models.TextField(
         blank=True,
         default="",
@@ -441,6 +496,13 @@ class RtiDocumentItem(TimeStampedModel):
         blank=True,
         default="",
         verbose_name="Document Title (தமிழ்)",
+    )
+    subheading_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Sub-heading / Group (தமிழ்)",
+        help_text="Optional sub-heading in Tamil (e.g. 'பொது மனுக்கள் குழு')",
     )
     description_ta = models.TextField(
         blank=True,
@@ -461,11 +523,41 @@ class RtiDocumentItem(TimeStampedModel):
         default="PDF",
         help_text="Document format",
     )
+
+    # 🇬🇧 English File Upload (Optional)
+    document_file_en = models.FileField(
+        upload_to="rti/documents/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (English)",
+        help_text="Upload official English version of RTI document / form (PDF, Excel, Word)",
+    )
+
+    # 🇱🇰 Sinhala File Upload (සිංහල - Optional)
+    document_file_si = models.FileField(
+        upload_to="rti/documents/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (සිංහල)",
+        help_text="Upload official Sinhala version of RTI document / form (PDF, Excel, Word)",
+    )
+
+    # 🇱🇰 Tamil File Upload (தமிழ் - Optional)
+    document_file_ta = models.FileField(
+        upload_to="rti/documents/%Y/",
+        blank=True,
+        null=True,
+        verbose_name="Official File (தமிழ்)",
+        help_text="Upload official Tamil version of RTI document / form (PDF, Excel, Word)",
+    )
+
+    # Legacy / Default File
     document_file = models.FileField(
         upload_to="rti/documents/%Y/",
         blank=True,
         null=True,
-        help_text="Upload official document file (PDF, Excel, Word, etc.)",
+        verbose_name="General / Default File",
+        help_text="Upload general document file if language-specific files are not separate",
     )
     file_url_fallback = models.CharField(
         max_length=500,
@@ -510,6 +602,23 @@ class RtiDocumentItem(TimeStampedModel):
         verbose_name = "04. RTI Document / Form / Report"
         verbose_name_plural = "04. RTI Documents, Forms & Reports"
 
+    def get_file_for_lang(self, lang="en"):
+        if lang == "si" and self.document_file_si:
+            return self.document_file_si
+        if lang == "ta" and self.document_file_ta:
+            return self.document_file_ta
+        if lang == "en" and self.document_file_en:
+            return self.document_file_en
+        # Fallbacks: try English -> Sinhala -> Tamil -> Default file
+        return self.document_file_en or self.document_file_si or self.document_file_ta or self.document_file
+
+    def get_subheading_for_lang(self, lang="en"):
+        if lang == "si" and self.subheading_si:
+            return self.subheading_si
+        if lang == "ta" and self.subheading_ta:
+            return self.subheading_ta
+        return self.subheading_en
+
     def save(self, *args, **kwargs):
         if not self.item_id or not str(self.item_id).strip():
             base = slugify(self.title_en) if self.title_en else f"item-{uuid.uuid4().hex[:6]}"
@@ -526,9 +635,10 @@ class RtiDocumentItem(TimeStampedModel):
             else:
                 self.display_date = str(self.published_date)
 
-        if self.document_file and (not self.file_size or self.file_size == "150 KB"):
+        active_file = self.document_file_en or self.document_file_si or self.document_file_ta or self.document_file
+        if active_file and (not self.file_size or self.file_size == "150 KB"):
             try:
-                size_bytes = self.document_file.size
+                size_bytes = active_file.size
                 if size_bytes < 1024 * 1024:
                     self.file_size = f"{round(size_bytes / 1024)} KB"
                 else:
