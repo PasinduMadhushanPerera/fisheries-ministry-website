@@ -170,6 +170,14 @@ class NewsArticleItemAdminForm(forms.ModelForm):
         model = NewsArticleItem
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "slug" in self.fields:
+            self.fields["slug"].required = False
+            self.fields["slug"].disabled = True
+            self.fields["slug"].widget.attrs["placeholder"] = "✨ Auto-generated from title upon save"
+            self.fields["slug"].help_text = "🔒 Slug is disabled & will be auto-generated automatically from the article title upon saving."
+
 
 class NewsContentBlockAdminForm(forms.ModelForm):
     class Meta:

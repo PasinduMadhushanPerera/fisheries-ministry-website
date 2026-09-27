@@ -28,6 +28,14 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: [
+    "192.168.10.9",
+    "192.168.10.9:3000",
+    "localhost",
+    "127.0.0.1",
+    "localhost:3000",
+    "127.0.0.1:3000",
+  ],
   turbopack: {
     root: process.cwd(),
   },
@@ -35,14 +43,13 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "http",
-        hostname: "127.0.0.1",
+        hostname: "*",
         port: "8000",
         pathname: "/**",
       },
       {
         protocol: "http",
-        hostname: "localhost",
-        port: "8000",
+        hostname: "**",
         pathname: "/**",
       },
       {

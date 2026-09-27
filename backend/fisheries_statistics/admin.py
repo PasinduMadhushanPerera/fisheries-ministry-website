@@ -21,6 +21,9 @@ class FisheriesSummaryMetricAdminForm(forms.ModelForm):
         fields = "__all__"
 
 
+from django.urls import reverse
+
+
 class StatisticsCategoryAdminForm(forms.ModelForm):
     class Meta:
         model = StatisticsCategory
@@ -31,17 +34,13 @@ class StatisticsCategoryAdminForm(forms.ModelForm):
             "description_ta": forms.Textarea(attrs={"rows": 2}),
         }
 
-
-class StatisticsTableRowInline(admin.StackedInline):
-    model = StatisticsTableRow
-    extra = 1
-    verbose_name = "Table Data Row"
-    verbose_name_plural = "Table Data Rows (Breakdown Records)"
-    fields = (
-        ("order", "value", "unit", "is_emphasized"),
-        "label_en",
-        ("label_si", "label_ta"),
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "slug" in self.fields:
+            self.fields["slug"].required = False
+            self.fields["slug"].disabled = True
+            self.fields["slug"].widget.attrs["placeholder"] = "✨ Auto-generated from title upon save"
+            self.fields["slug"].help_text = "🔒 Slug is disabled & will be auto-generated automatically from the category title upon saving."
 
 
 @admin.register(FisheriesStatisticsHeader)
@@ -124,7 +123,6 @@ class FisheriesSummaryMetricAdmin(admin.ModelAdmin):
 @admin.register(StatisticsCategory)
 class StatisticsCategoryAdmin(admin.ModelAdmin):
     form = StatisticsCategoryAdminForm
-    inlines = [StatisticsTableRowInline]
     list_display = [
         "title_en",
         "slug",
@@ -139,7 +137,6 @@ class StatisticsCategoryAdmin(admin.ModelAdmin):
     list_editable = ["is_default_open", "order", "is_active"]
     list_filter = ["is_default_open", "is_active"]
     search_fields = ["title_en", "title_si", "title_ta", "description_en", "slug"]
-    prepopulated_fields = {"slug": ("title_en",)}
 
     fieldsets = (
         ("🏷️ Category Configuration", {
@@ -174,8 +171,10 @@ class StatisticsCategoryAdmin(admin.ModelAdmin):
 
     def row_count_display(self, obj):
         count = obj.rows.count()
+        url = reverse("admin:fisheries_statistics_statisticstablerow_changelist") + f"?category__id__exact={obj.id}"
         return format_html(
-            '<span style="font-weight: bold; color: #256B29; background: #e8f5e9; padding: 3px 10px; border-radius: 6px; border: 1px solid #c8e6c9;">{} Rows</span>',
+            '<a href="{}" style="font-weight: bold; color: #256B29; background: #e8f5e9; padding: 4px 10px; border-radius: 6px; border: 1px solid #c8e6c9; text-decoration: none;" title="Manage table rows for this category">📊 {} Rows</a>',
+            url,
             count,
         )
     row_count_display.short_description = "Table Rows"

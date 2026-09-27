@@ -20,6 +20,14 @@ class MonthlyProductionReportAdminForm(forms.ModelForm):
             "description_ta": forms.Textarea(attrs={"rows": 2}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "report_id" in self.fields:
+            self.fields["report_id"].required = False
+            self.fields["report_id"].disabled = True
+            self.fields["report_id"].widget.attrs["placeholder"] = "✨ Auto-generated from Year & Month upon save"
+            self.fields["report_id"].help_text = "🔒 Report ID is disabled & will be auto-generated automatically from Year & Month upon saving."
+
 
 @admin.register(MonthlyFishProductionHeader)
 class MonthlyFishProductionHeaderAdmin(admin.ModelAdmin):

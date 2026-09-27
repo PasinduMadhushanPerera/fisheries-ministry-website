@@ -171,9 +171,10 @@ class StatisticsCategory(TimeStampedModel):
         help_text="Display sequence order",
     )
     slug = models.SlugField(
-        max_length=150,
+        max_length=255,
         unique=True,
-        help_text="Identifier (e.g. 'annual-fish-production', 'fishing-fleet')",
+        blank=True,
+        help_text="🔒 Auto-generated unique identifier slug (Created automatically from category title upon saving)",
     )
     icon_name = models.CharField(
         max_length=50,
@@ -249,6 +250,33 @@ class StatisticsCategory(TimeStampedModel):
         ordering = ["order", "id"]
         verbose_name = "03. Statistical Category & Table"
         verbose_name_plural = "03. Statistical Categories & Tables"
+
+    def save(self, *args, **kwargs):
+        # Auto-generate unique slug if empty or format properly
+        if not self.slug or not str(self.slug).strip():
+            from django.utils.text import slugify
+            from uuid import uuid4
+            base_slug = slugify(self.title_en) if (self.title_en and self.title_en.strip()) else (
+                slugify(self.title_si) if (self.title_si and self.title_si.strip()) else (
+                    slugify(self.title_ta) if (self.title_ta and self.title_ta.strip()) else "stat-category"
+                )
+            )
+            if not base_slug:
+                base_slug = "stat-category"
+            base_slug = base_slug[:200].rstrip('-')
+            candidate_slug = base_slug
+            while StatisticsCategory.objects.filter(slug=candidate_slug).exclude(pk=self.pk).exists():
+                candidate_slug = f"{base_slug}-{uuid4().hex[:6]}"
+            self.slug = candidate_slug
+        else:
+            from django.utils.text import slugify
+            clean_slug = slugify(self.slug)
+            if clean_slug:
+                self.slug = clean_slug[:255].rstrip('-')
+            else:
+                self.slug = str(self.slug)[:255]
+
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.title_en} ({self.rows.count()} rows)"

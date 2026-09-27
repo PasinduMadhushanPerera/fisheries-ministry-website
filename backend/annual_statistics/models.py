@@ -108,7 +108,8 @@ class AnnualStatisticsReport(TimeStampedModel):
     report_id = models.CharField(
         max_length=100,
         unique=True,
-        help_text="Unique identifier (e.g. 'annual-bulletin-2024', 'indicators-dataset-2024')",
+        blank=True,
+        help_text="🔒 Auto-generated unique report ID (Created automatically from year & title upon saving)",
     )
     year = models.PositiveIntegerField(
         default=2024,
@@ -215,6 +216,16 @@ class AnnualStatisticsReport(TimeStampedModel):
         verbose_name_plural = "02. Annual Statistics Reports"
 
     def save(self, *args, **kwargs):
+        # Auto-generate report_id if empty
+        if not self.report_id or not str(self.report_id).strip():
+            from uuid import uuid4
+            from django.utils.text import slugify
+            title_slug = slugify(self.title_en) if self.title_en else "annual-report"
+            candidate_id = f"annual-{self.year}-{title_slug[:30]}"
+            while AnnualStatisticsReport.objects.filter(report_id=candidate_id).exclude(pk=self.pk).exists():
+                candidate_id = f"annual-{self.year}-{uuid4().hex[:6]}"
+            self.report_id = candidate_id
+
         # Auto-format display date if empty
         if not self.display_date and self.published_date:
             self.display_date = self.published_date.strftime("%d %B %Y")

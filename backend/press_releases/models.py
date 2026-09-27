@@ -190,8 +190,9 @@ class PressReleaseItem(TimeStampedModel):
         help_text="Display priority sequence",
     )
     slug = models.SlugField(
-        max_length=150,
+        max_length=255,
         unique=True,
+        blank=True,
         help_text="Unique URL identifier (e.g. tuna-export-agreement-2026)",
     )
     release_number = models.CharField(
@@ -383,11 +384,19 @@ class PressReleaseItem(TimeStampedModel):
         if not self.published_date or not str(self.published_date).strip():
             self.published_date = timezone.now().strftime("%Y-%m-%d")
 
-        # Auto-generate unique slug if empty
+        # Auto-generate unique slug if empty or format properly
         if not self.slug or not str(self.slug).strip():
             from django.utils.text import slugify
             base_slug = slugify(self.title_en) if self.title_en else "press-release"
+            base_slug = base_slug[:200].rstrip('-')
             self.slug = f"{base_slug}-{uuid4().hex[:6]}"
+        else:
+            from django.utils.text import slugify
+            clean_slug = slugify(self.slug)
+            if clean_slug:
+                self.slug = clean_slug[:255].rstrip('-')
+            else:
+                self.slug = str(self.slug)[:255]
 
         # Auto-sync multilingual category labels
         if self.category in CATEGORY_LABELS_MAP:

@@ -15,6 +15,14 @@ class WeeklyPriceReportAdminForm(forms.ModelForm):
         model = WeeklyPriceReport
         fields = "__all__"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "report_id" in self.fields:
+            self.fields["report_id"].required = False
+            self.fields["report_id"].disabled = True
+            self.fields["report_id"].widget.attrs["placeholder"] = "✨ Auto-generated from Year, Month & Week upon save"
+            self.fields["report_id"].help_text = "🔒 Report ID is disabled & will be auto-generated automatically from Year, Month & Week upon saving."
+
 
 @admin.register(WeeklyFishPricesHeader)
 class WeeklyFishPricesHeaderAdmin(admin.ModelAdmin):

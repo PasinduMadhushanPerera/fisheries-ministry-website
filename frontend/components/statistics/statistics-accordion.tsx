@@ -39,7 +39,7 @@ interface StatisticsAccordionProps {
 }
 
 export function StatisticsAccordion({ header, sections }: StatisticsAccordionProps) {
-  const displaySections = sections && sections.length > 0 ? sections : (fallbackSections as unknown as ApiStatisticsSection[])
+  const displaySections = sections !== undefined && sections !== null ? sections : (fallbackSections as unknown as ApiStatisticsSection[])
 
   // Fishing Fleet section open by default, or section configured with is_default_open
   const defaultOpenSlug = displaySections.find((s) => s.is_default_open)?.slug || "fishing-fleet"

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import {
   FileSpreadsheet,
@@ -8,6 +8,7 @@ import {
   FileType,
   Download,
   CalendarDays,
+  ChevronDown,
   Eye,
   Search,
   FolderOpen,
@@ -28,7 +29,7 @@ import type {
   ApiMonthlyProductionReport,
 } from "@/lib/api/monthly-fish-production"
 
-type QuickFilter = "All reports" | "Latest" | "First half" | "Second half"
+type QuickFilter = "All" | "Latest" | "This Month" | "This Year"
 type SortOption = "Newest first" | "Oldest first" | "Month A–Z"
 
 interface MonthlyProductionLibraryProps {
@@ -43,7 +44,7 @@ export function MonthlyProductionLibrary({
   availableYears,
 }: MonthlyProductionLibraryProps) {
   const allReports: ApiMonthlyProductionReport[] =
-    reports && reports.length > 0
+    reports !== undefined && reports !== null
       ? reports
       : (fallbackReports as unknown as ApiMonthlyProductionReport[])
 
@@ -57,44 +58,29 @@ export function MonthlyProductionLibrary({
     return Array.from(set).sort((a, b) => Number(b) - Number(a))
   }, [availableYears, allReports])
 
-  const initialYear = yearsList.length > 0 ? yearsList[0] : "2026"
-
-  const [selectedYear, setSelectedYear] = useState<string>(initialYear)
+  const [selectedYear, setSelectedYear] = useState<string>("All years")
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [activeFilter, setActiveFilter] = useState<QuickFilter>("All reports")
+  const [activeFilter, setActiveFilter] = useState<QuickFilter>("All")
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
 
-  // Modal State
-  const [selectedReport, setSelectedReport] = useState<ApiMonthlyProductionReport | null>(null)
+  // Track open year accordions (closed by default)
+  const [openYears, setOpenYears] = useState<Record<number, boolean>>({})
 
-  // Keyboard Escape listener for Modal
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedReport(null)
-      }
-    }
-    if (selectedReport) {
-      window.addEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "unset"
-    }
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "unset"
-    }
-  }, [selectedReport])
+  const toggleYear = (year: number) => {
+    setOpenYears((prev) => ({ ...prev, [year]: !prev[year] }))
+  }
+
+
 
   const isFiltered =
     searchQuery !== "" ||
     selectedYear !== "All years" ||
-    activeFilter !== "All reports"
+    activeFilter !== "All"
 
   const clearFilters = () => {
     setSearchQuery("")
     setSelectedYear("All years")
-    setActiveFilter("All reports")
+    setActiveFilter("All")
     setSortOrder("Newest first")
   }
 
@@ -127,10 +113,12 @@ export function MonthlyProductionLibrary({
         matchesPill =
           report.year === newestItem.year &&
           report.monthNumber === newestItem.monthNumber
-      } else if (activeFilter === "First half") {
-        matchesPill = report.monthNumber >= 1 && report.monthNumber <= 6
-      } else if (activeFilter === "Second half") {
-        matchesPill = report.monthNumber >= 7 && report.monthNumber <= 12
+      } else if (activeFilter === "This Month" && newestItem) {
+        matchesPill =
+          report.year === newestItem.year &&
+          report.monthNumber === newestItem.monthNumber
+      } else if (activeFilter === "This Year" && newestItem) {
+        matchesPill = report.year === newestItem.year
       }
 
       return matchesYear && matchesSearch && matchesPill
@@ -147,6 +135,22 @@ export function MonthlyProductionLibrary({
 
     return result
   }, [allReports, selectedYear, searchQuery, activeFilter, sortOrder, newestItem])
+
+  // Group filtered reports by Year
+  const groupedByYear = useMemo(() => {
+    const map = new Map<number, { year: number; reports: ApiMonthlyProductionReport[] }>()
+    filteredReports.forEach((report) => {
+      const yearKey = report.year
+      if (!map.has(yearKey)) {
+        map.set(yearKey, {
+          year: report.year,
+          reports: [],
+        })
+      }
+      map.get(yearKey)!.reports.push(report)
+    })
+    return Array.from(map.values()).sort((a, b) => b.year - a.year)
+  }, [filteredReports])
 
   const badgeText = header?.badge_text || "Sectoral Production Data"
   const pageTitle = header?.title || "Monthly Fish Production Statistics"
@@ -191,9 +195,11 @@ export function MonthlyProductionLibrary({
                   {featuredReport.month} {featuredReport.year} Production Report
                 </h2>
 
-                <p className="mt-2 text-xs sm:text-sm !text-slate-300 leading-relaxed font-normal">
-                  {featuredReport.description || featuredReport.title}
-                </p>
+                {featuredReport.description ? (
+                  <p className="mt-2 text-xs sm:text-sm !text-slate-300 leading-relaxed font-normal">
+                    {featuredReport.description}
+                  </p>
+                ) : null}
 
                 <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-medium !text-white-500">
                   <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-lg border border-white/10">
@@ -208,33 +214,31 @@ export function MonthlyProductionLibrary({
               </div>
 
               <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setSelectedReport(featuredReport)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-5 py-3 text-xs font-bold text-white hover:bg-white/20 transition cursor-pointer"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span>View Details</span>
-                </button>
-
                 {featuredReport.fileUrl && featuredReport.fileUrl !== "#" ? (
-                  <a
-                    href={featuredReport.fileUrl}
-                    download
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-6 py-3 text-xs font-extrabold text-white hover:bg-[#2e7d32] transition shadow-md"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Download Report</span>
-                  </a>
+                  <>
+                    <a
+                      href={featuredReport.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-5 py-3 text-xs font-bold text-white hover:bg-white/20 transition"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>Preview Report</span>
+                    </a>
+                    <a
+                      href={featuredReport.fileUrl}
+                      download
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-6 py-3 text-xs font-extrabold text-white hover:bg-[#2e7d32] transition shadow-md"
+                    >
+                      <Download className="h-4 w-4" />
+                      <span>Download Report</span>
+                    </a>
+                  </>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedReport(featuredReport)}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-6 py-3 text-xs font-extrabold text-white hover:bg-[#2e7d32] transition shadow-md cursor-pointer"
-                  >
+                  <span className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-5 py-3 text-xs font-bold text-slate-300 opacity-60 cursor-not-allowed">
                     <Eye className="h-4 w-4" />
-                    <span>Document Summary</span>
-                  </button>
+                    <span>Preview Unavailable</span>
+                  </span>
                 )}
               </div>
             </div>
@@ -319,7 +323,7 @@ export function MonthlyProductionLibrary({
               <span className="text-xs font-bold text-slate-500 mr-1 flex items-center gap-1">
                 <Filter className="h-3 w-3" /> Quick filters:
               </span>
-              {(["All reports", "Latest", "First half", "Second half"] as QuickFilter[]).map((pill) => (
+              {(["All", "Latest", "This Month", "This Year"] as QuickFilter[]).map((pill) => (
                 <button
                   key={pill}
                   type="button"
@@ -361,81 +365,153 @@ export function MonthlyProductionLibrary({
           )}
         </div>
 
-        {/* Reports Grid (Card View) */}
-        {filteredReports.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredReports.map((report) => (
-              <div
-                key={report.id}
-                className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs hover:border-emerald-300 hover:shadow-md transition-all group"
-              >
-                <div>
-                  {/* Card Header: Excel Badge & File size */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <div className="flex items-center gap-2.5">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-[#256B29] group-hover:bg-emerald-100 transition-colors">
-                        <FileSpreadsheet className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-extrabold bg-emerald-100 text-[#256B29]">
-                          {report.fileType || "XLSX"}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
-                      {report.fileSize || "Spreadsheet"}
-                    </span>
-                  </div>
+        {/* Year Accordions List */}
+        {groupedByYear.length > 0 ? (
+          <div className="space-y-6">
+            {groupedByYear.map(({ year, reports: yearReports }) => {
+              const isOpen = Boolean(openYears[year])
 
-                  {/* Month Heading & Title */}
-                  <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#256B29] transition-colors">
-                    {report.month} {report.year} Production
-                  </h3>
-
-                  <p className="mt-2 text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed">
-                    {report.description || report.title}
-                  </p>
-
-                  {/* Meta: Published Date */}
-                  <div className="mt-4 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                    <CalendarDays className="h-3.5 w-3.5 text-[#256B29]" />
-                    <span>Published: {report.publishedDate}</span>
-                  </div>
-                </div>
-
-                {/* Card Actions Footer */}
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-3">
+              return (
+                <div
+                  key={year}
+                  className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    isOpen
+                      ? "border-[#256B29] ring-2 ring-emerald-600/20 shadow-md bg-gradient-to-br from-emerald-50/40 via-white to-slate-50/60"
+                      : "border-slate-300 hover:border-emerald-500/60 shadow-xs hover:shadow-md bg-white"
+                  }`}
+                >
+                  {/* Year Accordion Header */}
                   <button
                     type="button"
-                    onClick={() => setSelectedReport(report)}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-slate-500 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors cursor-pointer"
+                    onClick={() => toggleYear(year)}
+                    className="w-full p-5 sm:p-6 flex items-center justify-between gap-4 cursor-pointer text-left select-none transition-colors"
+                    aria-expanded={isOpen}
                   >
-                    <Eye className="h-3.5 w-3.5 text-[#256B29]" />
-                    <span>Details</span>
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 ${
+                          isOpen
+                            ? "bg-[#256B29] text-white shadow-xs"
+                            : "bg-emerald-100 text-[#256B29]"
+                        }`}
+                      >
+                        <FolderOpen className="h-5 w-5" aria-hidden="true" />
+                      </div>
+
+                      <div className="min-w-0">
+                        <h2
+                          className={`text-base sm:text-lg font-extrabold transition-colors duration-200 flex items-center gap-2.5 ${
+                            isOpen ? "text-[#256B29]" : "text-slate-950"
+                          }`}
+                        >
+                          <span>{year} Fish Production Reports</span>
+                          <span
+                            className={`text-xs font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
+                              isOpen
+                                ? "bg-emerald-100 text-[#256B29] border-emerald-300"
+                                : "bg-slate-100 text-slate-700 border-slate-300"
+                            }`}
+                          >
+                            {yearReports.length} {yearReports.length === 1 ? "Report" : "Monthly Reports"}
+                          </span>
+                        </h2>
+                        <p className="text-xs text-slate-600 font-medium mt-0.5 truncate">
+                          Official monthly sectoral production datasets compiled for {year}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
+                        isOpen
+                          ? "border-emerald-300 bg-emerald-100 text-[#256B29] rotate-180"
+                          : "border-slate-300 bg-slate-100 text-slate-700"
+                      }`}
+                    >
+                      <ChevronDown className="h-5 w-5" aria-hidden="true" />
+                    </div>
                   </button>
 
-                  {report.fileUrl && report.fileUrl !== "#" ? (
-                    <a
-                      href={report.fileUrl}
-                      download
-                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#256B29] text-xs font-bold !text-white hover:bg-[#1b4d1d] transition-colors shadow-2xs"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      <span>Download</span>
-                    </a>
-                  ) : (
-                    <button
-                      type="button"
-                      disabled
-                      className="inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-100 text-xs font-bold text-slate-900 cursor-not-allowed"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      <span>Available Soon</span>
-                    </button>
+                  {/* Monthly Reports Grid inside this Year Category */}
+                  {isOpen && (
+                    <div className="p-5 sm:p-6 bg-white border-t border-slate-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {yearReports.map((report) => (
+                          <div
+                            key={report.id}
+                            className="flex flex-col justify-between p-5 rounded-xl border border-slate-200 bg-slate-50/40 hover:bg-emerald-50/20 hover:border-emerald-300 hover:shadow-xs transition-all group"
+                          >
+                            <div>
+                              {/* File Type Badge & File size */}
+                              <div className="flex items-center justify-between gap-2 mb-3">
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-extrabold bg-emerald-100 text-[#256B29] border border-emerald-200">
+                                  {report.fileType || "XLSX"}
+                                </span>
+                                <span className="text-[11px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                                  {report.fileSize || "Spreadsheet"}
+                                </span>
+                              </div>
+
+                              {/* Title */}
+                              <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#256B29] transition-colors line-clamp-2">
+                                {report.month} {report.year} Production Report
+                              </h3>
+
+                              {/* Publication Date */}
+                              <div className="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                <CalendarDays className="h-3.5 w-3.5 text-[#256B29]" />
+                                <span>Published: {report.publishedDate}</span>
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="mt-5 pt-3 border-t border-slate-200/70 flex items-center gap-2">
+                              {report.fileUrl && report.fileUrl !== "#" ? (
+                                <a
+                                  href={report.fileUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-2xs"
+                                >
+                                  <Eye className="h-3.5 w-3.5 text-[#256B29]" />
+                                  <span>Preview</span>
+                                </a>
+                              ) : (
+                                <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-400 cursor-not-allowed">
+                                  <Eye className="h-3.5 w-3.5" />
+                                  <span>Preview</span>
+                                </span>
+                              )}
+
+                              {report.fileUrl && report.fileUrl !== "#" ? (
+                                <a
+                                  href={report.fileUrl}
+                                  download
+                                  className="inline-flex items-center justify-center p-2 rounded-lg bg-[#256B29] text-white hover:bg-[#1b4d1d] transition-colors shadow-2xs"
+                                  title="Download Document"
+                                  aria-label={`Download ${report.month} ${report.year} Production Report`}
+                                >
+                                  <Download className="h-3.5 w-3.5" />
+                                </a>
+                              ) : (
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="inline-flex items-center justify-center p-2 rounded-lg bg-slate-100 text-slate-400 cursor-not-allowed"
+                                  title="File available soon"
+                                >
+                                  <Download className="h-3.5 w-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         ) : (
           /* Empty Search State */
@@ -458,90 +534,7 @@ export function MonthlyProductionLibrary({
           </div>
         )}
 
-        {/* Modal: Report Details */}
-        {selectedReport && (
-          <div
-            className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="report-modal-title"
-          >
-            <div className="w-full max-w-lg rounded-2xl bg-white p-6 sm:p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
-              <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-[#256B29]">
-                    <FileSpreadsheet className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 id="report-modal-title" className="text-lg font-extrabold text-slate-900">
-                      {selectedReport.month} {selectedReport.year} Production
-                    </h3>
-                    <p className="text-xs text-slate-500 font-medium">
-                      Official Monthly Statistical Dataset
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedReport(null)}
-                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition cursor-pointer"
-                  aria-label="Close dialog"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
 
-              <div className="mt-5 space-y-4 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                <div>
-                  <h4 className="font-bold text-slate-900 mb-1">Dataset Description</h4>
-                  <p>{selectedReport.description}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 py-3 px-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
-                  <div>
-                    <span className="text-slate-500 block">File Type</span>
-                    <strong className="text-slate-900 font-bold">{selectedReport.fileType} Document</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">File Size</span>
-                    <strong className="text-slate-900 font-bold">{selectedReport.fileSize}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Publication Date</span>
-                    <strong className="text-slate-900 font-bold">{selectedReport.publishedDate}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Coverage</span>
-                    <strong className="text-slate-900 font-bold">National (All Districts)</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedReport(null)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
-                >
-                  Close
-                </button>
-
-                {selectedReport.fileUrl && selectedReport.fileUrl !== "#" ? (
-                  <a
-                    href={selectedReport.fileUrl}
-                    download
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#256B29] text-xs font-bold !text-white hover:bg-[#1b4d1d] transition shadow-xs"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Download Document</span>
-                  </a>
-                ) : (
-                  <span className="text-xs text-slate-400 italic">File download ready soon</span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </Container>
     </section>
   )

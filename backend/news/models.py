@@ -247,9 +247,10 @@ class NewsArticleItem(TimeStampedModel):
         help_text="Display priority sequence",
     )
     slug = models.SlugField(
-        max_length=150,
+        max_length=255,
         unique=True,
-        help_text="Unique identifier slug (e.g. mirissa-anchorage-development-2026)",
+        blank=True,
+        help_text="🔒 Auto-generated unique URL slug (Created automatically from title upon saving)",
     )
     category = models.CharField(
         max_length=50,
@@ -439,11 +440,28 @@ class NewsArticleItem(TimeStampedModel):
         if not self.published_date or not str(self.published_date).strip():
             self.published_date = timezone.now().strftime("%Y-%m-%d")
 
-        # Auto-generate unique slug if empty
+        # Auto-generate unique slug if empty or ensure max_length safety
         if not self.slug or not str(self.slug).strip():
             from django.utils.text import slugify
-            base_slug = slugify(self.title_en) if self.title_en else "news-article"
-            self.slug = f"{base_slug}-{uuid4().hex[:6]}"
+            base_slug = slugify(self.title_en) if (self.title_en and self.title_en.strip()) else (
+                slugify(self.title_si) if (self.title_si and self.title_si.strip()) else (
+                    slugify(self.title_ta) if (self.title_ta and self.title_ta.strip()) else "news-article"
+                )
+            )
+            if not base_slug:
+                base_slug = "news-article"
+            base_slug = base_slug[:200].rstrip('-')
+            candidate_slug = f"{base_slug}-{uuid4().hex[:6]}"
+            while NewsArticleItem.objects.filter(slug=candidate_slug).exclude(pk=self.pk).exists():
+                candidate_slug = f"{base_slug}-{uuid4().hex[:6]}"
+            self.slug = candidate_slug
+        else:
+            from django.utils.text import slugify
+            clean_slug = slugify(self.slug)
+            if clean_slug:
+                self.slug = clean_slug[:255].rstrip('-')
+            else:
+                self.slug = str(self.slug)[:255]
 
         # Auto-sync multilingual category labels whenever category is selected
         if self.category in CATEGORY_LABELS_MAP:

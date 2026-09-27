@@ -69,7 +69,7 @@ export function getApiBaseUrl(): string {
 
   if (typeof window !== "undefined" && window.location?.hostname) {
     const host = window.location.hostname
-    if (/^(localhost|127\.0\.0\.1|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.test(host)) {
+    if (host) {
       return `http://${host}:8000`
     }
   }

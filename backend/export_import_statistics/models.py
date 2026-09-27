@@ -270,7 +270,8 @@ class ExportImportReport(TimeStampedModel):
     report_id = models.CharField(
         max_length=100,
         unique=True,
-        help_text="Unique identifier (e.g. '2026-05', '2026-04')",
+        blank=True,
+        help_text="🔒 Auto-generated unique report ID (Created automatically from year & month upon saving)",
     )
     year = models.PositiveIntegerField(
         default=2026,
@@ -379,6 +380,16 @@ class ExportImportReport(TimeStampedModel):
         # Auto-sync month_number from month name
         if self.month in MONTH_MAP:
             self.month_number = MONTH_MAP[self.month]
+
+        # Auto-generate report_id if empty
+        if not self.report_id or not str(self.report_id).strip():
+            from uuid import uuid4
+            from django.utils.text import slugify
+            month_slug = slugify(self.month) if self.month else "month"
+            candidate_id = f"trade-{self.year}-{month_slug}"
+            while ExportImportReport.objects.filter(report_id=candidate_id).exclude(pk=self.pk).exists():
+                candidate_id = f"trade-{self.year}-{month_slug}-{uuid4().hex[:4]}"
+            self.report_id = candidate_id
 
         # Auto-format display date if empty
         if not self.display_date and self.published_date:

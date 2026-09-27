@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import {
   FileText,
@@ -20,6 +20,9 @@ import {
   FolderSearch,
   ArrowUpDown,
   BarChart3,
+  FolderOpen,
+  ChevronDown,
+  CalendarDays,
 } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
@@ -54,7 +57,7 @@ export function AnnualReportsLibrary({
   availableYears,
 }: AnnualReportsLibraryProps) {
   const allReports: ApiAnnualStatisticsDocument[] =
-    reports && reports.length > 0
+    reports !== undefined && reports !== null
       ? reports
       : (fallbackReports as unknown as ApiAnnualStatisticsDocument[])
 
@@ -73,28 +76,14 @@ export function AnnualReportsLibrary({
   const [selectedYear, setSelectedYear] = useState<string>("All years")
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
 
-  // Modal State
-  const [selectedDocument, setSelectedDocument] =
-    useState<ApiAnnualStatisticsDocument | null>(null)
+  // Track open year accordions (closed by default)
+  const [openYears, setOpenYears] = useState<Record<number, boolean>>({})
 
-  // Keyboard Escape listener for Modal
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedDocument(null)
-      }
-    }
-    if (selectedDocument) {
-      window.addEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "unset"
-    }
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "unset"
-    }
-  }, [selectedDocument])
+  const toggleYear = (year: number) => {
+    setOpenYears((prev) => ({ ...prev, [year]: !prev[year] }))
+  }
+
+
 
   // Clear filters action
   const isFiltered =
@@ -150,6 +139,22 @@ export function AnnualReportsLibrary({
 
     return result
   }, [allReports, searchQuery, selectedYear, selectedFormat, sortOrder])
+
+  // Group filtered reports by Year
+  const groupedByYear = useMemo(() => {
+    const map = new Map<number, { year: number; reports: ApiAnnualStatisticsDocument[] }>()
+    filteredDocuments.forEach((doc) => {
+      const yearKey = doc.year
+      if (!map.has(yearKey)) {
+        map.set(yearKey, {
+          year: doc.year,
+          reports: [],
+        })
+      }
+      map.get(yearKey)!.reports.push(doc)
+    })
+    return Array.from(map.values()).sort((a, b) => b.year - a.year)
+  }, [filteredDocuments])
 
   // Primary Featured Item (e.g. latest bulletin)
   const featuredDocument = useMemo(() => {
@@ -266,33 +271,38 @@ export function AnnualReportsLibrary({
               </div>
 
               <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setSelectedDocument(featuredDocument)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-5 py-3 text-xs font-bold text-white hover:bg-white/20 transition cursor-pointer"
-                >
-                  <Eye className="h-4 w-4" />
-                  <span>View Details</span>
-                </button>
-
-                {featuredDocument.downloadUrl && featuredDocument.downloadUrl !== "#" ? (
-                  <a
-                    href={featuredDocument.downloadUrl}
-                    download
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-6 py-3 text-xs font-extrabold text-white hover:bg-[#2e7d32] transition shadow-md"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Download Report</span>
-                  </a>
+                {(featuredDocument.fileUrl || featuredDocument.downloadUrl) &&
+                (featuredDocument.fileUrl !== "#" || featuredDocument.downloadUrl !== "#") ? (
+                  <>
+                    <a
+                      href={
+                        featuredDocument.fileUrl && featuredDocument.fileUrl !== "#"
+                          ? featuredDocument.fileUrl
+                          : featuredDocument.downloadUrl
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-5 py-3 text-xs font-bold text-white hover:bg-white/20 transition"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span>Preview Report</span>
+                    </a>
+                    {featuredDocument.downloadUrl && featuredDocument.downloadUrl !== "#" ? (
+                      <a
+                        href={featuredDocument.downloadUrl}
+                        download
+                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-6 py-3 text-xs font-extrabold text-white hover:bg-[#2e7d32] transition shadow-md"
+                      >
+                        <Download className="h-4 w-4" />
+                        <span>Download Report</span>
+                      </a>
+                    ) : null}
+                  </>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDocument(featuredDocument)}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-6 py-3 text-xs font-extrabold text-white hover:bg-[#2e7d32] transition shadow-md cursor-pointer"
-                  >
+                  <span className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-5 py-3 text-xs font-bold text-slate-300 opacity-60 cursor-not-allowed">
                     <Eye className="h-4 w-4" />
-                    <span>Document Summary</span>
-                  </button>
+                    <span>Preview Unavailable</span>
+                  </span>
                 )}
               </div>
             </div>
@@ -429,82 +439,171 @@ export function AnnualReportsLibrary({
           )}
         </div>
 
-        {filteredDocuments.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDocuments.map((doc) => {
-              const badge = getFormatBadge(doc.fileType)
-              const FormatIcon = badge.icon
+        {/* Year Accordions List */}
+        {groupedByYear.length > 0 ? (
+          <div className="space-y-6">
+            {groupedByYear.map(({ year, reports: yearReports }) => {
+              const isOpen = Boolean(openYears[year])
 
               return (
                 <div
-                  key={doc.id}
-                  className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-2xs hover:border-emerald-300 hover:shadow-md transition-all group"
+                  key={year}
+                  className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    isOpen
+                      ? "border-[#256B29] ring-2 ring-emerald-600/20 shadow-md bg-gradient-to-br from-emerald-50/40 via-white to-slate-50/60"
+                      : "border-slate-300 hover:border-emerald-500/60 shadow-xs hover:shadow-md bg-white"
+                  }`}
                 >
-                  <div>
-                    {/* Card Top: Format Badge & Year */}
-                    <div className="flex items-center justify-between gap-2 mb-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${badge.iconBg} transition-colors`}>
-                          <FormatIcon className="h-5 w-5" />
-                        </div>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-extrabold border ${badge.bg}`}>
-                          {doc.fileType}
-                        </span>
+                  {/* Year Accordion Header */}
+                  <button
+                    type="button"
+                    onClick={() => toggleYear(year)}
+                    className="w-full p-5 sm:p-6 flex items-center justify-between gap-4 cursor-pointer text-left select-none transition-colors"
+                    aria-expanded={isOpen}
+                  >
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 ${
+                          isOpen
+                            ? "bg-[#256B29] text-white shadow-xs"
+                            : "bg-emerald-100 text-[#256B29]"
+                        }`}
+                      >
+                        <FolderOpen className="h-5 w-5" aria-hidden="true" />
                       </div>
-                      <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-md">
-                        {doc.year}
-                      </span>
+
+                      <div className="min-w-0">
+                        <h2
+                          className={`text-base sm:text-lg font-extrabold transition-colors duration-200 flex items-center gap-2.5 ${
+                            isOpen ? "text-[#256B29]" : "text-slate-950"
+                          }`}
+                        >
+                          <span>{year} Annual Statistics Reports & Datasets</span>
+                          <span
+                            className={`text-xs font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
+                              isOpen
+                                ? "bg-emerald-100 text-[#256B29] border-emerald-300"
+                                : "bg-slate-100 text-slate-700 border-slate-300"
+                            }`}
+                          >
+                            {yearReports.length} {yearReports.length === 1 ? "Report" : "Annual Reports"}
+                          </span>
+                        </h2>
+                        <p className="text-xs text-slate-600 font-medium mt-0.5 truncate">
+                          Official annual statistical bulletins and sector publications compiled for {year}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="text-base font-extrabold text-slate-900 group-hover:text-[#256B29] transition-colors leading-snug">
-                      {doc.title}
-                    </h3>
-
-                    {/* Description */}
-                    <p className="mt-2 text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed">
-                      {doc.description}
-                    </p>
-
-                    {/* Meta info */}
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
-                      <span>Size: {doc.fileSize}</span>
-                      <span>Published: {doc.publishedDate}</span>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons Footer */}
-                  <div className="mt-6 pt-3 border-t border-slate-100 flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedDocument(doc)}
-                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition cursor-pointer"
+                    <div
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
+                        isOpen
+                          ? "border-emerald-300 bg-emerald-100 text-[#256B29] rotate-180"
+                          : "border-slate-300 bg-slate-100 text-slate-700"
+                      }`}
                     >
-                      <Eye className="h-3.5 w-3.5 text-[#256B29]" />
-                      <span>Details</span>
-                    </button>
+                      <ChevronDown className="h-5 w-5" aria-hidden="true" />
+                    </div>
+                  </button>
 
-                    {doc.downloadUrl && doc.downloadUrl !== "#" ? (
-                      <a
-                        href={doc.downloadUrl}
-                        download
-                        className="inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#256B29] text-xs font-bold !text-white hover:bg-[#1b4d1d] transition shadow-2xs"
-                        title="Download file"
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                        <span>Download</span>
-                      </a>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setSelectedDocument(doc)}
-                        className="inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-slate-100 text-xs font-bold text-slate-500 hover:bg-slate-200 transition cursor-pointer"
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span>Preview</span>
-                      </button>
-                    )}
-                  </div>
+                  {/* Reports Grid inside this Year Category */}
+                  {isOpen && (
+                    <div className="p-5 sm:p-6 bg-white border-t border-slate-200">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {yearReports.map((doc) => {
+                          const badge = getFormatBadge(doc.fileType)
+                          const FormatIcon = badge.icon
+
+                          return (
+                            <div
+                              key={doc.id}
+                              className="flex flex-col justify-between p-5 rounded-xl border border-slate-200 bg-slate-50/40 hover:bg-emerald-50/20 hover:border-emerald-300 hover:shadow-xs transition-all group"
+                            >
+                              <div>
+                                {/* File Type Badge & File size */}
+                                <div className="flex items-center justify-between gap-2 mb-3">
+                                  <div className="flex items-center gap-2">
+                                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${badge.iconBg}`}>
+                                      <FormatIcon className="h-4 w-4" />
+                                    </div>
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-extrabold border ${badge.bg}`}>
+                                      {doc.fileType}
+                                    </span>
+                                  </div>
+                                  <span className="text-[11px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                                    {doc.fileSize || "500 KB"}
+                                  </span>
+                                </div>
+
+                                {/* Title */}
+                                <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#256B29] transition-colors line-clamp-2">
+                                  {doc.title}
+                                </h3>
+
+                                {doc.description ? (
+                                  <p className="mt-2 text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                                    {doc.description}
+                                  </p>
+                                ) : null}
+
+                                {/* Publication Date */}
+                                <div className="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                  <CalendarDays className="h-3.5 w-3.5 text-[#256B29]" />
+                                  <span>Published: {doc.publishedDate}</span>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="mt-5 pt-3 border-t border-slate-200/70 flex items-center gap-2">
+                                {(doc.fileUrl || doc.downloadUrl) &&
+                                (doc.fileUrl !== "#" || doc.downloadUrl !== "#") ? (
+                                  <a
+                                    href={
+                                      doc.fileUrl && doc.fileUrl !== "#"
+                                        ? doc.fileUrl
+                                        : doc.downloadUrl
+                                    }
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-2xs"
+                                  >
+                                    <Eye className="h-3.5 w-3.5 text-[#256B29]" />
+                                    <span>Preview</span>
+                                  </a>
+                                ) : (
+                                  <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-400 cursor-not-allowed">
+                                    <Eye className="h-3.5 w-3.5" />
+                                    <span>Preview</span>
+                                  </span>
+                                )}
+
+                                {doc.downloadUrl && doc.downloadUrl !== "#" ? (
+                                  <a
+                                    href={doc.downloadUrl}
+                                    download
+                                    className="inline-flex items-center justify-center p-2 rounded-lg bg-[#256B29] text-white hover:bg-[#1b4d1d] transition-colors shadow-2xs"
+                                    title="Download file"
+                                    aria-label={`Download ${doc.title}`}
+                                  >
+                                    <Download className="h-3.5 w-3.5" />
+                                  </a>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    disabled
+                                    className="inline-flex items-center justify-center p-2 rounded-lg bg-slate-100 text-slate-400 cursor-not-allowed"
+                                    title="Download unavailable"
+                                  >
+                                    <Download className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )
             })}
@@ -530,90 +629,7 @@ export function AnnualReportsLibrary({
           </div>
         )}
 
-        {/* 4. Details Modal */}
-        {selectedDocument && (
-          <div
-            className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="document-modal-title"
-          >
-            <div className="w-full max-w-xl rounded-3xl bg-white p-6 sm:p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
-              <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-[#256B29]">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#256B29]">
-                      Annual Statistics Document
-                    </span>
-                    <h3 id="document-modal-title" className="text-lg sm:text-xl font-extrabold text-slate-900">
-                      {selectedDocument.title}
-                    </h3>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedDocument(null)}
-                  className="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition cursor-pointer"
-                  aria-label="Close dialog"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
 
-              <div className="mt-5 space-y-4 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                <div>
-                  <h4 className="font-bold text-slate-900 mb-1">Document Summary & Scope</h4>
-                  <p>{selectedDocument.description}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 py-3 px-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
-                  <div>
-                    <span className="text-slate-500 block">Publication Year</span>
-                    <strong className="text-slate-900 font-bold">{selectedDocument.year}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">File Format</span>
-                    <strong className="text-slate-900 font-bold">{selectedDocument.fileType} Document</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">File Size</span>
-                    <strong className="text-slate-900 font-bold">{selectedDocument.fileSize}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Languages</span>
-                    <strong className="text-slate-900 font-bold">{selectedDocument.language || "English"}</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedDocument(null)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
-                >
-                  Close
-                </button>
-
-                {selectedDocument.downloadUrl && selectedDocument.downloadUrl !== "#" ? (
-                  <a
-                    href={selectedDocument.downloadUrl}
-                    download
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#256B29] text-xs font-bold text-white hover:bg-[#1b4d1d] transition shadow-xs"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Download File</span>
-                  </a>
-                ) : (
-                  <span className="text-xs text-slate-400 italic">File download ready soon</span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </Container>
     </section>
   )

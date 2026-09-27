@@ -164,8 +164,9 @@ class EventItem(TimeStampedModel):
         help_text="Display priority sequence",
     )
     slug = models.SlugField(
-        max_length=150,
+        max_length=255,
         unique=True,
+        blank=True,
         help_text="Unique URL identifier (e.g. national-fisheries-symposium-2026)",
     )
     reference_number = models.CharField(
@@ -372,11 +373,19 @@ class EventItem(TimeStampedModel):
         verbose_name_plural = "02. Event Items"
 
     def save(self, *args, **kwargs):
-        # Auto-generate slug
+        # Auto-generate slug if empty or format properly
         if not self.slug or not str(self.slug).strip():
             from django.utils.text import slugify
             base_slug = slugify(self.title_en) if self.title_en else "event"
+            base_slug = base_slug[:200].rstrip('-')
             self.slug = f"{base_slug}-{uuid4().hex[:6]}"
+        else:
+            from django.utils.text import slugify
+            clean_slug = slugify(self.slug)
+            if clean_slug:
+                self.slug = clean_slug[:255].rstrip('-')
+            else:
+                self.slug = str(self.slug)[:255]
 
         # Auto-fill display date if empty
         if not self.display_date and self.date:

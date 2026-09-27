@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import Link from "next/link"
 import {
   FileText,
@@ -53,13 +53,13 @@ export function FisheryInformationLibrary({
   items,
 }: FisheryInformationLibraryProps) {
   const allCategories: ApiFisheryCategoryMeta[] = useMemo(() => {
-    return categories && categories.length > 0
+    return categories !== undefined && categories !== null
       ? categories
       : (fallbackCategories as unknown as ApiFisheryCategoryMeta[])
   }, [categories])
 
   const allItems: ApiFisheryInformationItem[] = useMemo(() => {
-    return items && items.length > 0
+    return items !== undefined && items !== null
       ? items
       : (fallbackItems as unknown as ApiFisheryInformationItem[])
   }, [items])
@@ -72,27 +72,7 @@ export function FisheryInformationLibrary({
   const defaultOpenCat = allCategories.length > 0 ? allCategories[0].id : "landing-site-maps"
   const [openCategory, setOpenCategory] = useState<string | null>(defaultOpenCat)
 
-  // Modal State
-  const [selectedItem, setSelectedItem] = useState<ApiFisheryInformationItem | null>(null)
 
-  // Keyboard Escape listener for Modal
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedItem(null)
-      }
-    }
-    if (selectedItem) {
-      window.addEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = "unset"
-    }
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown)
-      document.body.style.overflow = "unset"
-    }
-  }, [selectedItem])
 
   const toggleCategory = (catId: string) => {
     setOpenCategory((prev) => (prev === catId ? null : catId))
@@ -458,18 +438,31 @@ export function FisheryInformationLibrary({
 
                                 {/* Card Actions Footer */}
                                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2">
-                                  <button
-                                    type="button"
-                                    onClick={() => setSelectedItem(item)}
-                                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition cursor-pointer"
-                                  >
-                                    <Eye className="h-3.5 w-3.5 text-[#256B29]" />
-                                    <span>Details</span>
-                                  </button>
-
-                                  {item.downloadUrl && item.downloadUrl !== "#" ? (
+                                  {(item.fileUrl || item.downloadUrl) &&
+                                  (item.fileUrl !== "#" || item.downloadUrl !== "#") ? (
                                     <a
-                                      href={item.downloadUrl}
+                                      href={
+                                        item.fileUrl && item.fileUrl !== "#"
+                                          ? item.fileUrl
+                                          : item.downloadUrl
+                                      }
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition"
+                                    >
+                                      <Eye className="h-3.5 w-3.5 text-[#256B29]" />
+                                      <span>Preview</span>
+                                    </a>
+                                  ) : (
+                                    <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-400 cursor-not-allowed">
+                                      <Eye className="h-3.5 w-3.5" />
+                                      <span>Preview</span>
+                                    </span>
+                                  )}
+
+                                  {(item.downloadUrl && item.downloadUrl !== "#") || (item.fileUrl && item.fileUrl !== "#") ? (
+                                    <a
+                                      href={item.downloadUrl && item.downloadUrl !== "#" ? item.downloadUrl : item.fileUrl}
                                       download
                                       className="inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-lg bg-[#256B29] text-xs font-bold text-white hover:bg-[#1b4d1d] transition shadow-2xs"
                                     >
@@ -479,11 +472,11 @@ export function FisheryInformationLibrary({
                                   ) : (
                                     <button
                                       type="button"
-                                      onClick={() => setSelectedItem(item)}
-                                      className="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-slate-100 text-xs font-bold text-slate-500 hover:bg-slate-200 transition cursor-pointer"
+                                      disabled
+                                      className="inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-lg bg-slate-100 text-xs font-bold text-slate-400 cursor-not-allowed"
                                     >
-                                      <Eye className="h-3.5 w-3.5" />
-                                      <span>Preview</span>
+                                      <Download className="h-3.5 w-3.5" />
+                                      <span>Download</span>
                                     </button>
                                   )}
                                 </div>
@@ -529,90 +522,7 @@ export function FisheryInformationLibrary({
           </div>
         )}
 
-        {/* Modal: Item Details */}
-        {selectedItem && (
-          <div
-            className="fixed inset-0 z-[99999] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="fishery-item-modal-title"
-          >
-            <div className="w-full max-w-lg rounded-2xl bg-white p-6 sm:p-8 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200">
-              <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-100 text-[#256B29]">
-                    <FileText className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 id="fishery-item-modal-title" className="text-lg font-extrabold text-slate-900">
-                      {selectedItem.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 font-medium">
-                      Official Reference Dataset &amp; Documentation
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSelectedItem(null)}
-                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition cursor-pointer"
-                  aria-label="Close dialog"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
 
-              <div className="mt-5 space-y-4 text-xs sm:text-sm text-slate-700 leading-relaxed">
-                <div>
-                  <h4 className="font-bold text-slate-900 mb-1">Scope & Details</h4>
-                  <p>{selectedItem.description}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 py-3 px-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
-                  <div>
-                    <span className="text-slate-500 block">File Type</span>
-                    <strong className="text-slate-900 font-bold">{selectedItem.fileType} Resource</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">File Size</span>
-                    <strong className="text-slate-900 font-bold">{selectedItem.fileSize}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Location / Coverage</span>
-                    <strong className="text-slate-900 font-bold">{selectedItem.location || "National"}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block">Publication Date</span>
-                    <strong className="text-slate-900 font-bold">{selectedItem.publishedDate || "Official Release"}</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedItem(null)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition cursor-pointer"
-                >
-                  Close
-                </button>
-
-                {selectedItem.downloadUrl && selectedItem.downloadUrl !== "#" ? (
-                  <a
-                    href={selectedItem.downloadUrl}
-                    download
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#256B29] text-xs font-bold text-white hover:bg-[#1b4d1d] transition shadow-xs"
-                  >
-                    <Download className="h-4 w-4" />
-                    <span>Download File</span>
-                  </a>
-                ) : (
-                  <span className="text-xs text-slate-400 italic">File download ready soon</span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </Container>
     </section>
   )

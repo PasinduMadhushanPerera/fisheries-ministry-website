@@ -52,7 +52,7 @@ DEBUG = get_boolean_env(
 
 ALLOWED_HOSTS = get_list_env(
     "DJANGO_ALLOWED_HOSTS",
-    "127.0.0.1,localhost",
+    "*",
 )
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",

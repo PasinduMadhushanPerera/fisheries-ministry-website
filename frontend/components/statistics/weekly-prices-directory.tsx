@@ -39,7 +39,7 @@ export function WeeklyPricesDirectory({
   availableYears,
 }: WeeklyPricesDirectoryProps) {
   const allReports: ApiWeeklyPriceReport[] =
-    reports && reports.length > 0
+    reports !== undefined && reports !== null
       ? reports
       : (fallbackReports as unknown as ApiWeeklyPriceReport[])
 
@@ -53,24 +53,16 @@ export function WeeklyPricesDirectory({
     return Array.from(set).sort((a, b) => Number(b) - Number(a))
   }, [availableYears, allReports])
 
-  const initialYear = yearsList.length > 0 ? yearsList[0] : "2026"
-
-  const [selectedYear, setSelectedYear] = useState<string>(initialYear)
+  const [selectedYear, setSelectedYear] = useState<string>("All years")
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [activeFilter, setActiveFilter] = useState<FilterPill>("All")
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
 
-  // Track open monthly accordions
-  const [openMonths, setOpenMonths] = useState<Record<string, boolean>>({
-    June: true,
-    May: false,
-    April: false,
-    March: false,
-    December: true,
-  })
+  // Track open monthly accordions (closed by default)
+  const [openMonths, setOpenMonths] = useState<Record<string, boolean>>({})
 
-  const toggleMonth = (month: string) => {
-    setOpenMonths((prev) => ({ ...prev, [month]: !prev[month] }))
+  const toggleMonth = (groupKey: string) => {
+    setOpenMonths((prev) => ({ ...prev, [groupKey]: !prev[groupKey] }))
   }
 
   const isFiltered =
@@ -141,17 +133,21 @@ export function WeeklyPricesDirectory({
     return result
   }, [allReports, selectedYear, searchQuery, activeFilter, sortOrder, newestItem])
 
-  // Group filtered reports by Month
+  // Group filtered reports by Month & Year
   const groupedByMonth = useMemo(() => {
-    const map = new Map<string, ApiWeeklyPriceReport[]>()
+    const map = new Map<string, { monthName: string; year: number; reports: ApiWeeklyPriceReport[] }>()
     filteredReports.forEach((report) => {
-      const monthKey = report.month
-      if (!map.has(monthKey)) {
-        map.set(monthKey, [])
+      const groupKey = `${report.month}-${report.year}`
+      if (!map.has(groupKey)) {
+        map.set(groupKey, {
+          monthName: report.month,
+          year: report.year,
+          reports: [],
+        })
       }
-      map.get(monthKey)!.push(report)
+      map.get(groupKey)!.reports.push(report)
     })
-    return Array.from(map.entries())
+    return Array.from(map.values())
   }, [filteredReports])
 
   const badgeText = header?.badge_text || "Official Market Intelligence"
@@ -302,53 +298,76 @@ export function WeeklyPricesDirectory({
         {/* Monthly Accordions List */}
         {groupedByMonth.length > 0 ? (
           <div className="space-y-6">
-            {groupedByMonth.map(([monthName, monthReports]) => {
-              const isOpen = openMonths[monthName] ?? true
-              const reportYear = monthReports[0]?.year || selectedYear
+            {groupedByMonth.map(({ monthName, year, reports: monthReports }) => {
+              const groupKey = `${monthName}-${year}`
+              const isOpen = Boolean(openMonths[groupKey])
 
               return (
                 <div
-                  key={monthName}
-                  className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-2xs transition-all"
+                  key={groupKey}
+                  className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    isOpen
+                      ? "border-[#256B29] ring-2 ring-emerald-600/20 shadow-md bg-gradient-to-br from-emerald-50/40 via-white to-slate-50/60"
+                      : "border-slate-300 hover:border-emerald-500/60 shadow-xs hover:shadow-md bg-white"
+                  }`}
                 >
                   {/* Month Accordion Header */}
                   <button
                     type="button"
-                    onClick={() => toggleMonth(monthName)}
-                    className="w-full p-5 sm:p-6 flex items-center justify-between gap-4 bg-slate-50/70 hover:bg-slate-100/70 transition-colors cursor-pointer text-left select-none border-b border-slate-200/60"
+                    onClick={() => toggleMonth(groupKey)}
+                    className="w-full p-5 sm:p-6 flex items-center justify-between gap-4 cursor-pointer text-left select-none transition-colors select-none"
                     aria-expanded={isOpen}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-[#256B29]">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 ${
+                          isOpen
+                            ? "bg-[#256B29] text-white shadow-xs"
+                            : "bg-emerald-100 text-[#256B29]"
+                        }`}
+                      >
                         <FolderOpen className="h-5 w-5" aria-hidden="true" />
                       </div>
-                      <div>
-                        <h2 className="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
+
+                      <div className="min-w-0">
+                        <h2
+                          className={`text-base sm:text-lg font-extrabold transition-colors duration-200 flex items-center gap-2.5 ${
+                            isOpen ? "text-[#256B29]" : "text-slate-950"
+                          }`}
+                        >
                           <span>
-                            {monthName} {reportYear}
+                            {monthName} {year}
                           </span>
-                          <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600">
+                          <span
+                            className={`text-xs font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
+                              isOpen
+                                ? "bg-emerald-100 text-[#256B29] border-emerald-300"
+                                : "bg-slate-100 text-slate-700 border-slate-300"
+                            }`}
+                          >
                             {monthReports.length} {monthReports.length === 1 ? "Report" : "Reports"}
                           </span>
                         </h2>
-                        <p className="text-xs text-slate-500 font-medium mt-0.5">
-                          Weekly bulletins published during {monthName}
+                        <p className="text-xs text-slate-600 font-medium mt-0.5 truncate">
+                          Weekly bulletins published during {monthName} {year}
                         </p>
                       </div>
                     </div>
 
                     <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 transition-transform duration-200 ${
-                        isOpen ? "rotate-180 text-[#256B29] border-emerald-300 bg-emerald-50" : ""
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
+                        isOpen
+                          ? "border-emerald-300 bg-emerald-100 text-[#256B29] rotate-180"
+                          : "border-slate-300 bg-slate-100 text-slate-700"
                       }`}
                     >
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-5 w-5" aria-hidden="true" />
                     </div>
                   </button>
 
                   {/* Reports Grid in this Month */}
                   {isOpen && (
-                    <div className="p-5 sm:p-6 bg-white">
+                    <div className="p-5 sm:p-6 bg-white border-t border-slate-200">
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         {monthReports.map((report) => (
                           <div

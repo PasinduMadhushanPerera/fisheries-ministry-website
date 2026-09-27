@@ -133,7 +133,8 @@ class MonthlyProductionReport(TimeStampedModel):
     report_id = models.CharField(
         max_length=100,
         unique=True,
-        help_text="Unique identifier (e.g. '2026-03', '2026-02')",
+        blank=True,
+        help_text="🔒 Auto-generated unique report ID (Created automatically from year & month upon saving)",
     )
     year = models.PositiveIntegerField(
         default=2026,
@@ -158,7 +159,7 @@ class MonthlyProductionReport(TimeStampedModel):
     )
     description_en = models.TextField(
         blank=True,
-        default="Official fish production statistics across marine, coastal, and inland sectors.",
+        default="",
         verbose_name="Overview / Summary (English)",
     )
 
@@ -171,7 +172,7 @@ class MonthlyProductionReport(TimeStampedModel):
     )
     description_si = models.TextField(
         blank=True,
-        default="සාගර, වෙරළබඩ සහ මිරිදිය අංශ ඔස්සේ නිල මත්ස්‍ය නිෂ්පාදන සංඛ්‍යාලේඛන දත්ත.",
+        default="",
         verbose_name="Overview / Summary (සිංහල)",
     )
 
@@ -184,7 +185,7 @@ class MonthlyProductionReport(TimeStampedModel):
     )
     description_ta = models.TextField(
         blank=True,
-        default="கடல், கடலோர மற்றும் நன்னீர் துறைகளின் உத்தியோகபூர்வ மீன் உற்பத்தி புள்ளிவிவரங்கள்.",
+        default="",
         verbose_name="Overview / Summary (தமிழ்)",
     )
 
@@ -247,6 +248,16 @@ class MonthlyProductionReport(TimeStampedModel):
         # Auto-sync month_number from month name
         if self.month in MONTH_MAP:
             self.month_number = MONTH_MAP[self.month]
+
+        # Auto-generate report_id if empty
+        if not self.report_id or not str(self.report_id).strip():
+            from uuid import uuid4
+            from django.utils.text import slugify
+            month_slug = slugify(self.month) if self.month else "month"
+            candidate_id = f"production-{self.year}-{month_slug}"
+            while MonthlyProductionReport.objects.filter(report_id=candidate_id).exclude(pk=self.pk).exists():
+                candidate_id = f"production-{self.year}-{month_slug}-{uuid4().hex[:4]}"
+            self.report_id = candidate_id
 
         # Auto-format display date if empty
         if not self.display_date and self.published_date:

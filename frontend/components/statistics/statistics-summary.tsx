@@ -118,7 +118,7 @@ function CountUpNumber({ value }: { value: string | number }) {
 }
 
 export function StatisticsSummary({ cards }: StatisticsSummaryProps) {
-  const displayCards = cards && cards.length > 0 ? cards : (fallbackSummaryCards as unknown as ApiSummaryCard[])
+  const displayCards = cards !== undefined && cards !== null ? cards : (fallbackSummaryCards as unknown as ApiSummaryCard[])
 
   return (
     <section className="relative py-10 sm:py-12 bg-slate-50/80 border-b border-slate-200/80 overflow-hidden" aria-label="Summary Statistics">
