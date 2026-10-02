@@ -49,6 +49,7 @@ def custom_get_app_list(request, app_label=None):
         "rti_page",
         "downloads_page",
         "contact_page",
+        "internal_affairs",
     }
     if request.user.is_superuser:
         allowed_apps.add("auth")
@@ -111,6 +112,8 @@ def custom_get_app_list(request, app_label=None):
             return 25
         if label == "contact_page":
             return 26
+        if label == "internal_affairs":
+            return 27
         if label == "auth":
             return 90
         return 99
@@ -162,6 +165,7 @@ urlpatterns = [
     path("api/v1/foreign-training/", include("foreign_training.urls")),
     path("api/v1/procurement/", include("procurement_page.urls")),
     path("api/v1/recruitment/", include("recruitment_page.urls")),
+    path("api/v1/internal-affairs/", include("internal_affairs.urls")),
 ]
 
 if settings.DEBUG:

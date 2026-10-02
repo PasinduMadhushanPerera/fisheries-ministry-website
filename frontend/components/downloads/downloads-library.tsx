@@ -63,7 +63,7 @@ export function DownloadsLibrary({
   documents: apiDocuments,
 }: DownloadsLibraryProps) {
   const categoriesList =
-    apiCategories && apiCategories.length > 0
+    apiCategories !== undefined && apiCategories !== null
       ? apiCategories
       : fallbackCategories.map((c) => ({
           id: c.id,
@@ -73,7 +73,7 @@ export function DownloadsLibrary({
         }))
 
   const rawDocumentsList =
-    apiDocuments && apiDocuments.length > 0
+    apiDocuments !== undefined && apiDocuments !== null
       ? apiDocuments
       : fallbackDocuments
 
@@ -269,35 +269,36 @@ export function DownloadsLibrary({
   }
 
   // Helper for category header icons
-  const getCategoryHeaderIcon = (iconName: string, catId: string) => {
+  const getCategoryHeaderIcon = (iconName: string, catId: string, isOpen: boolean) => {
     const key = iconName || catId
+    const iconClass = `h-5 w-5 ${isOpen ? "!text-white" : "text-[#256B29]"}`
     switch (key) {
       case "project-disclosures":
-        return <ShieldCheck className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <ShieldCheck className={iconClass} aria-hidden="true" />
       case "sdg14":
-        return <Globe className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <Globe className={iconClass} aria-hidden="true" />
       case "hr-development":
-        return <Users className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <Users className={iconClass} aria-hidden="true" />
       case "citizen-charter":
-        return <Award className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <Award className={iconClass} aria-hidden="true" />
       case "policy-strategy":
-        return <BookOpen className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <BookOpen className={iconClass} aria-hidden="true" />
       case "performance-report":
-        return <LineChart className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <LineChart className={iconClass} aria-hidden="true" />
       case "mega-project-progress":
-        return <Building className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <Building className={iconClass} aria-hidden="true" />
       case "progress-report":
-        return <Layers className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <Layers className={iconClass} aria-hidden="true" />
       case "physical-financial-progress":
-        return <DollarSign className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <DollarSign className={iconClass} aria-hidden="true" />
       case "annual-statistics":
-        return <Briefcase className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <Briefcase className={iconClass} aria-hidden="true" />
       case "action-plan":
-        return <Calendar className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <Calendar className={iconClass} aria-hidden="true" />
       case "fishery-articles":
-        return <FolderOpen className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <FolderOpen className={iconClass} aria-hidden="true" />
       default:
-        return <Files className="h-5 w-5 !text-white" aria-hidden="true" style={{ color: "#ffffff" }} />
+        return <Files className={iconClass} aria-hidden="true" />
     }
   }
 
@@ -384,56 +385,8 @@ export function DownloadsLibrary({
             </div>
           </div>
 
-          {/* Category Filter Pills (Main 5 Items) */}
-          <div className="mt-5 pt-5 border-t border-slate-100">
-            <div className="flex items-center justify-between gap-2 mb-2.5">
-              <div className="flex items-center gap-2">
-                <Filter className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-                <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                  Filter by Category
-                </span>
-              </div>
-              {categoriesList.length > 5 && (
-                <button
-                  type="button"
-                  onClick={() => setShowAllCategories((prev) => !prev)}
-                  className="text-xs font-semibold text-[#388E3C] hover:underline cursor-pointer"
-                >
-                  {showAllCategories ? "Show top 5 only" : `+${categoriesList.length - 5} More categories`}
-                </button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => setActiveCategoryFilter("All categories")}
-                className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                  activeCategoryFilter === "All categories"
-                    ? "bg-[#388E3C] text-white shadow-2xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                All categories
-              </button>
-              {(showAllCategories ? categoriesList : categoriesList.slice(0, 5)).map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setActiveCategoryFilter(cat.id)}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                    activeCategoryFilter === cat.id
-                      ? "bg-[#388E3C] text-white shadow-2xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
-                >
-                  {cat.title}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Format Filter Pills */}
-          <div className="mt-3.5">
+          <div className="mt-5 pt-5 border-t border-slate-100">
             <div className="flex items-center gap-2 mb-2">
               <Files className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
               <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
@@ -526,10 +479,12 @@ export function DownloadsLibrary({
                 <div
                   key={category.id}
                   id={`category-${category.id}`}
-                  className={`rounded-2xl border bg-white shadow-2xs overflow-hidden transition-all duration-300 scroll-mt-28 ${
-                    highlightedCat === category.id
-                      ? "border-[#256B29] ring-2 ring-[#256B29]/30 shadow-md"
-                      : "border-slate-200"
+                  className={`rounded-2xl border transition-all duration-200 overflow-hidden scroll-mt-28 ${
+                    isOpen
+                      ? "border-[#256B29] ring-2 ring-emerald-600/20 shadow-md bg-gradient-to-br from-emerald-50/40 via-white to-slate-50/60"
+                      : highlightedCat === category.id
+                      ? "border-[#256B29] ring-2 ring-[#256B29]/30 shadow-md bg-white"
+                      : "border-slate-300 hover:border-emerald-500/60 shadow-xs hover:shadow-md bg-white"
                   }`}
                 >
                   {/* Category Header Button */}
@@ -537,45 +492,67 @@ export function DownloadsLibrary({
                     type="button"
                     onClick={() => toggleCategory(category.id)}
                     aria-expanded={isOpen}
-                    className="w-full flex items-center justify-between p-5 sm:p-6 text-left transition hover:bg-slate-50/70 cursor-pointer"
+                    className="w-full flex items-center justify-between p-5 sm:p-6 text-left cursor-pointer select-none transition-colors"
                   >
                     <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
-                      <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-[#2E7D32] text-white shadow-xs">
-                        {getCategoryHeaderIcon(category.icon, category.id)}
+                      <div
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 ${
+                          isOpen
+                            ? "bg-[#256B29] text-white shadow-xs"
+                            : "bg-emerald-100 text-[#256B29]"
+                        }`}
+                      >
+                        {getCategoryHeaderIcon(category.icon, category.id, isOpen)}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h3 className="text-base sm:text-lg font-bold text-slate-900">
-                            {category.title}
+                          <h3
+                            className={`text-base sm:text-lg font-extrabold transition-colors duration-200 flex items-center gap-2.5 ${
+                              isOpen ? "text-[#256B29]" : "text-slate-950"
+                            }`}
+                          >
+                            <span>{category.title}</span>
                           </h3>
                           {highlightedCat === category.id && (
                             <span className="inline-flex items-center rounded-full bg-[#256B29] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
                               Selected
                             </span>
                           )}
-                          <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-600">
-                            {category.items.length}{" "}
-                            {category.items.length === 1 ? "file" : "files"}
-                          </span>
                         </div>
-                        <p className="text-xs text-slate-500 truncate max-w-xl mt-0.5">
-                          {category.description}
-                        </p>
+                        {category.description && (
+                          <p className="text-xs text-slate-600 font-medium mt-0.5 truncate max-w-xl">
+                            {category.description}
+                          </p>
+                        )}
                       </div>
                     </div>
 
-                    <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-transform duration-200 ${
-                        isOpen ? "rotate-180 bg-slate-200 text-slate-900" : ""
-                      }`}
-                    >
-                      <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`text-xs font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
+                          isOpen
+                            ? "bg-emerald-100 text-[#256B29] border-emerald-300"
+                            : "bg-slate-100 text-slate-700 border-slate-300"
+                        }`}
+                      >
+                        {category.items.length} {category.items.length === 1 ? "file" : "files"}
+                      </span>
+
+                      <div
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
+                          isOpen
+                            ? "border-emerald-300 bg-emerald-100 text-[#256B29] rotate-180"
+                            : "border-slate-300 bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        <ChevronDown className="h-5 w-5" aria-hidden="true" />
+                      </div>
                     </div>
                   </button>
 
                   {/* Accordion Content */}
                   {isOpen && (
-                    <div className="border-t border-slate-100 bg-slate-50/40 p-4 sm:p-6">
+                    <div className="border-t border-slate-200 bg-white p-5 sm:p-6">
                       {category.items.length === 0 ? (
                         <p className="text-xs text-slate-500 italic py-2 text-center">
                           No documents currently available under this category.
@@ -585,7 +562,7 @@ export function DownloadsLibrary({
                           {category.items.map((doc) => (
                             <div
                               key={doc.id}
-                              className="group flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4.5 shadow-2xs transition hover:border-[#388E3C]/60 hover:shadow-xs"
+                              className="group flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-4.5 shadow-2xs transition hover:border-[#256B29] hover:shadow-xs"
                             >
                               <div>
                                 {/* Top Meta */}
@@ -625,14 +602,9 @@ export function DownloadsLibrary({
                                 </div>
 
                                 {/* Title */}
-                                <h4 className="mt-3 text-sm font-bold text-slate-900 group-hover:text-[#388E3C] transition-colors leading-snug">
+                                <h4 className="mt-3 text-sm font-extrabold text-slate-900 group-hover:text-[#256B29] transition-colors leading-snug">
                                   {doc.title}
                                 </h4>
-
-                                {/* Description */}
-                                <p className="mt-1.5 text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                                  {doc.description}
-                                </p>
 
                                 {/* Date / Year */}
                                 <div className="mt-3 flex items-center gap-2 text-[11px] text-slate-400">

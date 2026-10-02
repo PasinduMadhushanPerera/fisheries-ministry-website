@@ -346,44 +346,70 @@ export function FisheryInformationLibrary({
               return (
                 <div
                   key={category.id}
-                  className="rounded-2xl border border-slate-200 bg-white shadow-2xs overflow-hidden transition-all"
+                  className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                    isOpen
+                      ? "border-[#256B29] ring-2 ring-emerald-600/20 shadow-md bg-gradient-to-br from-emerald-50/40 via-white to-slate-50/60"
+                      : "border-slate-300 hover:border-emerald-500/60 shadow-xs hover:shadow-md bg-white"
+                  }`}
                 >
                   {/* Category Header Bar */}
                   <button
                     type="button"
                     onClick={() => toggleCategory(category.id)}
-                    className="w-full p-5 sm:p-6 flex items-center justify-between gap-4 text-left bg-white hover:bg-slate-50/80 transition-colors cursor-pointer border-b border-slate-100"
+                    className="w-full p-5 sm:p-6 flex items-center justify-between gap-4 cursor-pointer text-left select-none transition-colors"
                     aria-expanded={isOpen}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 border border-emerald-100">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors duration-200 ${
+                          isOpen
+                            ? "bg-[#256B29] text-white shadow-xs"
+                            : "bg-emerald-100 text-[#256B29]"
+                        }`}
+                      >
                         {getCategoryIcon(category.icon_type, category.id)}
                       </div>
-                      <div>
-                        <h2 className="text-base sm:text-lg font-extrabold text-slate-900">
+                      <div className="min-w-0">
+                        <h2
+                          className={`text-base sm:text-lg font-extrabold transition-colors duration-200 flex items-center gap-2.5 ${
+                            isOpen ? "text-[#256B29]" : "text-slate-950"
+                          }`}
+                        >
                           {category.title}
                         </h2>
-                        <p className="text-xs text-slate-500 font-normal line-clamp-1">
-                          {category.description}
-                        </p>
+                        {category.description && (
+                          <p className="text-xs text-slate-600 font-medium mt-0.5 truncate">
+                            {category.description}
+                          </p>
+                        )}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-[#256B29] bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                        {categoryItems.length} files
-                      </span>
-                      <ChevronDown
-                        className={`h-5 w-5 text-slate-400 transition-transform duration-200 ${
-                          isOpen ? "rotate-180 text-slate-700" : ""
+                      <span
+                        className={`text-xs font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
+                          isOpen
+                            ? "bg-emerald-100 text-[#256B29] border-emerald-300"
+                            : "bg-slate-100 text-slate-700 border-slate-300"
                         }`}
-                      />
+                      >
+                        {categoryItems.length} {categoryItems.length === 1 ? "file" : "files"}
+                      </span>
+                      <div
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
+                          isOpen
+                            ? "border-emerald-300 bg-emerald-100 text-[#256B29] rotate-180"
+                            : "border-slate-300 bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        <ChevronDown className="h-5 w-5" aria-hidden="true" />
+                      </div>
                     </div>
                   </button>
 
                   {/* Items Grid or Empty Category State */}
                   {isOpen && (
-                    <div className="p-6 bg-slate-50/50">
+                    <div className="p-5 sm:p-6 bg-white border-t border-slate-200">
                       {categoryItems.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                           {categoryItems.map((item) => {
@@ -424,11 +450,6 @@ export function FisheryInformationLibrary({
                                     {item.title}
                                   </h3>
 
-                                  {/* Description */}
-                                  <p className="mt-1.5 text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                                    {item.description}
-                                  </p>
-
                                   {/* Meta */}
                                   <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
                                     <span>Size: {item.fileSize}</span>
@@ -464,10 +485,10 @@ export function FisheryInformationLibrary({
                                     <a
                                       href={item.downloadUrl && item.downloadUrl !== "#" ? item.downloadUrl : item.fileUrl}
                                       download
-                                      className="inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-lg bg-[#256B29] text-xs font-bold text-white hover:bg-[#1b4d1d] transition shadow-2xs"
+                                      className="inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-lg bg-[#256B29] text-xs font-bold text-white !text-white hover:bg-[#1b4d1d] hover:text-white hover:!text-white transition shadow-2xs"
                                     >
-                                      <Download className="h-3.5 w-3.5" />
-                                      <span>Download</span>
+                                      <Download className="h-3.5 w-3.5 text-white !text-white" />
+                                      <span className="text-white !text-white">Download</span>
                                     </a>
                                   ) : (
                                     <button

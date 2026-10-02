@@ -1,13 +1,27 @@
+export type CustomContactLine = {
+  id: number | string
+  label: string
+  value: string
+  icon_type?: string
+  link_type?: string
+  linkUrl?: string
+  order?: number
+}
+
 export type InternalAffairsOfficer = {
   id: string
   name: string
   designation: string
   roleBadge: string
-  phone: string
-  mobileWhatsapp: string
-  email: string
-  officeAddress: string
+  phone?: string
+  phoneLabel?: string
+  mobileWhatsapp?: string
+  mobileLabel?: string
+  email?: string
+  emailLabel?: string
+  officeAddress?: string
   photo: string
+  customContactLines?: CustomContactLine[]
 }
 
 export type ImportantInfoCard = {
@@ -30,10 +44,29 @@ export const internalAffairsOfficers: InternalAffairsOfficer[] = [
     designation: "Senior Assistant Secretary",
     roleBadge: "Internal Affairs Lead",
     phone: "+94 11 244 6183",
+    phoneLabel: "Telephone",
     mobileWhatsapp: "+94 71 442 8434",
+    mobileLabel: "Mobile / WhatsApp",
     email: "iau@fisheries.gov.lk",
+    emailLabel: "Email",
     officeAddress: "Ministry of Fisheries, Aquatic and Ocean Resources, New Secretariat, Maligawatta, Colombo 10",
     photo: "/images/leadership/Senior Assistant Secretary.jpg",
+    customContactLines: [
+      {
+        id: 1,
+        label: "IAU WhatsApp",
+        value: "+94 707 786 181",
+        icon_type: "whatsapp",
+        linkUrl: "https://wa.me/94707786181",
+      },
+      {
+        id: 2,
+        label: "IAU E-mail",
+        value: "iau[at]fisheries.gov.lk",
+        icon_type: "email",
+        linkUrl: "mailto:iau@fisheries.gov.lk",
+      },
+    ],
   },
   {
     id: "director-development",
@@ -41,10 +74,14 @@ export const internalAffairsOfficers: InternalAffairsOfficer[] = [
     designation: "Director (Development)",
     roleBadge: "Development Oversight",
     phone: "+94 11 244 1537",
+    phoneLabel: "Telephone",
     mobileWhatsapp: "+94 77 692 7738",
+    mobileLabel: "Mobile / WhatsApp",
     email: "gyasintha@yahoo.com",
+    emailLabel: "Email",
     officeAddress: "Ministry of Fisheries, Aquatic and Ocean Resources, New Secretariat, Maligawatta, Colombo 10",
     photo: "/images/leadership/Director (Development).jpg",
+    customContactLines: [],
   },
 ]
 

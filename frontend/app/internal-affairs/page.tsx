@@ -3,53 +3,59 @@ import type { Metadata } from "next"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
-import { InternalAffairsHero } from "@/components/internal-affairs/internal-affairs-hero"
-import { InternalAffairsOverview } from "@/components/internal-affairs/internal-affairs-overview"
 import { InternalAffairsOfficers } from "@/components/internal-affairs/internal-affairs-officers"
-import { ComplaintOptions } from "@/components/internal-affairs/complaint-options"
-import { ImportantInformation } from "@/components/internal-affairs/important-information"
-import { InternalAffairsContact } from "@/components/internal-affairs/internal-affairs-contact"
-import { InternalAffairsFaq } from "@/components/internal-affairs/internal-affairs-faq"
+import { InternalAffairsDocuments } from "@/components/internal-affairs/internal-affairs-documents"
+import {
+  fetchInternalAffairsOfficers,
+  fetchInternalAffairsDocuments,
+  fetchInternalAffairsSettings,
+} from "@/lib/api/internal-affairs"
+import { fetchHeaderFooterData } from "@/lib/api/header-footer"
+import { getServerLanguage } from "@/lib/get-server-language"
+
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+export const fetchCache = "force-no-store"
 
 export const metadata: Metadata = {
-  title: "Internal Affairs Unit",
+  title: "Internal Affairs Unit - Ministry of Fisheries",
   description:
     "Submit complaints, report misconduct, or contact the Internal Affairs Unit regarding Ministry services, officer integrity, and public service standards.",
 }
 
-export default function InternalAffairsPage() {
+interface PageProps {
+  searchParams: Promise<{ lang?: string }>
+}
+
+export default async function InternalAffairsPage({ searchParams }: PageProps) {
+  const currentLang = await getServerLanguage(searchParams)
+
+  const [officersData, documentsData, settingsData, headerFooterData] = await Promise.all([
+    fetchInternalAffairsOfficers(currentLang),
+    fetchInternalAffairsDocuments(currentLang),
+    fetchInternalAffairsSettings(currentLang),
+    fetchHeaderFooterData().catch(() => null),
+  ])
+
   return (
     <>
-      <SiteHeader />
+      <SiteHeader initialHeader={headerFooterData?.header} />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
-        {/* 1. Breadcrumb */}
         <Breadcrumb items={[{ label: "Internal Affairs Unit" }]} />
 
-        {/* 2. Compact Hero */}
-        {/* <InternalAffairsHero /> */}
+        <InternalAffairsOfficers
+          initialOfficers={officersData}
+          header={settingsData?.officersHeader}
+        />
 
-        {/* 3. About Internal Affairs Unit */}
-        {/* <InternalAffairsOverview /> */}
-
-        {/* 4. Key Officers */}
-        <InternalAffairsOfficers />
-
-        {/* 5. Complaint & Inquiry Options */}
-        {/* <ComplaintOptions /> */}
-
-        {/* 6. Important Information */}
-        {/* <ImportantInformation /> */}
-
-        {/* 7. Contact Information & Map */}
-        {/* <InternalAffairsContact /> */}
-
-        {/* 8. FAQ Accordion */}
-        {/* <InternalAffairsFaq /> */}
+        <InternalAffairsDocuments
+          initialDocuments={documentsData}
+          header={settingsData?.documentsHeader}
+        />
       </main>
 
-      {/* 9. Footer */}
-      <SiteFooter />
+      <SiteFooter initialFooter={headerFooterData?.footer} />
     </>
   )
 }

@@ -14,7 +14,7 @@ interface FeaturedDownloadsProps {
 export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps) {
   const [selectedDoc, setSelectedDoc] = useState<ApiDownloadDocumentItem | DownloadDocument | null>(null)
 
-  const items = featuredDocuments && featuredDocuments.length > 0
+  const items = featuredDocuments !== undefined && featuredDocuments !== null
     ? featuredDocuments
     : downloadDocuments.filter((doc) => doc.featured)
 
@@ -77,14 +77,9 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                 </div>
 
                 {/* Title */}
-                <h3 className="mt-3 text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#388E3C] transition-colors leading-snug">
+                <h3 className="mt-3 text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#256B29] transition-colors leading-snug">
                   {doc.title}
                 </h3>
-
-                {/* Description */}
-                <p className="mt-2 text-xs text-slate-600 leading-relaxed line-clamp-2">
-                  {doc.description}
-                </p>
 
                 {doc.publishedDate && (
                   <p className="mt-3 text-[11px] text-slate-500 font-medium">

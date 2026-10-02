@@ -95,6 +95,7 @@ INSTALLED_APPS = [
     "rti_page",
     "downloads_page",
     "contact_page",
+    "internal_affairs",
     "header_footer",
     "home_page",
     "pages",
