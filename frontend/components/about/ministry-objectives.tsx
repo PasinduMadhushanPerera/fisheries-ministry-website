@@ -151,10 +151,6 @@ export function MinistryObjectives({
                   <h3 className="mt-5 text-lg font-bold text-slate-900 group-hover:text-[#256B29] transition-colors">
                     {item.title}
                   </h3>
-
-                  <p className="mt-2.5 text-sm leading-relaxed text-slate-600">
-                    {item.description}
-                  </p>
                 </div>
 
                 <div className="mt-6 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs font-semibold text-[#256B29]">

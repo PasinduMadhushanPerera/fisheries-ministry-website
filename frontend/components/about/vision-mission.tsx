@@ -91,7 +91,7 @@ export function VisionMission({ initialVisionMission }: { initialVisionMission?:
                   {item.heading}
                 </h3>
 
-                <p className="mt-3 text-sm leading-relaxed text-slate-200/90">
+                <p className="mt-3 text-sm leading-relaxed text-slate-200/90 text-justify">
                   {item.description}
                 </p>
               </div>

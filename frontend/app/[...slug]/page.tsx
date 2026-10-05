@@ -82,14 +82,18 @@ export default async function DynamicPageRoute({ params }: Props) {
                 <span>{page.badge_text || "Ministry Portal"}</span>
               </span>
 
-              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight">
-                {page.hero_title || page.title}
-              </h1>
+              {page.hero_title || page.title ? (
+                <h1
+                  className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight"
+                  dangerouslySetInnerHTML={{ __html: page.hero_title || page.title }}
+                />
+              ) : null}
 
               {page.hero_subtitle && (
-                <p className="text-sm sm:text-base leading-relaxed text-slate-200/90 text-justify">
-                  {page.hero_subtitle}
-                </p>
+                <div
+                  className="text-sm sm:text-base leading-relaxed text-slate-200/90 text-justify prose prose-invert max-w-none [&_p]:m-0 [&_p]:p-0"
+                  dangerouslySetInnerHTML={{ __html: page.hero_subtitle }}
+                />
               )}
             </div>
           </Container>

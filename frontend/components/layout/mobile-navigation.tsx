@@ -15,13 +15,45 @@ import {
 } from "lucide-react"
 
 import { mainNavigation, NavigationItem } from "@/data/navigation"
+import { getDynamicNavigation } from "@/lib/api/navigation"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/src/contexts/LanguageContext"
 
-export function MobileNavigation() {
+interface MobileNavigationProps {
+  initialNavigation?: NavigationItem[]
+}
+
+export function MobileNavigation({ initialNavigation }: MobileNavigationProps) {
   const pathname = usePathname()
   const navigationId = useId()
   const { language } = useLanguage()
+
+  const [navItems, setNavItems] = useState<NavigationItem[]>(
+    initialNavigation && initialNavigation.length > 0 ? initialNavigation : mainNavigation
+  )
+
+  useEffect(() => {
+    async function loadDynamicNav() {
+      try {
+        const dynamicItems = await getDynamicNavigation()
+        if (dynamicItems && dynamicItems.length > 0) {
+          setNavItems(dynamicItems)
+        }
+      } catch (err) {
+        console.error("Failed to load dynamic navigation:", err)
+      }
+    }
+
+    void loadDynamicNav()
+
+    const handleFocus = () => {
+      void loadDynamicNav()
+    }
+    window.addEventListener("focus", handleFocus)
+    return () => {
+      window.removeEventListener("focus", handleFocus)
+    }
+  }, [])
 
   function getLabel(item: NavigationItem) {
     if (language === "si" && item.label_si) return item.label_si
@@ -245,7 +277,7 @@ export function MobileNavigation() {
                   className="p-3"
                 >
                   <ul className="space-y-1">
-                    {mainNavigation.map((item) => {
+                    {navItems.map((item) => {
                       const hasChildren =
                         item.children && item.children.length > 0
 

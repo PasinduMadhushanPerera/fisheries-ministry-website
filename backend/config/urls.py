@@ -50,6 +50,8 @@ def custom_get_app_list(request, app_label=None):
         "downloads_page",
         "contact_page",
         "internal_affairs",
+        "navigation",
+        "pages",
     }
     if request.user.is_superuser:
         allowed_apps.add("auth")
@@ -114,6 +116,10 @@ def custom_get_app_list(request, app_label=None):
             return 26
         if label == "internal_affairs":
             return 27
+        if label == "navigation":
+            return 28
+        if label == "pages":
+            return 29
         if label == "auth":
             return 90
         return 99

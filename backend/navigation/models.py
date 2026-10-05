@@ -55,5 +55,5 @@ class MenuItem(TimeStampedModel):
 
     def __str__(self) -> str:
         if self.parent:
-            return f"  ↳ {self.parent.title} > {self.title} ({self.url})"
-        return f"{self.title} ({self.url})"
+            return f"  ↳ Sub-item under '{self.parent.title}': {self.title} ({self.url})"
+        return f"⭐ TOP-LEVEL TAB: {self.title} ({self.url})"

@@ -10,7 +10,6 @@ import {
   HeartHandshake,
 } from "lucide-react"
 
-import { LinkButton } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Section } from "@/components/ui/section"
 import { ApiAboutOverview } from "@/lib/api/about"
@@ -151,16 +150,7 @@ export function MinistryOverview({ initialOverview }: { initialOverview?: ApiAbo
             </div>
           </div>
 
-          <div className="pt-2">
-            <LinkButton
-              href={ctaButtonUrl}
-              variant="outline"
-              className="border-slate-300 bg-white hover:border-[#256B29] hover:bg-emerald-50 text-xs font-extrabold"
-            >
-              <span>{ctaButtonText}</span>
-              <ArrowRight aria-hidden="true" className="h-4 w-4" />
-            </LinkButton>
-          </div>
+
         </div>
 
         {/* RIGHT COLUMN: 3 CORE RESPONSIBILITY CARDS (5 COLS) */}

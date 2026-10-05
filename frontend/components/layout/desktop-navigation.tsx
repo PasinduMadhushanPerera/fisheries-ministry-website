@@ -6,13 +6,21 @@ import { usePathname } from "next/navigation"
 import { ChevronDown } from "lucide-react"
 
 import { mainNavigation, NavigationItem } from "@/data/navigation"
+import { getDynamicNavigation } from "@/lib/api/navigation"
 import { cn } from "@/lib/utils"
 import { useLanguage } from "@/src/contexts/LanguageContext"
 
-export function DesktopNavigation() {
+interface DesktopNavigationProps {
+  initialNavigation?: NavigationItem[]
+}
+
+export function DesktopNavigation({ initialNavigation }: DesktopNavigationProps) {
   const pathname = usePathname()
   const { language } = useLanguage()
 
+  const [navItems, setNavItems] = useState<NavigationItem[]>(
+    initialNavigation && initialNavigation.length > 0 ? initialNavigation : mainNavigation
+  )
   const [openMenu, setOpenMenu] = useState<string | null>(null)
   const navigationRef = useRef<HTMLElement>(null)
 
@@ -21,6 +29,29 @@ export function DesktopNavigation() {
     if (language === "ta" && item.label_ta) return item.label_ta
     return item.label
   }
+
+  useEffect(() => {
+    async function loadDynamicNav() {
+      try {
+        const dynamicItems = await getDynamicNavigation()
+        if (dynamicItems && dynamicItems.length > 0) {
+          setNavItems(dynamicItems)
+        }
+      } catch (err) {
+        console.error("Failed to load dynamic navigation:", err)
+      }
+    }
+
+    void loadDynamicNav()
+
+    const handleFocus = () => {
+      void loadDynamicNav()
+    }
+    window.addEventListener("focus", handleFocus)
+    return () => {
+      window.removeEventListener("focus", handleFocus)
+    }
+  }, [])
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -91,7 +122,7 @@ export function DesktopNavigation() {
       className="hidden lg:block w-full overflow-visible"
     >
       <ul className="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
-        {mainNavigation.map((item) => {
+        {navItems.map((item) => {
           const hasChildren =
             item.children && item.children.length > 0
 

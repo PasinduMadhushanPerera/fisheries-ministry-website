@@ -5,3 +5,6 @@ class HeaderFooterConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "header_footer"
     verbose_name = "00. Common Header & Footer Settings"
+
+    def ready(self):
+        import header_footer.signals  # noqa: F401

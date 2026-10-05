@@ -115,7 +115,7 @@ function LeadershipCardComponent({
             {leader.title}
           </h3>
 
-          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 text-justify">
             {leader.description}
           </p>
         </div>
