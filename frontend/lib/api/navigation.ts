@@ -11,9 +11,10 @@ export type ApiMenuItem = {
   children?: ApiMenuItem[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function getDynamicNavigation(): Promise<NavigationItem[]> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/navigation/`
 
   try {

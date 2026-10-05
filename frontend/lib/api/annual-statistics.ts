@@ -36,11 +36,12 @@ export interface ApiAnnualStatisticsData {
   reports: ApiAnnualStatisticsDocument[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchAnnualStatisticsData(
   lang: string = "en"
 ): Promise<ApiAnnualStatisticsData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/statistics/annual-reports/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {

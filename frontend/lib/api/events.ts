@@ -46,11 +46,12 @@ export interface ApiEventsPageData {
   events: ApiEventItem[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchEventsPageData(
   lang: string = "en"
 ): Promise<ApiEventsPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/events/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {
@@ -69,8 +70,7 @@ export async function fetchEventBySlug(
   slug: string,
   lang: string = "en"
 ): Promise<ApiEventItem | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/events/${encodeURIComponent(slug)}/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {

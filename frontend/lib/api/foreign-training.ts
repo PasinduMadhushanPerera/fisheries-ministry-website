@@ -34,11 +34,12 @@ export interface ApiForeignTrainingPageData {
   programmes: ApiForeignTrainingProgramme[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchForeignTrainingPageData(
   lang: string = "en"
 ): Promise<ApiForeignTrainingPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/foreign-training/?lang=${encodeURIComponent(lang)}`
 
   try {

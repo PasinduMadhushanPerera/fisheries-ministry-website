@@ -33,11 +33,12 @@ export interface ApiLocalTrainingPageData {
   programmes: ApiLocalTrainingProgramme[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchLocalTrainingPageData(
   lang: string = "en"
 ): Promise<ApiLocalTrainingPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/local-training/?lang=${encodeURIComponent(lang)}`
 
   try {

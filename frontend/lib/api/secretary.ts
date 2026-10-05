@@ -34,9 +34,10 @@ export type ApiSecretaryPageData = {
   secretariat: ApiSecretarySecretariat
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchSecretaryPageData(lang: string = "en"): Promise<ApiSecretaryPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/secretary/?lang=${encodeURIComponent(lang)}`
 
   try {

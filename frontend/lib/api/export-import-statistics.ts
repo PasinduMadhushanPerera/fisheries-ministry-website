@@ -51,11 +51,12 @@ export interface ApiExportImportData {
   reports: ApiExportImportReport[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchExportImportData(
   lang: string = "en"
 ): Promise<ApiExportImportData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/statistics/export-and-import/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {

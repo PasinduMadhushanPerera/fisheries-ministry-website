@@ -617,19 +617,7 @@ export function DownloadsLibrary({
                               </div>
 
                               {/* Card Action Buttons */}
-                              <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-1 pt-3 border-t border-slate-100">
-                                <button
-                                  type="button"
-                                  onClick={() => setSelectedDoc(doc)}
-                                  className="flex-1 inline-flex min-h-[36px] items-center justify-center gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 text-xs font-bold text-slate-700 transition hover:bg-slate-100 cursor-pointer"
-                                >
-                                  <Eye
-                                    className="h-3.5 w-3.5 text-slate-500"
-                                    aria-hidden="true"
-                                  />
-                                  <span>View</span>
-                                </button>
-
+                              <div className="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 pt-3 border-t border-slate-100">
                                 <a
                                   href={doc.fileUrl}
                                   target="_blank"
@@ -646,13 +634,13 @@ export function DownloadsLibrary({
                                 <a
                                   href={doc.downloadUrl || doc.fileUrl}
                                   download
-                                  className="flex-1 inline-flex min-h-[36px] items-center justify-center gap-1 rounded-lg bg-[#388E3C] px-2 text-xs font-bold text-white transition hover:bg-[#256B29]"
+                                  className="flex-1 inline-flex min-h-[36px] items-center justify-center gap-1.5 rounded-lg bg-[#256B29] px-2 text-xs font-extrabold text-white !text-white transition hover:bg-[#1b4d1d] hover:text-white hover:!text-white shadow-2xs"
                                 >
                                   <Download
-                                    className="h-3.5 w-3.5"
+                                    className="h-3.5 w-3.5 text-white !text-white"
                                     aria-hidden="true"
                                   />
-                                  <span>Get</span>
+                                  <span className="text-white !text-white">Get</span>
                                 </a>
                               </div>
                             </div>

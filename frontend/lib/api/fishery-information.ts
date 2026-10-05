@@ -44,11 +44,12 @@ export interface ApiFisheryInformationData {
   items: ApiFisheryInformationItem[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchFisheryInformationData(
   lang: string = "en"
 ): Promise<ApiFisheryInformationData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/statistics/related-information/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {

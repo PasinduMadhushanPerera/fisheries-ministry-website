@@ -39,11 +39,12 @@ export interface ApiProcurementPageData {
   tenders: ApiProcurementTenderItem[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchProcurementPageData(
   lang: string = "en"
 ): Promise<ApiProcurementPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/procurement/?lang=${encodeURIComponent(lang)}`
 
   try {

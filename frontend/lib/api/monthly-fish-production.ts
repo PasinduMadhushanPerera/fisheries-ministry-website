@@ -26,11 +26,12 @@ export interface ApiMonthlyFishProductionData {
   reports: ApiMonthlyProductionReport[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchMonthlyFishProductionData(
   lang: string = "en"
 ): Promise<ApiMonthlyFishProductionData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/statistics/monthly-fish-production/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {

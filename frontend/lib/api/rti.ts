@@ -64,16 +64,14 @@ export interface ApiRtiPageData {
   documents: ApiRtiDocumentItem[]
 }
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://pasiperera.pythonanywhere.com"
+import { getApiBaseUrl } from "../utils"
 
 export async function fetchRtiPageData(
   language = "en"
 ): Promise<ApiRtiPageData | null> {
   try {
-    const url = `${API_BASE_URL}/api/v1/rti/?lang=${encodeURIComponent(
+    const baseUrl = getApiBaseUrl()
+    const url = `${baseUrl}/api/v1/rti/?lang=${encodeURIComponent(
       language
     )}&_t=${Date.now()}`
 

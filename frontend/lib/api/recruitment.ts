@@ -37,11 +37,12 @@ export interface ApiRecruitmentPageData {
   vacancies: ApiRecruitmentVacancyItem[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchRecruitmentPageData(
   lang: string = "en"
 ): Promise<ApiRecruitmentPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/recruitment/?lang=${encodeURIComponent(lang)}`
 
   try {

@@ -57,11 +57,12 @@ export interface ApiFisheriesAtAGlanceData {
   sections: ApiStatisticsSection[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchFisheriesAtAGlanceData(
   lang: string = "en"
 ): Promise<ApiFisheriesAtAGlanceData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/statistics/at-a-glance/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {

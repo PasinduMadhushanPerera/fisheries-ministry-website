@@ -38,11 +38,12 @@ export interface ApiNoticesPageData {
   notices: ApiNoticeItem[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchNoticesPageData(
   lang: string = "en"
 ): Promise<ApiNoticesPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/notices/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {
@@ -61,8 +62,7 @@ export async function fetchNoticeBySlug(
   slug: string,
   lang: string = "en"
 ): Promise<ApiNoticeItem | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/notices/${encodeURIComponent(slug)}/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {

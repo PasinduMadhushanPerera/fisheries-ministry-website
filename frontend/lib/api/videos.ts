@@ -37,11 +37,12 @@ export interface ApiVideosPageData {
   videos: ApiVideoItem[]
 }
 
+import { getApiBaseUrl } from "../utils"
+
 export async function fetchVideosPageData(
   lang: string = "en"
 ): Promise<ApiVideosPageData | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/videos/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {
@@ -60,8 +61,7 @@ export async function fetchVideoBySlug(
   slug: string,
   lang: string = "en"
 ): Promise<ApiVideoItem | null> {
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || "https://pasiperera.pythonanywhere.com"
-  const baseUrl = rawUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+  const baseUrl = getApiBaseUrl()
   const endpoint = `${baseUrl}/api/v1/videos/${encodeURIComponent(slug)}/?lang=${encodeURIComponent(lang)}&_t=${Date.now()}`
 
   try {
