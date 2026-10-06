@@ -1,12 +1,16 @@
 from django.core.management.base import BaseCommand
-from local_training.models import LocalTrainingPageHeader, LocalTrainingProgramme
+from local_training.models import (
+    LocalTrainingPageHeader,
+    LocalTrainingCategory,
+    LocalTrainingProgramme,
+)
 
 
 class Command(BaseCommand):
     help = "Seed rich multilingual data for Local Training Opportunities"
 
     def handle(self, *args, **options):
-        self.stdout.write("Seeding Local Training page and programmes...")
+        self.stdout.write("Seeding Local Training categories and programmes...")
 
         # 1. Page Header
         hdr, _ = LocalTrainingPageHeader.objects.get_or_create(id=1)
@@ -20,7 +24,7 @@ class Command(BaseCommand):
 
         hdr.description_en = "Browse local training courses, technical workshops, professional development programmes and capacity building opportunities provided by the Ministry of Fisheries and national partner institutions."
         hdr.description_si = "ධීවර අමාත්‍යාංශය සහ ජාතික හවුල්කාර ආයතන විසින් පවත්වනු ලබන දේශීය පුහුණු පාඨමාලා, තාක්ෂණික වැඩමුළු, වෘත්තීය සංවර්ධන වැඩසටහන් සහ ධාරිතා වර්ධන අවස්ථා ගවේෂණය කරන්න."
-        hdr.description_ta = "கடற்றொழில் அமைச்சு மற்றும் தேசிய பங்குதாரர் நிறுவனங்களால் வழங்கப்படும் உள்ளூர் பயிற்சிப் படிப்புகள், தொழினுட்ப பட்டறைகள் மற்றும் திறன் மேம்பாட்டு வாய்ப்புகளைப் பார்வையிடவும்."
+        hdr.description_ta = "கடற்றොழில் அமைச்சு மற்றும் தேசிய பங்குதாரர் நிறுவனங்களால் வழங்கப்படும் உள்ளூர் பயிற்சிப் படிப்புகள், தொழினுட்ப பட்டறைகள் மற்றும் திறன் மேம்பாட்டு வாய்ப்புகளைப் பார்வையிடவும்."
 
         hdr.featured_badge_en = "Featured 2026 Opportunities"
         hdr.featured_badge_si = "2026 විශේෂ අවස්ථා"
@@ -32,16 +36,78 @@ class Command(BaseCommand):
 
         hdr.library_title_en = "Training Programme Library"
         hdr.library_title_si = "පුහුණු වැඩසටහන් පුස්තකාලය"
-        hdr.library_title_ta = "பயிற்සිத் திட்ட நூலகம்"
+        hdr.library_title_ta = "பயிற்சித் திட்ட நூலகம்"
         hdr.save()
 
-        # 2. Programmes Data
+        # 2. Categories Data
+        categories_data = [
+            {
+                "category_id": "language-courses",
+                "order": 1,
+                "icon_type": "globe",
+                "title_en": "Language & Official Communication",
+                "title_si": "භාෂා සහ රාජ්‍ය සන්නිවේදනය",
+                "title_ta": "மொழி மற்றும் அரச தொடர்பாடல்",
+                "description_en": "Professional English, Sinhala, and Tamil proficiency courses for public sector officers.",
+                "description_si": "රාජ්‍ය අංශයේ නිලධාරීන් සඳහා වෘත්තීය ඉංග්‍රීසි, සිංහල සහ දෙමළ ප්‍රවීණතා පාඨමාලා.",
+                "description_ta": "அரசத்துறை அதிகாரிகளுக்கான ஆங்கிலம், சிங்களம் மற்றும் தமிழ் மொழிப் பயிற்சிகள்.",
+            },
+            {
+                "category_id": "maritime-technical",
+                "order": 2,
+                "icon_type": "anchor",
+                "title_en": "Maritime, Safety & Nautical Skills",
+                "title_si": "නාවික, ආරක්ෂාව සහ තාක්ෂණික කුසලතා",
+                "title_ta": "கடல்சார், பாதுகாப்பு மற்றும் தொழினுட்ப தகைமைகள்",
+                "description_en": "Vessel navigation, safety at sea, outboard motor maintenance, and diving certifications.",
+                "description_si": "යාත්‍රා නාවික සහාය, මුහුදු ආරක්ෂාව, පිටත එන්ජින් නඩත්තුව සහ කිමිදුම් සහතික.",
+                "description_ta": "படகு செலுத்துகை, கடல் பாதுகாப்பு, வெளிப்ப இணைப்பு எஞ்சின் பராமரிப்பு மற்றும் மூழ்கிப் பயிற்சிகள்.",
+            },
+            {
+                "category_id": "aquaculture-vocational",
+                "order": 3,
+                "icon_type": "fish",
+                "title_en": "Aquaculture & Fisheries Management",
+                "title_si": "ජලජීවී වගාව සහ ධීවර කළමනාකරණය",
+                "title_ta": "நீர்வாழ் உயிரின வளர்ப்பு மற்றும் கடற்றොழில் நிர்வாகம்",
+                "description_en": "Shrimp farming, sea cucumber culture, inland fisheries, and hatchery operational courses.",
+                "description_si": "ඉස්සන් වගාව, මුහුදු කූඩැල්ලන් වගාව, අභ්‍යන්තර ධීවර සහ පැටවුන් බිහි කිරීමේ පාඨමාලා.",
+                "description_ta": "ஈரால் வளர்ப்பு, கடல் அட்டை வளர்ப்பு மற்றும் நன்னீர் மீன்பிடி மேலாண்மைப் பயிற்சிகள்.",
+            },
+            {
+                "category_id": "public-administration",
+                "order": 4,
+                "icon_type": "briefcase",
+                "title_en": "Administration, Finance & Governance",
+                "title_si": "පාලනය, මුදල් සහ ප්‍රසම්පාදන කළමනාකරණය",
+                "title_ta": "நிர்வாகம், நிதி மற்றும் அரசாங்கக் கொள்முதல்",
+                "description_en": "Public procurement regulations, financial accounting, and administrative circular workshops.",
+                "description_si": "රාජ්‍ය ප්‍රසම්පාදන රෙගුලාසි, මුදල් ගිණුම්කරණය සහ පරිපාලන වටලේඛන වැඩමුළු.",
+                "description_ta": "பொதுக் கொள்முதல் விதிகள், நிதி கணக்கியல் மற்றும் நிர்வாகப் பயிற்சிகள்.",
+            },
+        ]
+
+        cat_map = {}
+        for c_data in categories_data:
+            cat, _ = LocalTrainingCategory.objects.get_or_create(
+                category_id=c_data["category_id"],
+                defaults=c_data,
+            )
+            for k, v in c_data.items():
+                setattr(cat, k, v)
+            cat.save()
+            cat_map[c_data["category_id"]] = cat
+
+        # 3. Programmes Data
         programmes_data = [
             {
                 "slug": "english-language-courses-2026-2027",
                 "order": 1,
                 "year": 2026,
-                "category": "language",
+                "category_id": "language-courses",
+                "subheading_en": "Spoken English & Official Communication",
+                "subheading_si": "කතාකරන ඉංග්‍රීසි සහ නිල සන්නිවේදනය",
+                "subheading_ta": "பேச்சு ஆங்கிலம் மற்றும் அரச தொடர்பாடல்",
                 "status": "Open",
                 "featured": True,
                 "title_en": "English Language Courses 2026/2027",
@@ -54,197 +120,100 @@ class Command(BaseCommand):
                 "description_si": "වෘත්තීය සන්නිවේදනය සහ වාර්තාකරණය වැඩිදියුණු කිරීම සඳහා රාජ්‍ය අංශයේ නිලධාරීන් සහ අමාත්‍යාංශ කාර්ය මණ්ඩලය වෙනුවෙන් සැලසුම් කරන ලද ඉංග්‍රීසි භාෂා ප්‍රවීණතා පාඨමාලා.",
                 "description_ta": "தொழில்சார் தொடர்பாடல் மற்றும் அறிக்கை தயாரிப்பை மேம்படுத்துவதற்காக பொதுத்துறை அதிகாரிகள் மற்றும் பணியாளர்களுக்காக வடிவமைக்கப்பட்ட விரிவான ஆங்கிலப் பயிற்சி.",
                 "category_label_en": "Language Courses",
-                "category_label_si": "භාෂා පාඨමාලා",
-                "category_label_ta": "மொழிப் பயிற்சிகள்",
                 "published_date": "2026-01-15",
                 "application_deadline": "2026-03-31",
                 "file_type": "PDF",
-                "file_size": "1 MB",
-                "image_fallback": "/images/services/local-training.jpg",
+                "file_size": "1.2 MB",
             },
             {
-                "slug": "training-program-on-sdfl-schedule-july-2026",
+                "slug": "safety-at-sea-nautical-training-2026",
                 "order": 2,
                 "year": 2026,
-                "category": "professional-development",
-                "status": "Open",
+                "category_id": "maritime-technical",
+                "subheading_en": "Maritime Safety & Vessel Navigation",
+                "subheading_si": "මුහුදු ආරක්ෂාව සහ යාත්‍රා මෙහෙයුම්",
+                "subheading_ta": "கடல் பாதுகாப்பு மற்றும் படகு செலுத்துகை",
+                "status": "Closing Soon",
                 "featured": True,
-                "title_en": "Training Program on SDFL – Program Schedule – July 2026",
-                "title_si": "SDFL පුහුණු වැඩසටහන් කාලසටහන – ජූලි 2026",
-                "title_ta": "SDFL பயிற்சித் திட்ட அட்டவணை – ஜூலை 2026",
-                "provider_en": "Skills Development Fund Limited (SDFL)",
-                "provider_si": "කුසලතා සංවර්ධන අරමුදල (SDFL)",
-                "provider_ta": "திறன் மேம்பாட்டு நிதியம் (SDFL)",
-                "description_en": "Official annual training schedule and course catalogue offered by SDFL focusing on technical skill upgrading, vocational competency, and industrial productivity.",
-                "description_si": "තාක්ෂණික නිපුණතා, වෘත්තීය නිපුණතාව සහ කාර්මික ඵලදායිතාව ඉහළ නැංවීම කෙරෙහි අවධානය යොමු කරමින් SDFL විසින් පිරිනමනු ලබන නිල වාර්ෂික පුහුණු පාඨමාලා නාමාවලිය.",
-                "description_ta": "தொழினுட்ப திறன் மேம்பாடு மற்றும் உற்பத்தித்திறனை மையமாகக் கொண்டு SDFL வழங்கும் அதிகாரப்பூர்வ வருடாந்த பயிற்சி அட்டவணை.",
-                "category_label_en": "Professional Development",
-                "category_label_si": "වෘත්තීය සංවර්ධනය",
-                "category_label_ta": "தொழில்முறை மேம்பாடு",
+                "title_en": "Safety at Sea & Outboard Motor Maintenance",
+                "title_si": "මුහුදු ආරක්ෂාව සහ පිටත එන්ජින් නඩත්තු පුහුණුව",
+                "title_ta": "கடல் பாதுகாப்பு மற்றும் வெளிப்ப இணைப்பு எஞ்சின் பராமரிப்பு",
+                "provider_en": "NIFNE & Sri Lanka Navy Maritime Academy",
+                "provider_si": "ජාතික ධීවර හා නාවික ඉංජිනේරු ආයතනය (NIFNE)",
+                "provider_ta": "தேசிய கடற்றොழில் மற்றும் கடல்சார் பொறியியல் நிறுவனம்",
+                "description_en": "Practical marine safety certification covering sea survival, GPS navigation, emergency distress signaling, and engine troubleshooting for multiday fishermen.",
+                "description_si": "බහුදින ධීවරයන් සඳහා මුහුදේ ජීවිත ආරක්ෂාව, GPS නාවික පද්ධති සහ එන්ජින් අලුත්වැඩියාව පිළිබඳ ප්‍රායෝගික තාක්ෂණික සහතික පත්‍ර පාඨමාලාව.",
+                "description_ta": "பலநாள் மீன்பிடி தொழிலாளர்களுக்கான கடல் வாழ்வாங்கு பாதுகாப்பு, ஜிபிஎஸ் வழிகாட்டுதல் மற்றும் எஞ்சின் பழுதுபார்ப்பு பயிற்சி.",
+                "category_label_en": "Maritime & Safety",
                 "published_date": "2026-02-01",
-                "application_deadline": "2026-06-30",
-                "file_type": "PDF",
-                "file_size": "178 KB",
-                "image_fallback": "/images/services/foreign-training.jpg",
-            },
-            {
-                "slug": "mba-program-open-university-sri-lanka",
-                "order": 3,
-                "year": 2026,
-                "category": "management",
-                "status": "Open",
-                "featured": True,
-                "title_en": "Master of Business Administration Program – The Open University of Sri Lanka",
-                "title_si": "ව්‍යාපාර පරිපාලනපති (MBA) උපාධි වැඩසටහන – ශ්‍රී ලංකා විවෘත විශ්වවිද්‍යාලය",
-                "title_ta": "வணிக முகாமைத்துவ முதுமாணி (MBA) திட்டம் – இலங்கை திறந்த பல்கலைக்கழகம்",
-                "provider_en": "The Open University of Sri Lanka (OUSL)",
-                "provider_si": "ශ්‍රී ලංකා විවෘත විශ්වවිද්‍යාලය (OUSL)",
-                "provider_ta": "இலங்கை திறந்த பல்கலைக்கழகம் (OUSL)",
-                "description_en": "Postgraduate MBA degree programme intake notice for executive public officers seeking advanced managerial, strategic planning, and organizational leadership skills.",
-                "description_si": "උසස් කළමනාකරණ, උපායමාර්ගික සැලසුම් සහ ආයතනික නායකත්ව කුසලතා අපේක්ෂා කරන විධායක රාජ්‍ය නිලධාරීන් සඳහා වන පශ්චාද් උපාධි MBA වැඩසටහන.",
-                "description_ta": "உயர் முகாமைத்துவம் மற்றும் தலைமைத்துவ திறன்களை நாடும் நிறைவேற்று அதிகாரிகளுக்கான முதுகலை MBA பட்டப்படிப்பு.",
-                "category_label_en": "Management",
-                "category_label_si": "කළමනාකරණය",
-                "category_label_ta": "முகாமைத்துவம்",
-                "published_date": "2026-01-20",
                 "application_deadline": "2026-04-15",
                 "file_type": "PDF",
-                "file_size": "794 KB",
-                "image_fallback": "/images/services/recruitment.jpg",
+                "file_size": "850 KB",
             },
             {
-                "slug": "contract-administration-payment-procedures",
-                "order": 4,
+                "slug": "aquaculture-hatchery-management-2026",
+                "order": 3,
                 "year": 2026,
-                "category": "procurement",
+                "category_id": "aquaculture-vocational",
+                "subheading_en": "Coastal Aquaculture & Hatchery Operations",
+                "subheading_si": "වෙරළබඩ ජලජීවී වගාව සහ පැටවුන් බිහි කිරීම",
+                "subheading_ta": "கடலோர நீர்வாழ் உயிரின வளர்ப்பு மற்றும் விதைப் பண்ணை",
                 "status": "Open",
                 "featured": True,
-                "title_en": "Contract Administration and Payment Procedures",
-                "title_si": "කොන්ත්‍රාත් පරිපාලනය සහ ගෙවීම් පටිපාටි පුහුණුව",
-                "title_ta": "ஒப்பந்த நிர்வாகம் மற்றும் கொடுப்பனவு நடைமுறைகள்",
-                "provider_en": "National Institute of Business Management (NIBM)",
-                "provider_si": "ජාතික ව්‍යාපාර කළමනාකාරීත්ව ආයතනය (NIBM)",
-                "provider_ta": "தேசிய வணிக முகாமைத்துவ நிறுவனம் (NIBM)",
-                "description_en": "Specialized workshop covering public contract management, contractor dispute resolution, milestone verification, and government payment clearance protocols.",
-                "description_si": "රාජ්‍ය කොන්ත්‍රාත් කළමනාකරණය, කොන්ත්‍රාත්කරු ආරවුල් නිරාකරණය සහ රජයේ ගෙවීම් නිෂ්කාශන ප්‍රොටෝකෝල පිළිබඳ විශේෂ පුහුණු වැඩමුළුව.",
-                "description_ta": "அரசு ஒப்பந்த முகாமைத்துவம், கொடுப்பனவு நடைமுறைகள் மற்றும் ஒப்பந்த பிணக்கு தீர்வு குறித்த சிறப்பு செயலமர்வு.",
-                "category_label_en": "Procurement",
-                "category_label_si": "ප්‍රසම්පාදනය",
-                "category_label_ta": "கொள்முதல்",
+                "title_en": "Commercial Shrimp & Sea Cucumber Farming",
+                "title_si": "වාණිජ ඉස්සන් සහ මුහුදු කූඩැල්ලන් වගා තාක්ෂණය",
+                "title_ta": "வணிக ரீதியான இறால் மற்றும் கடல் அட்டை வளர்ப்பு தொழினுட்பம்",
+                "provider_en": "NAQDA Training Centre - Tangalle & Chilaw",
+                "provider_si": "ජාතික ජලජීවී වගා සංවර්ධන අධිකාරිය (NAQDA)",
+                "provider_ta": "தேசிய நீர்வாழ் உயிரின வளர்ப்பு அபிவிருத்தி அதிகாரசபை",
+                "description_en": "Specialized vocational course on water quality management, disease control, sustainable feeding protocols, and export quality harvesting.",
+                "description_si": "ජල තත්ත්ව පාලනය, රෝග පාලනය, තිරසාර පෝෂණ ක්‍රමවේද සහ අපනයන මට්ටමේ අස්වනු නෙලීම පිළිබඳ විශේෂඥ පුහුණුව.",
+                "description_ta": "நீர்த் தர மேலாண்மை, நோய் கட்டுப்பாடு மற்றும் ஏற்றுமதித் தர அறுவடை குறித்த விசேட தொழினுட்பப் பயிற்சி.",
+                "category_label_en": "Aquaculture & Farming",
                 "published_date": "2026-02-10",
-                "application_deadline": "2026-03-25",
-                "file_type": "PDF",
-                "file_size": "891 KB",
-                "image_fallback": "/images/services/tenders.jpg",
-            },
-            {
-                "slug": "ict-skills-digital-governance-fisheries",
-                "order": 5,
-                "year": 2026,
-                "category": "technology",
-                "status": "Open",
-                "featured": False,
-                "title_en": "ICT Skills for Digital Governance in Fisheries",
-                "title_si": "ධීවර ක්ෂේත්‍රයේ ඩිජිටල් පාලනය සඳහා තොරතුරු තාක්ෂණ කුසලතා",
-                "title_ta": "கடற்றொழிலில் டிஜிட்டல் நிர்வாகத்திற்கான தகவல் தொழினுட்ப திறன்",
-                "provider_en": "Information and Communication Technology Agency (ICTA)",
-                "provider_si": "තොරතුරු හා සන්නිවේදන තාක්ෂණ නියෝජිතායතනය (ICTA)",
-                "provider_ta": "தகவல் மற்றும் தொடர்பாடல் தொழினுட்ப முகவரகம் (ICTA)",
-                "description_en": "Hands-on computer training on modern digital services, VMS monitoring software, online licensing portals, and cloud data tools for Ministry staff.",
-                "description_si": "නවීන ඩිජිටල් සේවා, VMS යාත්‍රා නිරීක්ෂණ මෘදුකාංග සහ මාර්ගගත බලපත්‍ර පද්ධති පිළිබඳ අමාත්‍යාංශ කාර්ය මණ්ඩලය සඳහා ප්‍රායෝගික පරිගණක පුහුණුව.",
-                "description_ta": "டிஜிட்டல் சேவைகள், VMS கண்காணிப்பு மென்பொருள் மற்றும் இணைய அனுமதிப்பத்திர தளங்கள் பற்றிய அமைச்சு ஊழியர்களுக்கான தொழினுட்பப் பயிற்சி.",
-                "category_label_en": "Technology & Digital Skills",
-                "category_label_si": "තොරතුරු තාක්ෂණය",
-                "category_label_ta": "தொழினுட்பம்",
-                "published_date": "2026-02-05",
                 "application_deadline": "2026-04-30",
                 "file_type": "PDF",
-                "file_size": "450 KB",
-                "image_fallback": "/images/services/weather.jpg",
-            },
-            {
-                "slug": "public-financial-regulations-audit-compliance",
-                "order": 6,
-                "year": 2026,
-                "category": "finance",
-                "status": "Open",
-                "featured": False,
-                "title_en": "Public Financial Regulations and Audit Compliance",
-                "title_si": "රාජ්‍ය මූල්‍ය රෙගුලාසි සහ විගණන අනුකූලතා වැඩමුළුව",
-                "title_ta": "அரச நிதி ஒழுங்குவிதிகள் மற்றும் கணக்காய்வு இணக்கப்பாடு",
-                "provider_en": "Sri Lanka Institute of Development Administration (SLIDA)",
-                "provider_si": "ශ්‍රී ලංකා සංවර්ධන පරිපාලන ආයතනය (SLIDA)",
-                "provider_ta": "இலங்கை அபிவிருத்தி நிர்வாக நிறுவனம் (SLIDA)",
-                "description_en": "Comprehensive study of government FR guidelines, expenditure verification, voucher approval systems, and preparation for national audit queries.",
-                "description_si": "රජයේ මූල්‍ය රෙගුලාසි (FR) මාර්ගෝපදේශ, වියදම් සත්‍යාපනය සහ ජාතික විගණන විමසීම් සඳහා සූදානම් වීම පිළිබඳ පුළුල් අධ්‍යයනයක්.",
-                "description_ta": "அரசாங்க நிதி ஒழுங்குவிதிகள், செலவு சரிபார்ப்பு மற்றும் தேசிய கணக்காய்வுக்கான தயாரிப்பு பற்றிய விரிவான பயிற்சி.",
-                "category_label_en": "Finance & Accounting",
-                "category_label_si": "මූල්‍ය හා ගිණුම්කරණය",
-                "category_label_ta": "நிதி மற்றும் கணக்கியல்",
-                "published_date": "2026-01-28",
-                "application_deadline": "2026-03-20",
-                "file_type": "PDF",
-                "file_size": "620 KB",
-                "image_fallback": "/images/services/services.jpg",
-            },
-            {
-                "slug": "sustainable-aquaculture-hatchery-management-2025",
-                "order": 7,
-                "year": 2025,
-                "category": "professional-development",
-                "status": "Closed",
-                "featured": False,
-                "title_en": "Sustainable Aquaculture & Hatchery Management 2025",
-                "title_si": "තිරසාර ජලජීවී වගාව සහ බීජෞෂණාගාර කළමනාකරණය 2025",
-                "title_ta": "நிலையான நீர்வாழ் உயிரின வளர்ப்பு மற்றும் குஞ்சுபொரிப்பக முகாமைத்துவம் 2025",
-                "provider_en": "National Aquaculture Development Authority (NAQDA)",
-                "provider_si": "ජාතික ජලජීවී වගා සංවර්ධන අධිකාරිය (NAQDA)",
-                "provider_ta": "தேசிய நீர்வாழ் உயிரின வளர்ப்பு அபிவிருத்தி அதிகாரசபை (NAQDA)",
-                "description_en": "Field certification course covering seed production, water quality management, feed formulation, and biosecurity for freshwater and coastal hatcheries.",
-                "description_si": "මිරිදිය සහ වෙරළබඩ බීජෞෂණාගාර සඳහා මත්ස්‍ය බීජ නිෂ්පාදනය, ජල තත්ත්ව කළමනාකරණය සහ ජෛව ආරක්ෂාව පිළිබඳ ක්ෂේත්‍ර සහතිකපත්‍ර පාඨමාලාව.",
-                "description_ta": "நன்னீர் மற்றும் கரையோர குஞ்சுபொரிப்பகங்களுக்கான உற்பத்தி, நீர் தர முகாமைத்துவம் மற்றும் உயிர் பாதுகாப்பு சான்றிதழ் படிப்பு.",
-                "category_label_en": "Professional Development",
-                "category_label_si": "වෘත්තීය සංවර්ධනය",
-                "category_label_ta": "தொழில்முறை மேம்பாடு",
-                "published_date": "2025-06-10",
-                "application_deadline": "2025-08-15",
-                "file_type": "PDF",
                 "file_size": "1.4 MB",
-                "image_fallback": "/images/services/coastal.jpg",
             },
             {
-                "slug": "marine-engine-repair-navigational-safety-2025",
-                "order": 8,
-                "year": 2025,
-                "category": "professional-development",
-                "status": "Closed",
+                "slug": "procurement-financial-regulations-2026",
+                "order": 4,
+                "year": 2026,
+                "category_id": "public-administration",
+                "subheading_en": "Government Procurement & Circular Compliance",
+                "subheading_si": "රාජ්‍ය ප්‍රසම්පාදන සහ වටලේඛන අනුකූලතාවය",
+                "subheading_ta": "அரசாங்கக் கொள்முதல் மற்றும் சுற்றுநிருபங்கள்",
+                "status": "Upcoming",
                 "featured": False,
-                "title_en": "Marine Engine Repair & Navigational Safety 2025",
-                "title_si": "සාගර එන්ජින් අලුත්වැඩියාව සහ නාවික ආරක්ෂාව 2025",
-                "title_ta": "கடல் இயந்திர திருத்தம் மற்றும் வழிசெலுத்தல் பாதுகாப்பு 2025",
-                "provider_en": "Ceylon Fisheries Harbour Corporation (CFHC) & NIFTE",
-                "provider_si": "ලංකා ධීවර වරාය නීතිගත සංස්ථාව (CFHC) සහ NIFTE",
-                "provider_ta": "இலங்கை மீன்பிடித் துறைமுகக் கூட்டுத்தாபனம் (CFHC)",
-                "description_en": "Vocational training for multi-day boat technicians on diesel engine maintenance, electrical troubleshooting, and emergency GPS distress systems.",
-                "description_si": "ඩීසල් එන්ජින් නඩත්තුව, විදුලි දෝෂ නිරාකරණය සහ හදිසි GPS ආපදා පද්ධති පිළිබඳ බහුදින යාත්‍රා කාර්මික ශිල්පීන් සඳහා වෘත්තීය පුහුණුව.",
-                "description_ta": "டீசல் என்ஜின் பராமரிப்பு மற்றும் அவசரகால GPS அமைப்புகள் குறித்த படகு தொழில்நுட்பவியலாளர்களுக்கான தொழிற்பயிற்சி.",
-                "category_label_en": "Professional Development",
-                "category_label_si": "වෘත්තීය සංවර්ධනය",
-                "category_label_ta": "தொழில்முறை மேம்பாடு",
-                "published_date": "2025-04-12",
-                "application_deadline": "2025-05-30",
-                "file_type": "PDF",
-                "file_size": "850 KB",
-                "image_fallback": "/images/services/offshore.jpg",
+                "title_en": "Public Procurement & Contract Management Seminar",
+                "title_si": "රාජ්‍ය ප්‍රසම්පාදන සහ කොන්ත්‍රාත් කළමනාකරණ සම්මන්ත්‍රණය",
+                "title_ta": "பொதுக் கொள்முதல் மற்றும் ஒப்பந்த மேலாண்மை கருத்தரங்கு",
+                "provider_en": "Ministry Procurement Division & SLIDA",
+                "provider_si": "අමාත්‍යාංශ ප්‍රසම්පාදන අංශය සහ ශ්‍රී ලංකා සංවර්ධන පරිපාලන ආයතනය",
+                "provider_ta": "அமைச்சின் கொள்முதல் பிரிவு மற்றும் SLIDA",
+                "description_en": "Workshops for Ministry executives on bidding procedure guidelines, tender board evaluation standards, and financial accounting circulars.",
+                "description_si": "අමාත්‍යාංශ විධායක නිලධාරීන් සඳහා ටෙන්ඩර් පටිපාටි, ප්‍රසම්පාදන ඇගයීම් සහ මුදල් රෙගුලාසි පිළිබඳ ප්‍රායෝගික වැඩමුළුව.",
+                "description_ta": "கொள்முதல் நடைமுறைகள், கேள்விப்பத்திர மதிப்பீடு மற்றும் நிதி விதிகளுக்கான அதிகாரிகளுக்கான செயலமர்வு.",
+                "category_label_en": "Administration & Finance",
+                "published_date": "2026-03-01",
+                "application_deadline": "2026-05-15",
+                "file_type": "DOCX",
+                "file_size": "620 KB",
             },
         ]
 
         for p_data in programmes_data:
-            slug = p_data.pop("slug")
-            prog, created = LocalTrainingProgramme.objects.get_or_create(slug=slug, defaults=p_data)
-            if not created:
-                for k, v in p_data.items():
-                    setattr(prog, k, v)
-                prog.save()
+            cat_id = p_data.pop("category_id")
+            slug = p_data["slug"]
+            cat_obj = cat_map.get(cat_id)
 
-        self.stdout.write(self.style.SUCCESS("Successfully seeded Local Training data!"))
+            prog, _ = LocalTrainingProgramme.objects.get_or_create(
+                slug=slug,
+                defaults={**p_data, "category": cat_obj},
+            )
+            prog.category = cat_obj
+            for k, v in p_data.items():
+                setattr(prog, k, v)
+            prog.save()
+
+        self.stdout.write(self.style.SUCCESS("Successfully seeded Local Training categories and programmes!"))

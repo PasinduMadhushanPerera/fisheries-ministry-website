@@ -1,8 +1,16 @@
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import LocalTrainingPageHeader, LocalTrainingProgramme
-from .serializers import LocalTrainingPageHeaderSerializer, LocalTrainingProgrammeSerializer
+from .models import (
+    LocalTrainingPageHeader,
+    LocalTrainingCategory,
+    LocalTrainingProgramme,
+)
+from .serializers import (
+    LocalTrainingPageHeaderSerializer,
+    LocalTrainingCategorySerializer,
+    LocalTrainingProgrammeSerializer,
+)
 
 
 class LocalTrainingPageDataView(APIView):
@@ -21,11 +29,15 @@ class LocalTrainingPageDataView(APIView):
         header, _ = LocalTrainingPageHeader.objects.get_or_create(id=1)
         header_data = LocalTrainingPageHeaderSerializer(header, context=context).data
 
+        categories = LocalTrainingCategory.objects.filter(is_active=True).order_by("order", "id")
+        categories_data = LocalTrainingCategorySerializer(categories, many=True, context=context).data
+
         programmes = LocalTrainingProgramme.objects.filter(is_active=True).order_by("-year", "order", "-id")
         programmes_data = LocalTrainingProgrammeSerializer(programmes, many=True, context=context).data
 
         return Response({
             "language": lang,
             "header": header_data,
+            "categories": categories_data,
             "programmes": programmes_data,
         })

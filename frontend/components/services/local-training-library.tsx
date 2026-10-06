@@ -1,7 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
-import Image from "next/image"
+import { useState, useMemo } from "react"
 import {
   FileText,
   ImageIcon,
@@ -10,18 +9,30 @@ import {
   FileArchive,
   Files,
   Download,
+  ExternalLink,
   Eye,
   Building2,
   SearchX,
   GraduationCap,
   Calendar,
   Clock,
+  ChevronDown,
+  FolderOpen,
+  Globe,
+  Anchor,
+  Fish,
+  Briefcase,
+  Award,
+  ShieldCheck,
+  BookOpen,
 } from "lucide-react"
 
 import type { LocalTrainingProgramme } from "@/data/local-training-programmes"
+import type { ApiLocalTrainingCategory } from "@/lib/api/local-training"
 import { Container } from "@/components/ui/container"
 
 interface LocalTrainingLibraryProps {
+  categories?: ApiLocalTrainingCategory[]
   programmes: LocalTrainingProgramme[]
   activeYearTab: string
   setActiveYearTab: (year: string) => void
@@ -46,6 +57,27 @@ function getFileIcon(fileType: string) {
       return FileArchive
     default:
       return Files
+  }
+}
+
+function getCategoryIcon(iconType?: string) {
+  switch (iconType) {
+    case "globe":
+      return <Globe className="h-5 w-5 text-white" aria-hidden="true" />
+    case "anchor":
+      return <Anchor className="h-5 w-5 text-white" aria-hidden="true" />
+    case "fish":
+      return <Fish className="h-5 w-5 text-white" aria-hidden="true" />
+    case "briefcase":
+      return <Briefcase className="h-5 w-5 text-white" aria-hidden="true" />
+    case "award":
+      return <Award className="h-5 w-5 text-white" aria-hidden="true" />
+    case "shield-check":
+      return <ShieldCheck className="h-5 w-5 text-white" aria-hidden="true" />
+    case "book-open":
+      return <BookOpen className="h-5 w-5 text-white" aria-hidden="true" />
+    default:
+      return <GraduationCap className="h-5 w-5 text-white" aria-hidden="true" />
   }
 }
 
@@ -88,6 +120,7 @@ function getStatusBadge(status: LocalTrainingProgramme["status"]) {
 }
 
 export function LocalTrainingLibrary({
+  categories = [],
   programmes,
   activeYearTab,
   setActiveYearTab,
@@ -96,6 +129,40 @@ export function LocalTrainingLibrary({
   onSelectProgramme,
   onClearFilters,
 }: LocalTrainingLibraryProps) {
+  // Define default categories if API categories empty
+  const effectiveCategories: ApiLocalTrainingCategory[] = useMemo(() => {
+    if (categories !== undefined) return categories
+
+    // Fallback categories extracted from programmes
+    const catMap = new Map<string, string>()
+    programmes.forEach((p) => {
+      const id = p.category || "other"
+      const label = p.categoryLabel || "General Training"
+      if (!catMap.has(id)) catMap.set(id, label)
+    })
+
+    const result: ApiLocalTrainingCategory[] = []
+    let idx = 1
+    catMap.forEach((label, id) => {
+      result.push({
+        id,
+        title: label,
+        description: `Browse available courses and document files under ${label}`,
+        order: idx++,
+      })
+    })
+    return result
+  }, [categories, programmes])
+
+  // Accordion state: First category open by default
+  const [openCategory, setOpenCategory] = useState<string | null>(
+    effectiveCategories[0]?.id || null
+  )
+
+  const toggleCategory = (catId: string) => {
+    setOpenCategory((prev) => (prev === catId ? null : catId))
+  }
+
   const availableYears = useMemo(() => {
     const yearsSet = new Set<string>(["2026", "2025", "2024"])
     if (programmes) {
@@ -106,8 +173,143 @@ export function LocalTrainingLibrary({
     return Array.from(yearsSet).sort((a, b) => Number(b) - Number(a))
   }, [programmes])
 
+  // Group items by Category
+  const groupedSections = useMemo(() => {
+    return effectiveCategories.map((cat) => {
+      const items = programmes.filter(
+        (p) => p.category === cat.id || p.categoryLabel === cat.title
+      )
+      return {
+        ...cat,
+        items,
+      }
+    })
+  }, [effectiveCategories, programmes])
+
+  function renderGroupedItems(itemsList: LocalTrainingProgramme[]) {
+    const subMap = new Map<string, LocalTrainingProgramme[]>()
+    itemsList.forEach((item) => {
+      const sub = item.subheading ? item.subheading.trim() : ""
+      if (!subMap.has(sub)) subMap.set(sub, [])
+      subMap.get(sub)!.push(item)
+    })
+
+    const groups = Array.from(subMap.entries())
+
+    return groups.map(([subheading, items], gIdx) => (
+      <div
+        key={subheading || `group-${gIdx}`}
+        className={gIdx > 0 ? "mt-4 pt-2 border-t border-slate-200/80" : ""}
+      >
+        {/* Topic / Sub-heading Ribbon */}
+        {subheading && (
+          <div className="flex items-center gap-2 px-5 py-2.5 bg-emerald-50/80 border-l-4 border-l-[#256B29] rounded-r-xl mb-3 mx-4 mt-3">
+            <FolderOpen className="h-4 w-4 text-[#256B29]" aria-hidden="true" />
+            <span className="text-xs font-black uppercase tracking-wider text-[#150c39]">
+              {subheading}
+            </span>
+            <span className="ml-auto text-[11px] font-bold text-[#256B29] bg-white px-2.5 py-0.5 rounded-full border border-emerald-200 shadow-2xs">
+              {items.length} {items.length === 1 ? "file" : "files"}
+            </span>
+          </div>
+        )}
+
+        {/* Course File Rows matching RTI item layout */}
+        <div className="divide-y divide-slate-100">
+          {items.map((programme) => {
+            const FileIcon = getFileIcon(programme.fileType)
+            const targetUrl = programme.downloadUrl || programme.fileUrl || "#"
+
+            return (
+              <div
+                key={programme.id}
+                className="group flex flex-col md:flex-row md:items-center justify-between p-4 sm:p-5 transition-colors hover:bg-slate-50/80 gap-4"
+              >
+                {/* Left: Format Icon & Details */}
+                <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 group-hover:bg-white group-hover:shadow-2xs transition-all">
+                    <FileIcon className="h-5 w-5 text-[#256B29]" aria-hidden="true" />
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#256B29] transition-colors">
+                        {programme.title}
+                      </h4>
+                      {getStatusBadge(programme.status)}
+                      {programme.featured && (
+                        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
+                          Featured
+                        </span>
+                      )}
+                    </div>
+
+                    {programme.provider && (
+                      <div className="flex items-center gap-1.5 mt-1 text-xs font-medium text-slate-600">
+                        <Building2 className="h-3.5 w-3.5 text-[#256B29] shrink-0" />
+                        <span>{programme.provider}</span>
+                      </div>
+                    )}
+
+                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 font-medium">
+                      <span className="font-bold text-slate-700">Format: {programme.fileType}</span>
+                      <span>•</span>
+                      <span>Size: {programme.fileSize}</span>
+                      <span>•</span>
+                      <span>Year: {programme.year}</span>
+                      {programme.applicationDeadline && (
+                        <>
+                          <span>•</span>
+                          <span className="font-semibold text-amber-700">Deadline: {programme.applicationDeadline}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Action Buttons (Details, Open, Download) matching RTI */}
+                <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                  <button
+                    type="button"
+                    onClick={() => onSelectProgramme(programme)}
+                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50 cursor-pointer shadow-2xs"
+                    title="View details"
+                  >
+                    <Eye className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
+                    <span>Details</span>
+                  </button>
+
+                  <a
+                    href={targetUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50 shadow-2xs"
+                    title="Open file in new tab"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
+                    <span>Open</span>
+                  </a>
+
+                  <a
+                    href={targetUrl}
+                    download
+                    className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#388E3C] px-3.5 text-xs font-bold text-white transition hover:bg-[#256B29] shadow-2xs cursor-pointer"
+                    title="Download file"
+                  >
+                    <Download className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>Download</span>
+                  </a>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    ))
+  }
+
   return (
-    <section aria-label="Training programme library" className="bg-white py-12 sm:py-16">
+    <section aria-label="Training programme library" className="bg-slate-50 py-12 sm:py-16 border-b border-slate-200">
       <Container>
         {/* Header & Year Dropdown */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-6 mb-8">
@@ -131,7 +333,7 @@ export function LocalTrainingLibrary({
               id="library-year-select"
               value={activeYearTab}
               onChange={(e) => setActiveYearTab(e.target.value)}
-              className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-xs font-extrabold text-slate-900 focus:border-[#256B29] focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-100 transition-all cursor-pointer shadow-2xs"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-extrabold text-slate-900 focus:border-[#256B29] focus:outline-none focus:ring-4 focus:ring-emerald-100 transition-all cursor-pointer shadow-2xs"
             >
               <option value="All">All Years</option>
               {availableYears.map((yr) => (
@@ -143,99 +345,8 @@ export function LocalTrainingLibrary({
           </div>
         </div>
 
-        {/* Card Grid */}
-        {programmes.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {programmes.map((programme) => {
-              const FileIcon = getFileIcon(programme.fileType)
-              const cardImage = programme.image || "/images/services/local-training.jpg"
-
-              return (
-                <article
-                  key={programme.id}
-                  className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xs transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1"
-                >
-                  {/* Image Header */}
-                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-to-br from-[#041c22] to-[#0c4e48] text-white">
-                    <Image
-                      src={cardImage}
-                      alt={programme.title}
-                      fill
-                      unoptimized
-                      className="object-cover transition-transform duration-500 group-hover:scale-105 opacity-85"
-                    />
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
-
-                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between text-white">
-                      {getStatusBadge(programme.status)}
-
-                      <span className="rounded-md bg-black/50 border border-white/20 px-2 py-0.5 text-[11px] font-mono font-bold text-emerald-300 backdrop-blur-xs">
-                        {programme.year}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Content Body */}
-                  <div className="p-6 flex flex-1 flex-col justify-between space-y-4">
-                    <div>
-                      {/* Category & File Info Badges */}
-                      <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <span className="rounded-md bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-[11px] font-extrabold text-[#256B29]">
-                          {programme.categoryLabel}
-                        </span>
-
-                        <div className="flex items-center gap-1 text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200/80">
-                          <FileIcon className="h-3 w-3 text-[#256B29]" />
-                          <span>{programme.fileType} • {programme.fileSize}</span>
-                        </div>
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-base font-extrabold text-slate-900 leading-snug group-hover:text-[#256B29] transition-colors line-clamp-2">
-                        {programme.title}
-                      </h3>
-
-                      {/* Provider */}
-                      <div className="flex items-center gap-1.5 mt-2 text-xs font-bold text-slate-700">
-                        <Building2 className="h-3.5 w-3.5 text-[#256B29] shrink-0" />
-                        <span className="line-clamp-1">{programme.provider}</span>
-                      </div>
-
-                      {/* Description - Justified Text */}
-                      <p className="mt-2 text-xs text-slate-600 leading-relaxed text-justify line-clamp-3 font-normal">
-                        {programme.description}
-                      </p>
-                    </div>
-
-                    {/* View Details & Download Buttons */}
-                    <div className="border-t border-slate-100 pt-4 flex items-center justify-between gap-3">
-                      <button
-                        type="button"
-                        onClick={() => onSelectProgramme(programme)}
-                        className="inline-flex min-h-[38px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#256B29] px-4 text-xs font-extrabold text-white hover:bg-[#1b4d1d] transition shadow-2xs cursor-pointer"
-                      >
-                        <Eye className="h-3.5 w-3.5" />
-                        <span>View details</span>
-                      </button>
-
-                      <a
-                        href={programme.downloadUrl}
-                        download
-                        className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-                        title="Download file"
-                      >
-                        <Download className="h-3.5 w-3.5 text-[#256B29]" />
-                        <span>Download</span>
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              )
-            })}
-          </div>
-        ) : (
-          /* Empty State */
+        {/* Empty State */}
+        {programmes.length === 0 ? (
           <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center my-6">
             <SearchX className="mx-auto h-12 w-12 text-slate-400" aria-hidden="true" />
             <h3 className="mt-4 text-lg font-bold text-slate-900">No training programmes found</h3>
@@ -251,6 +362,86 @@ export function LocalTrainingLibrary({
                 Clear all filters
               </button>
             </div>
+          </div>
+        ) : (
+          /* Accordion Category Sections matching RTI layout */
+          <div className="space-y-4">
+            {groupedSections.map((category) => {
+              const isOpen = openCategory === category.id
+
+              return (
+                <div
+                  key={category.id}
+                  className={`overflow-hidden rounded-2xl border transition-all duration-200 ${
+                    isOpen
+                      ? "border-emerald-300 bg-white shadow-md ring-1 ring-emerald-400/30"
+                      : "border-slate-300/80 bg-white shadow-2xs hover:border-emerald-300/70"
+                  }`}
+                >
+                  {/* Category Header Bar (Accordion Trigger) */}
+                  <button
+                    type="button"
+                    onClick={() => toggleCategory(category.id)}
+                    aria-expanded={isOpen}
+                    className={`w-full flex items-center justify-between p-5 text-left transition-all duration-200 cursor-pointer border-b ${
+                      isOpen
+                        ? "bg-gradient-to-r from-emerald-100/80 via-emerald-50/90 to-teal-50/70 border-emerald-200"
+                        : "bg-gradient-to-r from-slate-100 via-slate-50 to-emerald-50/40 hover:from-emerald-50/80 hover:to-slate-100 border-slate-200/80"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#150c39] text-white shadow-xs">
+                        {getCategoryIcon(category.icon_type)}
+                      </div>
+                      <div className="min-w-0 pr-2">
+                        <h3 className="text-base sm:text-lg font-extrabold text-slate-900 truncate">
+                          {category.title}
+                        </h3>
+                        {category.description && (
+                          <p className="text-xs text-slate-600 truncate hidden sm:block mt-0.5">
+                            {category.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span
+                        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold border shadow-2xs ${
+                          isOpen
+                            ? "bg-white text-[#1b5e20] border-emerald-300"
+                            : "bg-white text-slate-700 border-slate-200"
+                        }`}
+                      >
+                        {category.items.length} {category.items.length === 1 ? "course" : "courses"}
+                      </span>
+                      <div
+                        className={`flex h-8 w-8 items-center justify-center rounded-full border shadow-2xs transition-transform duration-200 ${
+                          isOpen
+                            ? "rotate-180 bg-white text-[#256B29] border-emerald-300"
+                            : "bg-white text-slate-600 border-slate-200"
+                        }`}
+                      >
+                        <ChevronDown className="h-4 w-4" aria-hidden="true" />
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Accordion Content (Grouped by Topic / Sub-heading) */}
+                  {isOpen && (
+                    <div className="divide-y divide-slate-100">
+                      {category.items.length === 0 ? (
+                        <div className="p-8 text-center text-xs text-slate-500">
+                          No active courses currently listed under this category.
+                        </div>
+                      ) : (
+                        renderGroupedItems(category.items)
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </Container>

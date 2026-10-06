@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react"
 import { LocalTrainingHero } from "@/components/services/local-training-hero"
 import { LocalTrainingToolbar } from "@/components/services/local-training-toolbar"
-import { LocalTrainingFeatured } from "@/components/services/local-training-featured"
 import { LocalTrainingLibrary } from "@/components/services/local-training-library"
 import { LocalTrainingPreview } from "@/components/services/local-training-preview"
 import { localTrainingProgrammes as defaultLocalProgrammes, type LocalTrainingProgramme } from "@/data/local-training-programmes"
@@ -42,7 +41,8 @@ export function LocalTrainingPageContent({ initialData }: LocalTrainingPageConte
 
   // Map API programmes or fallback to static list
   const programmesList: LocalTrainingProgramme[] = useMemo(() => {
-    if (initialData?.programmes && initialData.programmes.length > 0) {
+    if (initialData !== undefined && initialData !== null) {
+      if (!initialData.programmes) return []
       return initialData.programmes.map((p) => ({
         id: p.slug || String(p.id),
         year: p.year,
@@ -51,6 +51,7 @@ export function LocalTrainingPageContent({ initialData }: LocalTrainingPageConte
         description: p.description,
         category: p.category as any,
         categoryLabel: p.category_label,
+        subheading: p.subheading,
         publishedDate: p.published_date,
         applicationDeadline: p.application_deadline,
         fileType: (p.file_type as any) || "PDF",
@@ -145,15 +146,11 @@ export function LocalTrainingPageContent({ initialData }: LocalTrainingPageConte
         programmes={programmesList}
       />
 
-      {/* 3. Featured Opportunities */}
-      <LocalTrainingFeatured
-        programmes={filteredProgrammes}
-        featuredBadge={initialData?.header?.featured_badge}
-        onSelectProgramme={(prog) => setSelectedProgramme(prog)}
-      />
+
 
       {/* 4. Training Programme Library */}
       <LocalTrainingLibrary
+        categories={initialData?.categories}
         programmes={filteredProgrammes}
         activeYearTab={selectedYear}
         setActiveYearTab={setSelectedYear}

@@ -123,10 +123,10 @@ function LeadershipCardComponent({
         <div className="mt-6 pt-4 border-t border-slate-100">
           <Link
             href={leader.href}
-            className="inline-flex w-full items-center justify-between rounded-xl border border-[#256B29]/25 bg-emerald-50/60 px-4 py-2.5 text-sm font-bold text-[#256B29] transition-all duration-200 hover:bg-[#256B29] hover:text-white hover:border-[#256B29] hover:shadow-sm group/btn"
+            className="inline-flex w-full items-center justify-between rounded-xl border border-[#256B29]/25 bg-emerald-50/60 px-4 py-2.5 text-sm font-bold text-[#256B29] transition-all duration-200 hover:bg-[#256B29] hover:text-white group-hover:bg-[#256B29] group-hover:text-white hover:border-[#256B29] group-hover:border-[#256B29] hover:shadow-sm group/btn"
           >
-            <span>View leadership profile</span>
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#256B29]/15 text-[#256B29] group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors">
+            <span className="transition-colors group-hover:text-white group-hover/btn:text-white">View leadership profile</span>
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#256B29]/15 text-[#256B29] group-hover:bg-white/20 group-hover:text-white group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors">
               <ArrowRight
                 aria-hidden="true"
                 className="h-3.5 w-3.5 transition-transform duration-200 group-hover/btn:translate-x-0.5"

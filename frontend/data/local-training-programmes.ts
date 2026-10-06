@@ -14,6 +14,7 @@ export type LocalTrainingProgramme = {
     | "management"
     | "other"
   categoryLabel: string
+  subheading?: string
   publishedDate?: string
   applicationDeadline?: string
   fileType: "PDF" | "JPG" | "PNG" | "DOCX" | "XLSX" | "ZIP"

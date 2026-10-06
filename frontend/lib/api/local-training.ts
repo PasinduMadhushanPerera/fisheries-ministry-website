@@ -7,6 +7,14 @@ export interface ApiLocalTrainingHeader {
   library_title?: string
 }
 
+export interface ApiLocalTrainingCategory {
+  id: string
+  title: string
+  description?: string
+  icon_type?: string
+  order: number
+}
+
 export interface ApiLocalTrainingProgramme {
   id: number | string
   slug: string
@@ -14,6 +22,7 @@ export interface ApiLocalTrainingProgramme {
   year: number
   category: string
   category_label: string
+  subheading?: string
   status: "Open" | "Closing Soon" | "Closed" | "Upcoming" | "Archived"
   featured: boolean
   title: string
@@ -30,6 +39,7 @@ export interface ApiLocalTrainingProgramme {
 export interface ApiLocalTrainingPageData {
   language: string
   header: ApiLocalTrainingHeader
+  categories?: ApiLocalTrainingCategory[]
   programmes: ApiLocalTrainingProgramme[]
 }
 
@@ -50,7 +60,6 @@ export async function fetchLocalTrainingPageData(
       return null
     }
     const data = await res.json()
-    console.log(`[API Success] local-training endpoint returned ${data?.programmes?.length} items`)
     return data
   } catch (error) {
     console.error("Error fetching Local Training page data:", error)
