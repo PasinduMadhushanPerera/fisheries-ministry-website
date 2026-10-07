@@ -241,13 +241,14 @@ class LocalTrainingProgramme(TimeStampedModel):
         # 2. Auto-calculate file size & file type from uploaded document file if uploaded
         doc_file = self.document_file_en or self.document_file_si or self.document_file_ta
         if doc_file:
-            try:
-                if hasattr(doc_file, "size") and doc_file.size:
-                    calc_size = format_file_size(doc_file.size)
-                    if calc_size:
-                        self.file_size = calc_size
-            except Exception:
-                pass
+            if not self.file_size or not str(self.file_size).strip():
+                try:
+                    if hasattr(doc_file, "size") and doc_file.size:
+                        calc_size = format_file_size(doc_file.size)
+                        if calc_size:
+                            self.file_size = calc_size
+                except Exception:
+                    pass
 
             try:
                 file_name = getattr(doc_file, "name", "")

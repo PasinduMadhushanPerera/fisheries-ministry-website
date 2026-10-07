@@ -7,6 +7,14 @@ export interface ApiForeignTrainingHeader {
   library_title?: string
 }
 
+export interface ApiForeignTrainingCategory {
+  id: string
+  title: string
+  description?: string
+  icon_type?: string
+  order: number
+}
+
 export interface ApiForeignTrainingProgramme {
   id: number | string
   slug: string
@@ -15,6 +23,7 @@ export interface ApiForeignTrainingProgramme {
   country: string
   category: string
   category_label: string
+  subheading?: string
   status: "Open" | "Closing Soon" | "Closed" | "Upcoming" | "Archived"
   featured: boolean
   title: string
@@ -31,6 +40,7 @@ export interface ApiForeignTrainingProgramme {
 export interface ApiForeignTrainingPageData {
   language: string
   header: ApiForeignTrainingHeader
+  categories?: ApiForeignTrainingCategory[]
   programmes: ApiForeignTrainingProgramme[]
 }
 

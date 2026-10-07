@@ -1,8 +1,14 @@
 from rest_framework import serializers
-from .models import ForeignTrainingPageHeader, ForeignTrainingProgramme
+from .models import (
+    ForeignTrainingPageHeader,
+    ForeignTrainingCategory,
+    ForeignTrainingProgramme,
+)
 
 
 def resolve_lang(obj, field_base: str, context: dict) -> str:
+    if not obj:
+        return ""
     lang = context.get("lang", "en")
     if lang in ["si", "ta"]:
         val = getattr(obj, f"{field_base}_{lang}", None)
@@ -38,11 +44,26 @@ class ForeignTrainingPageHeaderSerializer(serializers.ModelSerializer):
     def get_library_title(self, obj): return resolve_lang(obj, "library_title", self.context)
 
 
+class ForeignTrainingCategorySerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source="category_id")
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ForeignTrainingCategory
+        fields = ["id", "title", "description", "icon_type", "order"]
+
+    def get_title(self, obj): return resolve_lang(obj, "title", self.context)
+    def get_description(self, obj): return resolve_lang(obj, "description", self.context)
+
+
 class ForeignTrainingProgrammeSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
+    subheading = serializers.SerializerMethodField()
     country = serializers.SerializerMethodField()
     institution = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()
     category_label = serializers.SerializerMethodField()
     image_url = serializers.SerializerMethodField()
     download_url = serializers.SerializerMethodField()
@@ -57,6 +78,7 @@ class ForeignTrainingProgrammeSerializer(serializers.ModelSerializer):
             "country",
             "category",
             "category_label",
+            "subheading",
             "status",
             "featured",
             "title",
@@ -71,12 +93,21 @@ class ForeignTrainingProgrammeSerializer(serializers.ModelSerializer):
         ]
 
     def get_title(self, obj): return resolve_lang(obj, "title", self.context)
+    def get_subheading(self, obj): return resolve_lang(obj, "subheading", self.context)
     def get_country(self, obj): return resolve_lang(obj, "country", self.context)
     def get_institution(self, obj): return resolve_lang(obj, "institution", self.context)
     def get_description(self, obj): return resolve_lang(obj, "description", self.context)
+
+    def get_category(self, obj):
+        if obj.category:
+            return obj.category.category_id
+        return "other"
+
     def get_category_label(self, obj):
-        display_name = obj.get_category_display()
-        clean_display = display_name.split(" ", 1)[1] if (" " in display_name and not display_name[0].isalnum()) else display_name
+        if obj.category:
+            cat_title = resolve_lang(obj.category, "title", self.context)
+            if cat_title:
+                return cat_title
 
         lang = self.context.get("lang", "en")
         if lang in ["si", "ta"]:
@@ -86,15 +117,9 @@ class ForeignTrainingProgrammeSerializer(serializers.ModelSerializer):
 
         val_en = getattr(obj, "category_label_en", None)
         if val_en and str(val_en).strip():
-            from .models import CATEGORY_CHOICES
-            standard_labels = {choice[1] for choice in CATEGORY_CHOICES}
-            standard_labels_clean = {c.split(" ", 1)[1] if (" " in c and not c[0].isalnum()) else c for c in standard_labels}
-            all_standard = standard_labels | standard_labels_clean
+            return str(val_en).strip()
 
-            if val_en not in all_standard or val_en in [display_name, clean_display]:
-                return str(val_en).strip()
-
-        return clean_display
+        return "Overseas Fellowships"
 
     def get_image_url(self, obj):
         if obj.image:
@@ -103,7 +128,24 @@ class ForeignTrainingProgrammeSerializer(serializers.ModelSerializer):
         return obj.image_fallback or "/images/services/foreign-training.jpg"
 
     def get_download_url(self, obj):
-        if obj.document_file:
-            request = self.context.get("request")
-            return request.build_absolute_uri(obj.document_file.url) if request else obj.document_file.url
+        request = self.context.get("request")
+        lang = self.context.get("lang", "en")
+
+        doc_file = None
+        if lang == "si" and obj.document_file_si:
+            doc_file = obj.document_file_si
+        elif lang == "ta" and obj.document_file_ta:
+            doc_file = obj.document_file_ta
+        elif obj.document_file_en:
+            doc_file = obj.document_file_en
+        elif obj.document_file:
+            doc_file = obj.document_file
+        elif obj.document_file_si:
+            doc_file = obj.document_file_si
+        elif obj.document_file_ta:
+            doc_file = obj.document_file_ta
+
+        if doc_file:
+            return request.build_absolute_uri(doc_file.url) if request else doc_file.url
+
         return obj.file_url or "#"

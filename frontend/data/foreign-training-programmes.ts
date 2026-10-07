@@ -13,6 +13,7 @@ export type ForeignTrainingProgramme = {
     | "blue-economy"
     | "other"
   categoryLabel: string
+  subheading?: string
   publishedDate?: string
   applicationDeadline?: string
   fileType: "PDF" | "DOCX" | "XLSX" | "JPG" | "PNG" | "ZIP"

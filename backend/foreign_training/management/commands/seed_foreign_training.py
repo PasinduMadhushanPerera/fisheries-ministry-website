@@ -1,12 +1,16 @@
 from django.core.management.base import BaseCommand
-from foreign_training.models import ForeignTrainingPageHeader, ForeignTrainingProgramme
+from foreign_training.models import (
+    ForeignTrainingPageHeader,
+    ForeignTrainingCategory,
+    ForeignTrainingProgramme,
+)
 
 
 class Command(BaseCommand):
     help = "Seed rich multilingual data for Foreign Training & Overseas Fellowships"
 
     def handle(self, *args, **options):
-        self.stdout.write("Seeding Foreign Training page and programmes...")
+        self.stdout.write("Seeding Foreign Training categories, page header, and programmes...")
 
         # 1. Page Header
         hdr, _ = ForeignTrainingPageHeader.objects.get_or_create(id=1)
@@ -35,18 +39,89 @@ class Command(BaseCommand):
         hdr.library_title_ta = "வெளிநாட்டுப் பயிற்சி மற்றும் புலமைப்பரிசில் நூலகம்"
         hdr.save()
 
-        # 2. Programmes Data
+        # 2. Categories Data
+        categories_data = [
+            {
+                "category_id": "scholarships",
+                "order": 1,
+                "icon_type": "graduation-cap",
+                "title_en": "Scholarships & Fellowships",
+                "title_si": "ශිෂ්‍යත්ව සහ අධිශිෂ්‍යත්ව",
+                "title_ta": "புலமைப்பரிசில்கள் மற்றும் ஆய்வுப் பயிற்சிகள்",
+                "description_en": "Post-graduate degree scholarships and fully-funded research fellowships abroad.",
+                "description_si": "විදේශීය පශ්චාත් උපාධි ශිෂ්‍යත්ව සහ පූර්ණ අරමුදල් සහිත පර්යේෂණ අධිශිෂ්‍යත්ව වැඩසටහන්.",
+                "description_ta": "வெளிநாட்டு முதுகலை புலமைப்பரிசில்கள் மற்றும் முழு நிதியுதவி ஆராய்ச்சி வாய்ப்புகள்.",
+            },
+            {
+                "category_id": "high-seas",
+                "order": 2,
+                "icon_type": "anchor",
+                "title_en": "High-Seas Fisheries & Satellite VMS",
+                "title_si": "ගැඹුරු මුහුදු ධීවර කළමනාකරණය සහ VMS",
+                "title_ta": "உயர் கடல் மீன்பிடி முகாமைத்துவம் மற்றும் VMS",
+                "description_en": "Deep-sea fisheries governance, satellite vessel monitoring systems, and IUU enforcement.",
+                "description_si": "ගැඹුරු මුහුදු ධීවර පාලනය, චන්ද්‍රිකා යාත්‍රා නිරීක්ෂණ පද්ධති සහ IUU මැඩපැවැත්වීම.",
+                "description_ta": "ஆழ்கடல் மீன்பிடி ஆளுகை, செய்மதி படகு கண்காணிப்பு மற்றும் IUU தடுத்தல்.",
+            },
+            {
+                "category_id": "technical-seminars",
+                "order": 3,
+                "icon_type": "briefcase",
+                "title_en": "Technical Seminars & Aquaculture Workshops",
+                "title_si": "තාක්ෂණික සම්මන්ත්‍රණ සහ ජලජීවී වගා වැඩමුළු",
+                "title_ta": "தொழினுட்ப கருத்தரங்குகள் மற்றும் நீர்வாழ் உயிரின வளர்ப்பு",
+                "description_en": "Bilateral technical seminars, hatchery management, and seafood quality compliance.",
+                "description_si": "ද්විපාර්ශ්වික තාක්ෂණික සම්මන්ත්‍රණ, බීජෞෂණාගාර කළමනාකරණය සහ අපනයන ප්‍රමිතීන්.",
+                "description_ta": "இருதரப்பு தொழினுட்ப கருத்தரங்குகள், குஞ்சுபொரிப்பக முகாமைத்துவம் மற்றும் ஏற்றுமதி தரநிலைகள்.",
+            },
+            {
+                "category_id": "blue-economy",
+                "order": 4,
+                "icon_type": "award",
+                "title_en": "Blue Economy & Ocean Governance",
+                "title_si": "නීල ආර්ථිකය සහ සාගර පාලනය",
+                "title_ta": "நீலப் பொருளாதாரம் மற்றும் கடல்சார் ஆளுகை",
+                "description_en": "Executive leadership courses, marine spatial planning, and maritime security policy.",
+                "description_si": "විධායක නායකත්ව පාඨමාලා, සමුද්‍ර අවකාශීය සැලසුම්කරණය සහ සාගර ආර්ථික පාලනය.",
+                "description_ta": "நிறைவேற்று தலைமைத்துவ படிப்புகள் மற்றும் நிலையான கடல்சார் பொருளாதார ஆளுகை.",
+            },
+            {
+                "category_id": "oceanography",
+                "order": 5,
+                "icon_type": "globe",
+                "title_en": "Oceanography & Marine Science",
+                "title_si": "සාගර විද්‍යාව සහ සමුද්‍ර පර්යේෂණ",
+                "title_ta": "சமுத்திரவியல் மற்றும் கடல் அறிவியல்",
+                "description_en": "Advanced GIS ocean modeling, climate resilience tracking, and oceanographic research.",
+                "description_si": "උසස් GIS සාගර ආකෘති නිර්මාණය, දේශගුණික ඔරොත්තු දීමේ හැකියාව සහ සාගර විද්‍යාත්මක පර්යේෂණ.",
+                "description_ta": "மேம்பட்ட GIS கடல் மாதிரி மற்றும் காலநிலை பின்னடைவு ஆராய்ச்சி படிப்புகள்.",
+            },
+        ]
+
+        cat_objects = {}
+        for c_data in categories_data:
+            cat_id = c_data.pop("category_id")
+            cat, _ = ForeignTrainingCategory.objects.get_or_create(category_id=cat_id, defaults=c_data)
+            for k, v in c_data.items():
+                setattr(cat, k, v)
+            cat.save()
+            cat_objects[cat_id] = cat
+
+        # 3. Programmes Data
         programmes_data = [
             {
                 "slug": "jica-sustainable-fisheries-coastal-management-2026",
+                "category": cat_objects["scholarships"],
                 "order": 1,
                 "year": 2026,
                 "country_en": "Japan",
                 "country_si": "ජපානය",
                 "country_ta": "ஜப்பான்",
-                "category": "scholarships",
                 "status": "Open",
                 "featured": True,
+                "subheading_en": "Post-Graduate Overseas Fellowships",
+                "subheading_si": "පශ්චාත් උපාධි විදේශීය අධිශිෂ්‍යත්ව",
+                "subheading_ta": "முதுகலை வெளிநாட்டுப் புலமைப்பரிசில்கள்",
                 "title_en": "JICA Knowledge Co-Creation Program in Sustainable Fisheries & Coastal Management",
                 "title_si": "තිරසාර ධීවර හා වෙරළබඩ කළමනාකරණය පිළිබඳ JICA දැනුම සහයෝගීතා වැඩසටහන",
                 "title_ta": "நிலையான கடற்றொழில் மற்றும் கரையோர முகாமைத்துவத்திற்கான JICA கூட்டு அறிவுப் பகிர்வுத் திட்டம்",
@@ -67,14 +142,17 @@ class Command(BaseCommand):
             },
             {
                 "slug": "norad-high-seas-fishery-management-vms-2026",
+                "category": cat_objects["high-seas"],
                 "order": 2,
                 "year": 2026,
                 "country_en": "Norway",
                 "country_si": "නෝර්වේ",
                 "country_ta": "நோர்வே",
-                "category": "high-seas",
                 "status": "Open",
                 "featured": True,
+                "subheading_en": "Satellite VMS & IUU Enforcement",
+                "subheading_si": "චන්ද්‍රිකා VMS සහ IUU නීති බලාත්මක කිරීම",
+                "subheading_ta": "செய்மதி VMS மற்றும் IUU சட்ட அமலாக்கம்",
                 "title_en": "NORAD High-Seas Fishery Management & Satellite VMS Seminar 2026",
                 "title_si": "නෝර්වේජියානු NORAD ගැඹුරු මුහුදු ධීවර කළමනාකරණය සහ චන්ද්‍රිකා VMS සම්මන්ත්‍රණය 2026",
                 "title_ta": "NORAD உயர் கடல் மீன்பிடி முகாமைத்துவம் மற்றும் செய்மதி VMS கருத்தரங்கு 2026",
@@ -95,14 +173,17 @@ class Command(BaseCommand):
             },
             {
                 "slug": "itec-marine-aquaculture-hatchery-management",
+                "category": cat_objects["technical-seminars"],
                 "order": 3,
                 "year": 2026,
                 "country_en": "India",
                 "country_si": "ඉන්දියාව",
                 "country_ta": "இந்தியா",
-                "category": "technical-seminars",
                 "status": "Open",
                 "featured": True,
+                "subheading_en": "Marine Aquaculture & Hatcheries",
+                "subheading_si": "සමුද්‍ර ජලජීවී වගාව සහ බීජෞෂණාගාර",
+                "subheading_ta": "கடல்வாழ் உயிரின வளர்ப்பு மற்றும் குஞ்சுபொரிப்பகங்கள்",
                 "title_en": "ITEC International Course in Advanced Marine Aquaculture & Hatchery Management",
                 "title_si": "උසස් සමුද්‍ර ජලජීවී වගාව සහ බීජෞෂණාගාර කළමනාකරණය පිළිබඳ ITEC ජාත්‍යන්තර පාඨමාලාව",
                 "title_ta": "மேம்பட்ட கடல்வாழ் உயிரின வளர்ப்பு மற்றும் குஞ்சுபொரிப்பக முகாமைத்துவத்திற்கான ITEC சர்வதேச படிப்பு",
@@ -123,14 +204,17 @@ class Command(BaseCommand):
             },
             {
                 "slug": "blue-economy-ocean-governance-australia-2026",
+                "category": cat_objects["blue-economy"],
                 "order": 4,
                 "year": 2026,
                 "country_en": "Australia",
                 "country_si": "ඕස්ට්‍රේලියාව",
                 "country_ta": "அவுஸ்திரேலியா",
-                "category": "blue-economy",
                 "status": "Open",
                 "featured": True,
+                "subheading_en": "Executive Ocean Leadership",
+                "subheading_si": "විධායක සාගර නායකත්වය",
+                "subheading_ta": "நிறைவேற்று கடல்சார் தலைமைத்துவம்",
                 "title_en": "Blue Economy & Ocean Governance Leadership Program 2026",
                 "title_si": "නීල ආර්ථිකය සහ සාගර පාලන නායකත්ව වැඩසටහන 2026",
                 "title_ta": "நீலப் பொருளாதாரம் மற்றும் கடல்சார் ஆளுகை தலைமைத்துவ திட்டம் 2026",
@@ -151,14 +235,17 @@ class Command(BaseCommand):
             },
             {
                 "slug": "koica-oceanographic-data-climate-resilience-2026",
+                "category": cat_objects["oceanography"],
                 "order": 5,
                 "year": 2026,
                 "country_en": "South Korea",
                 "country_si": "දකුණු කොරියාව",
                 "country_ta": "தென் கொரியா",
-                "category": "oceanography",
                 "status": "Upcoming",
                 "featured": False,
+                "subheading_en": "GIS Ocean Modeling & Research",
+                "subheading_si": "GIS සාගර ආකෘති නිර්මාණය සහ පර්යේෂණ",
+                "subheading_ta": "GIS கடல் மாதிரி மற்றும் ஆராய்ச்சி",
                 "title_en": "KOICA Oceanographic Data Analysis & Climate Resilience Fellowship",
                 "title_si": "KOICA සාගර විද්‍යාත්මක දත්ත විශ්ලේෂණය සහ දේශගුණික ඔරොත්තු දීමේ හැකියාව පිළිබඳ අධිශිෂ්‍යත්වය",
                 "title_ta": "KOICA சமுத்திரவியல் தரவு பகுப்பாய்வு மற்றும் காலநிலை பின்னடைவு ஆய்வுப் பயிற்சி",
@@ -179,14 +266,17 @@ class Command(BaseCommand):
             },
             {
                 "slug": "fao-post-harvest-quality-certification-italy-2025",
+                "category": cat_objects["technical-seminars"],
                 "order": 6,
                 "year": 2025,
                 "country_en": "Italy",
                 "country_si": "ඉතාලිය",
                 "country_ta": "இத்தாலி",
-                "category": "technical-seminars",
                 "status": "Closed",
                 "featured": False,
+                "subheading_en": "Post-Harvest Compliance & Exports",
+                "subheading_si": "පසු අස්වනු ප්‍රමිතීන් සහ අපනයන",
+                "subheading_ta": "அறுவடைக்கு பிந்தைய இணக்கம் மற்றும் ஏற்றுமதி",
                 "title_en": "FAO Post-Harvest Quality & EU Seafood Export Certification Workshop",
                 "title_si": "පසු අස්වනු ගුණාත්මකභාවය සහ EU මුහුදු ආහාර අපනයන සහතිකකරණය පිළිබඳ FAO වැඩමුළුව",
                 "title_ta": "அறுவடைக்கு பிந்தைய தரம் மற்றும் EU கடல் உணவு ஏற்றுமதி சான்றிதழ் குறித்த FAO பட்டறை",
@@ -215,4 +305,4 @@ class Command(BaseCommand):
                     setattr(prog, k, v)
                 prog.save()
 
-        self.stdout.write(self.style.SUCCESS("Successfully seeded Foreign Training data!"))
+        self.stdout.write(self.style.SUCCESS("Successfully seeded Foreign Training categories and data!"))

@@ -1,9 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { ForeignTrainingHero } from "@/components/services/foreign-training-hero"
 import { ForeignTrainingToolbar } from "@/components/services/foreign-training-toolbar"
-import { ForeignTrainingFeatured } from "@/components/services/foreign-training-featured"
 import { ForeignTrainingLibrary } from "@/components/services/foreign-training-library"
 import { ForeignTrainingPreview } from "@/components/services/foreign-training-preview"
 import { foreignTrainingProgrammes as defaultForeignProgrammes, type ForeignTrainingProgramme } from "@/data/foreign-training-programmes"
@@ -43,7 +41,8 @@ export function ForeignTrainingPageContent({ initialData }: ForeignTrainingPageC
 
   // Map API programmes or fallback to static list
   const programmesList: ForeignTrainingProgramme[] = useMemo(() => {
-    if (initialData?.programmes && initialData.programmes.length > 0) {
+    if (initialData !== undefined && initialData !== null) {
+      if (!initialData.programmes) return []
       return initialData.programmes.map((p) => ({
         id: p.slug || String(p.id),
         year: p.year,
@@ -53,6 +52,7 @@ export function ForeignTrainingPageContent({ initialData }: ForeignTrainingPageC
         description: p.description,
         category: p.category as any,
         categoryLabel: p.category_label,
+        subheading: p.subheading,
         publishedDate: p.published_date,
         applicationDeadline: p.application_deadline,
         fileType: (p.file_type as any) || "PDF",
@@ -121,7 +121,7 @@ export function ForeignTrainingPageContent({ initialData }: ForeignTrainingPageC
         return b.year - a.year || (b.publishedDate ?? "").localeCompare(a.publishedDate ?? "")
       }
       if (sortBy === "oldest") {
-        return a.year - b.year || (a.publishedDate ?? "").localeCompare(b.publishedDate ?? "")
+        return a.year - b.year || (a.publishedDate ?? "").localeCompare(a.publishedDate ?? "")
       }
       if (sortBy === "title-az") {
         return a.title.localeCompare(b.title)
@@ -134,10 +134,7 @@ export function ForeignTrainingPageContent({ initialData }: ForeignTrainingPageC
 
   return (
     <>
-      {/* 1. Compact Page Hero if enabled */}
-      {/* <ForeignTrainingHero initialHeader={initialData?.header} /> */}
-
-      {/* 2. Search & Filter Toolbar */}
+      {/* 1. Search & Filter Toolbar */}
       <ForeignTrainingToolbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -155,15 +152,9 @@ export function ForeignTrainingPageContent({ initialData }: ForeignTrainingPageC
         onClearFilters={handleClearFilters}
       />
 
-      {/* 3. Featured Overseas Scholarships */}
-      <ForeignTrainingFeatured
-        programmes={filteredProgrammes}
-        featuredBadge={initialData?.header?.featured_badge}
-        onSelectProgramme={(prog) => setSelectedProgramme(prog)}
-      />
-
-      {/* 4. Foreign Training Library */}
+      {/* 2. Foreign Training Library */}
       <ForeignTrainingLibrary
+        categories={initialData?.categories}
         programmes={filteredProgrammes}
         activeYearTab={selectedYear}
         setActiveYearTab={setSelectedYear}
@@ -173,7 +164,7 @@ export function ForeignTrainingPageContent({ initialData }: ForeignTrainingPageC
         onClearFilters={handleClearFilters}
       />
 
-      {/* 5. Same-page Programme Preview Modal */}
+      {/* 3. Same-page Programme Preview Modal */}
       <ForeignTrainingPreview
         programme={selectedProgramme}
         onClose={() => setSelectedProgramme(null)}

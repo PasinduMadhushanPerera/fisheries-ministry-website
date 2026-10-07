@@ -1,8 +1,16 @@
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import ForeignTrainingPageHeader, ForeignTrainingProgramme
-from .serializers import ForeignTrainingPageHeaderSerializer, ForeignTrainingProgrammeSerializer
+from .models import (
+    ForeignTrainingPageHeader,
+    ForeignTrainingCategory,
+    ForeignTrainingProgramme,
+)
+from .serializers import (
+    ForeignTrainingPageHeaderSerializer,
+    ForeignTrainingCategorySerializer,
+    ForeignTrainingProgrammeSerializer,
+)
 
 
 class ForeignTrainingPageDataView(APIView):
@@ -21,11 +29,15 @@ class ForeignTrainingPageDataView(APIView):
         header, _ = ForeignTrainingPageHeader.objects.get_or_create(id=1)
         header_data = ForeignTrainingPageHeaderSerializer(header, context=context).data
 
+        categories = ForeignTrainingCategory.objects.filter(is_active=True).order_by("order", "id")
+        categories_data = ForeignTrainingCategorySerializer(categories, many=True, context=context).data
+
         programmes = ForeignTrainingProgramme.objects.filter(is_active=True).order_by("-year", "order", "-id")
         programmes_data = ForeignTrainingProgrammeSerializer(programmes, many=True, context=context).data
 
         return Response({
             "language": lang,
             "header": header_data,
+            "categories": categories_data,
             "programmes": programmes_data,
         })
