@@ -1,8 +1,16 @@
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import RecruitmentPageHeader, RecruitmentVacancyItem
-from .serializers import RecruitmentPageHeaderSerializer, RecruitmentVacancyItemSerializer
+from .models import (
+    RecruitmentPageHeader,
+    RecruitmentCategory,
+    RecruitmentVacancyItem,
+)
+from .serializers import (
+    RecruitmentPageHeaderSerializer,
+    RecruitmentCategorySerializer,
+    RecruitmentVacancyItemSerializer,
+)
 
 
 class RecruitmentPageDataView(APIView):
@@ -21,11 +29,15 @@ class RecruitmentPageDataView(APIView):
         header, _ = RecruitmentPageHeader.objects.get_or_create(id=1)
         header_data = RecruitmentPageHeaderSerializer(header, context=context).data
 
+        categories = RecruitmentCategory.objects.filter(is_active=True).order_by("order", "id")
+        categories_data = RecruitmentCategorySerializer(categories, many=True, context=context).data
+
         vacancies = RecruitmentVacancyItem.objects.filter(is_active=True).order_by("-year", "order", "-id")
         vacancies_data = RecruitmentVacancyItemSerializer(vacancies, many=True, context=context).data
 
         return Response({
             "language": lang,
             "header": header_data,
+            "categories": categories_data,
             "vacancies": vacancies_data,
         })

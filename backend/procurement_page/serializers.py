@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ProcurementPageHeader, ProcurementTenderItem, ProcurementTenderDocument
+from .models import ProcurementPageHeader, ProcurementCategory, ProcurementTenderItem, ProcurementTenderDocument
 
 
 def resolve_lang(obj, field_base: str, context: dict) -> str:
@@ -65,9 +65,33 @@ class ProcurementTenderDocumentSerializer(serializers.ModelSerializer):
         return obj.file_url or "#"
 
 
+class ProcurementCategorySerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProcurementCategory
+        fields = [
+            "id",
+            "category_id",
+            "title",
+            "description",
+            "icon_type",
+            "order",
+        ]
+
+    def get_title(self, obj):
+        return resolve_lang(obj, "title", self.context)
+
+    def get_description(self, obj):
+        return resolve_lang(obj, "description", self.context)
+
+
 class ProcurementTenderItemSerializer(serializers.ModelSerializer):
     ref_number = serializers.CharField()
+    category = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
+    subheading = serializers.SerializerMethodField()
     publisher = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     category_label = serializers.SerializerMethodField()
@@ -98,6 +122,7 @@ class ProcurementTenderItemSerializer(serializers.ModelSerializer):
             "status",
             "featured",
             "title",
+            "subheading",
             "publisher",
             "description",
             "detailed_scope",
@@ -120,7 +145,13 @@ class ProcurementTenderItemSerializer(serializers.ModelSerializer):
             "additional_documents",
         ]
 
+    def get_category(self, obj):
+        if obj.category_ref:
+            return obj.category_ref.category_id
+        return obj.category or ""
+
     def get_title(self, obj): return resolve_lang(obj, "title", self.context)
+    def get_subheading(self, obj): return resolve_lang(obj, "subheading", self.context)
     def get_publisher(self, obj): return resolve_lang(obj, "publisher", self.context)
     def get_description(self, obj): return resolve_lang(obj, "description", self.context)
     def get_additional_info(self, obj): return resolve_lang(obj, "additional_info", self.context)
@@ -135,6 +166,8 @@ class ProcurementTenderItemSerializer(serializers.ModelSerializer):
     def get_contact_info(self, obj): return resolve_lang(obj, "contact_info", self.context)
 
     def get_category_label(self, obj):
+        if obj.category_ref:
+            return resolve_lang(obj.category_ref, "title", self.context)
         if not obj.category:
             return ""
         lang = self.context.get("lang", "en")

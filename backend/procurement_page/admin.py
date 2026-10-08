@@ -1,6 +1,12 @@
 from django import forms
 from django.contrib import admin
-from .models import ProcurementPageHeader, ProcurementTenderItem, ProcurementTenderDocument
+from django.utils.html import format_html
+from .models import (
+    ProcurementPageHeader,
+    ProcurementCategory,
+    ProcurementTenderItem,
+    ProcurementTenderDocument,
+)
 
 
 class ProcurementPageHeaderAdminForm(forms.ModelForm):
@@ -11,6 +17,17 @@ class ProcurementPageHeaderAdminForm(forms.ModelForm):
             "description_en": forms.Textarea(attrs={"rows": 3}),
             "description_si": forms.Textarea(attrs={"rows": 3}),
             "description_ta": forms.Textarea(attrs={"rows": 3}),
+        }
+
+
+class ProcurementCategoryAdminForm(forms.ModelForm):
+    class Meta:
+        model = ProcurementCategory
+        fields = "__all__"
+        widgets = {
+            "description_en": forms.Textarea(attrs={"rows": 2}),
+            "description_si": forms.Textarea(attrs={"rows": 2}),
+            "description_ta": forms.Textarea(attrs={"rows": 2}),
         }
 
 
@@ -31,11 +48,27 @@ class ProcurementTenderItemAdminForm(forms.ModelForm):
         }
 
 
+class ProcurementTenderItemInline(admin.StackedInline):
+    model = ProcurementTenderItem
+    form = ProcurementTenderItemAdminForm
+    extra = 0
+    ordering = ["order", "-id"]
+    verbose_name = "Procurement Tender Notice"
+    verbose_name_plural = "Attached Procurement Tender Notices"
+
+    fields = (
+        ("order", "is_active", "featured"),
+        ("ref_number", "year", "status"),
+        ("title_en", "publisher_en", "document_file"),
+        ("file_type", "file_size", "published_date", "closing_date"),
+    )
+
+
 class ProcurementTenderDocumentInline(admin.StackedInline):
     model = ProcurementTenderDocument
     extra = 0
     verbose_name = "Additional Document"
-    verbose_name_plural = "📂 Additional Tender Documents (Click 'Add Document' below to add more documents)"
+    verbose_name_plural = "📂 Additional Attached Documents (Click 'Add Document' below to add more files)"
     fields = (
         "order",
         ("label_en", "label_si", "label_ta"),
@@ -82,6 +115,68 @@ class ProcurementPageHeaderAdmin(admin.ModelAdmin):
         return not ProcurementPageHeader.objects.exists()
 
 
+@admin.register(ProcurementCategory)
+class ProcurementCategoryAdmin(admin.ModelAdmin):
+    form = ProcurementCategoryAdminForm
+    list_display = [
+        "order",
+        "title_en",
+        "category_id",
+        "icon_type",
+        "attached_doc_count",
+        "is_active_badge",
+        "updated_at",
+    ]
+    list_display_links = ["title_en"]
+    list_filter = ["icon_type", "is_active"]
+    search_fields = ["title_en", "title_si", "title_ta", "category_id"]
+    ordering = ["order", "id"]
+    inlines = [ProcurementTenderItemInline]
+
+    fieldsets = (
+        ("📁 Category Identification & Settings", {
+            "fields": (
+                ("order", "is_active", "icon_type"),
+                ("category_id",),
+            ),
+        }),
+        ("🇬🇧 English Details", {
+            "fields": (
+                "title_en",
+                "description_en",
+            ),
+        }),
+        ("🇱🇰 Sinhala Details (සිංහල)", {
+            "classes": ("collapse",),
+            "fields": (
+                "title_si",
+                "description_si",
+            ),
+        }),
+        ("🇱🇰 Tamil Details (தமிழ்)", {
+            "classes": ("collapse",),
+            "fields": (
+                "title_ta",
+                "description_ta",
+            ),
+        }),
+    )
+
+    def attached_doc_count(self, obj):
+        count = obj.tenders.count()
+        return format_html(
+            '<span style="background: #f0fdf4; color: #16a34a; padding: 2px 8px; border-radius: 6px; font-weight: bold; border: 1px solid #bbf7d0;">📄 {} tenders</span>',
+            count,
+        )
+    attached_doc_count.short_description = "Attached Notices"
+
+    def is_active_badge(self, obj):
+        if obj.is_active:
+            return format_html('<span style="color: #15803d; font-weight: bold;">● Active</span>')
+        return format_html('<span style="color: #dc2626; font-weight: bold;">○ Inactive</span>')
+    is_active_badge.short_description = "Status"
+
+
 @admin.register(ProcurementTenderItem)
 class ProcurementTenderItemAdmin(admin.ModelAdmin):
     form = ProcurementTenderItemAdminForm
@@ -91,14 +186,14 @@ class ProcurementTenderItemAdmin(admin.ModelAdmin):
         "year",
         "title_en",
         "ref_number",
-        "category",
+        "category_ref",
         "status",
         "featured",
         "is_active",
     ]
     list_display_links = ["title_en"]
     list_editable = ["order", "status", "featured", "is_active"]
-    list_filter = ["year", "category", "status", "featured", "is_active"]
+    list_filter = ["category_ref", "year", "category", "status", "featured", "is_active"]
     search_fields = [
         "title_en",
         "title_si",
@@ -110,9 +205,9 @@ class ProcurementTenderItemAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title_en",)}
 
     fieldsets = (
-        ("Classification & Status", {
+        ("Classification & Parent Category", {
             "fields": (
-                ("order", "slug"),
+                ("category_ref", "order", "slug"),
                 ("ref_number", "year"),
                 ("category", "status"),
                 ("featured", "is_active"),
@@ -121,6 +216,7 @@ class ProcurementTenderItemAdmin(admin.ModelAdmin):
         ("🇬🇧 English Content", {
             "fields": (
                 "title_en",
+                "subheading_en",
                 ("publisher_en", "category_label_en"),
                 "description_en",
                 "detailed_scope_en",
@@ -131,6 +227,7 @@ class ProcurementTenderItemAdmin(admin.ModelAdmin):
         ("🇱🇰 Sinhala Content (සිංහල)", {
             "fields": (
                 "title_si",
+                "subheading_si",
                 ("publisher_si", "category_label_si"),
                 "description_si",
                 "detailed_scope_si",
@@ -141,6 +238,7 @@ class ProcurementTenderItemAdmin(admin.ModelAdmin):
         ("🇱🇰 Tamil Content (தமிழ்)", {
             "fields": (
                 "title_ta",
+                "subheading_ta",
                 ("publisher_ta", "category_label_ta"),
                 "description_ta",
                 "detailed_scope_ta",

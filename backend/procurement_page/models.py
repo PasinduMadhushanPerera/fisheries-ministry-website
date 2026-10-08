@@ -98,14 +98,87 @@ class ProcurementPageHeader(TimeStampedModel):
         return f"Header: {self.title_en}"
 
 
+CATEGORY_ICON_CHOICES = [
+    ("anchor", "Harbour & Marine Engineering (Anchor)"),
+    ("briefcase", "Equipment & Heavy Machinery (Briefcase)"),
+    ("globe", "IT & Telecommunications (Globe)"),
+    ("book-open", "Consultancy & Studies (BookOpen)"),
+    ("fish", "Supplies & Aquaculture (Fish)"),
+    ("shield-check", "General & Compliance (ShieldCheck)"),
+    ("building", "Buildings & Infrastructure (Building)"),
+    ("scale", "Legal & Regulatory (Scale)"),
+    ("file-text", "Standard Document (FileText)"),
+]
+
+
 # ==========================================================
-# 02. Procurement & Tender Notices (Multilingual)
+# 02. Procurement Categories
+# ==========================================================
+class ProcurementCategory(TimeStampedModel):
+    category_id = models.CharField(
+        max_length=100,
+        unique=True,
+        blank=True,
+        help_text="Unique category identifier (e.g. 'harbour', 'equipment', 'tenders-2026'). Auto-generated if blank.",
+    )
+
+    # 🇬🇧 English Details
+    title_en = models.CharField(max_length=255, default="", verbose_name="Category Title (English)")
+    description_en = models.TextField(blank=True, default="", verbose_name="Description (English)")
+
+    # 🇱🇰 Sinhala Details (සිංහල)
+    title_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Category Title (සිංහල)")
+    description_si = models.TextField(blank=True, default="", verbose_name="Description (සිංහල)")
+
+    # 🇱🇰 Tamil Details (தமிழ்)
+    title_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Category Title (தமிழ்)")
+    description_ta = models.TextField(blank=True, default="", verbose_name="Description (தமிழ்)")
+
+    icon_type = models.CharField(
+        max_length=30,
+        choices=CATEGORY_ICON_CHOICES,
+        default="anchor",
+        help_text="Visual icon for accordion",
+    )
+    order = models.PositiveIntegerField(default=1, help_text="Sort order sequence")
+    is_active = models.BooleanField(default=True, help_text="Display category on live website")
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "02. Procurement Category"
+        verbose_name_plural = "02. Procurement Categories"
+
+    def save(self, *args, **kwargs):
+        if not self.category_id or not str(self.category_id).strip():
+            base = slugify(self.title_en) if self.title_en else f"cat-{uuid4().hex[:6]}"
+            slug = base
+            count = 1
+            while ProcurementCategory.objects.filter(category_id=slug).exclude(pk=self.pk).exists():
+                slug = f"{base}-{count}"
+                count += 1
+            self.category_id = slug
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.order}. {self.title_en} ({self.category_id})"
+
+
+# ==========================================================
+# 03. Procurement & Tender Notices (Multilingual)
 # ==========================================================
 class ProcurementTenderItem(TimeStampedModel):
     order = models.PositiveIntegerField(default=1, help_text="Display priority sequence")
     slug = models.SlugField(max_length=150, unique=True, blank=True, help_text="Unique identifier slug (auto-generated if left blank)")
     ref_number = models.CharField(max_length=100, blank=True, default="", verbose_name="Tender Ref No (e.g. MOF/PR/2026/04)")
     year = models.IntegerField(default=2026, help_text="Procurement Year (e.g. 2026, 2025, 2024)")
+    category_ref = models.ForeignKey(
+        ProcurementCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tenders",
+        verbose_name="Parent Category",
+    )
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True, default="")
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, blank=True, default="")
     featured = models.BooleanField(default=False, help_text="Check to display in top 'Featured Tenders' section")
@@ -113,6 +186,7 @@ class ProcurementTenderItem(TimeStampedModel):
 
     # 🇬🇧 English Content
     title_en = models.CharField(max_length=500, verbose_name="Tender Title (English)")
+    subheading_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Sub-heading / Department Group (English e.g. 'Civil Works & Dredging Division')")
     publisher_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Procuring Entity / Department (English)")
     description_en = models.TextField(blank=True, default="", verbose_name="Short Description (English)")
     category_label_en = models.CharField(max_length=100, blank=True, default="", verbose_name="Category Label (English)")
@@ -127,6 +201,7 @@ class ProcurementTenderItem(TimeStampedModel):
 
     # 🇱🇰 Sinhala Content (සිංහල)
     title_si = models.CharField(max_length=500, blank=True, default="", verbose_name="Tender Title (සිංහල)")
+    subheading_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Sub-heading / Department Group (සිංහල)")
     publisher_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Procuring Entity (සිංහල)")
     description_si = models.TextField(blank=True, default="", verbose_name="Short Description (සිංහල)")
     category_label_si = models.CharField(max_length=100, blank=True, default="", verbose_name="Category Label (සිංහල)")
@@ -141,6 +216,7 @@ class ProcurementTenderItem(TimeStampedModel):
 
     # 🇱🇰 Tamil Content (தமிழ்)
     title_ta = models.CharField(max_length=500, blank=True, default="", verbose_name="Tender Title (தமிழ்)")
+    subheading_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Sub-heading / Department Group (தமிழ்)")
     publisher_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Procuring Entity (தமிழ்)")
     description_ta = models.TextField(blank=True, default="", verbose_name="Short Description (தமிழ்)")
     category_label_ta = models.CharField(max_length=100, blank=True, default="", verbose_name="Category Label (தமிழ்)")

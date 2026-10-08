@@ -1,9 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { RecruitmentHero } from "@/components/services/recruitment-hero"
 import { RecruitmentToolbar } from "@/components/services/recruitment-toolbar"
-import { RecruitmentFeatured } from "@/components/services/recruitment-featured"
 import { RecruitmentLibrary } from "@/components/services/recruitment-library"
 import { RecruitmentPreview } from "@/components/services/recruitment-preview"
 import { recruitmentVacancies as defaultRecruitmentVacancies, type RecruitmentVacancy } from "@/data/recruitment-vacancies"
@@ -42,11 +40,13 @@ export function RecruitmentPageContent({ initialData }: RecruitmentPageContentPr
 
   // Map API vacancies or fallback to static list
   const vacanciesList: RecruitmentVacancy[] = useMemo(() => {
-    if (initialData?.vacancies && initialData.vacancies.length > 0) {
+    if (initialData !== undefined && initialData !== null) {
+      if (!initialData.vacancies) return []
       return initialData.vacancies.map((v) => ({
         id: v.slug || String(v.id),
         refNumber: v.ref_number,
         title: v.title,
+        subheading: v.subheading,
         institution: v.institution,
         department: v.department,
         description: v.description,
@@ -57,10 +57,22 @@ export function RecruitmentPageContent({ initialData }: RecruitmentPageContentPr
         closingDate: v.closing_date,
         salaryScale: v.salary_scale,
         ageLimit: v.age_limit,
+        docButtonLabel: v.doc_button_label,
         fileType: (v.file_type as any) || "PDF",
         fileSize: v.file_size,
         fileUrl: v.download_url,
         downloadUrl: v.download_url,
+        secondDocumentLabel: v.second_document_label,
+        secondDownloadUrl: v.second_download_url,
+        secondFileType: v.second_file_type as any,
+        secondFileSize: v.second_file_size,
+        additionalDocuments: v.additional_documents?.map((d) => ({
+          id: d.id,
+          label: d.label,
+          downloadUrl: d.download_url,
+          fileType: d.file_type,
+          fileSize: d.file_size,
+        })),
         featured: v.featured,
         status: v.status,
         year: v.year,
@@ -130,10 +142,7 @@ export function RecruitmentPageContent({ initialData }: RecruitmentPageContentPr
 
   return (
     <>
-      {/* 1. Compact Page Hero if enabled */}
-      {/* <RecruitmentHero initialHeader={initialData?.header} /> */}
-
-      {/* 2. Search & Filter Toolbar */}
+      {/* 1. Search & Filter Toolbar */}
       <RecruitmentToolbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -149,15 +158,9 @@ export function RecruitmentPageContent({ initialData }: RecruitmentPageContentPr
         onClearFilters={handleClearFilters}
       />
 
-      {/* 3. Featured Public Service Vacancies */}
-      <RecruitmentFeatured
-        vacancies={filteredVacancies}
-        featuredBadge={initialData?.header?.featured_badge}
-        onSelectVacancy={(v) => setSelectedVacancy(v)}
-      />
-
-      {/* 4. Recruitment Library Grid */}
+      {/* 2. Recruitment Accordion Library */}
       <RecruitmentLibrary
+        categories={initialData?.categories}
         vacancies={filteredVacancies}
         activeYearTab={selectedYear}
         setActiveYearTab={setSelectedYear}
@@ -167,7 +170,7 @@ export function RecruitmentPageContent({ initialData }: RecruitmentPageContentPr
         onClearFilters={handleClearFilters}
       />
 
-      {/* 5. Same-page Recruitment Preview Modal */}
+      {/* 4. Same-page Recruitment Preview Modal */}
       <RecruitmentPreview
         vacancy={selectedVacancy}
         onClose={() => setSelectedVacancy(null)}

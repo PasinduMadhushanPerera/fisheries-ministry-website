@@ -18,6 +18,7 @@ export interface ApiProcurementTenderItem {
   status: "Open" | "Closing Soon" | "Closed" | "Awarded"
   featured: boolean
   title: string
+  subheading?: string
   publisher: string
   description: string
   detailed_scope: string[]
@@ -39,9 +40,19 @@ export interface ApiProcurementTenderItem {
   second_file_size?: string
 }
 
+export interface ApiProcurementCategory {
+  id: number | string
+  category_id: string
+  title: string
+  description: string
+  icon_type?: string
+  order: number
+}
+
 export interface ApiProcurementPageData {
   language: string
   header: ApiProcurementHeader
+  categories?: ApiProcurementCategory[]
   tenders: ApiProcurementTenderItem[]
 }
 

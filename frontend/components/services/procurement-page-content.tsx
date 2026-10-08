@@ -47,6 +47,7 @@ export function ProcurementPageContent({ initialData }: ProcurementPageContentPr
         id: t.slug || String(t.id),
         refNumber: t.ref_number,
         title: t.title,
+        subheading: t.subheading,
         publisher: t.publisher,
         description: t.description,
         detailedScope: t.detailed_scope && t.detailed_scope.length > 0 ? t.detailed_scope : [t.description],
@@ -164,6 +165,7 @@ export function ProcurementPageContent({ initialData }: ProcurementPageContentPr
 
       {/* 2. Procurement Row List */}
       <ProcurementLibrary
+        categories={initialData?.categories}
         tenders={filteredTenders}
         activeYearTab={selectedYear}
         setActiveYearTab={setSelectedYear}

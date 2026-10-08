@@ -1,8 +1,12 @@
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import ProcurementPageHeader, ProcurementTenderItem
-from .serializers import ProcurementPageHeaderSerializer, ProcurementTenderItemSerializer
+from .models import ProcurementPageHeader, ProcurementCategory, ProcurementTenderItem
+from .serializers import (
+    ProcurementPageHeaderSerializer,
+    ProcurementCategorySerializer,
+    ProcurementTenderItemSerializer,
+)
 
 
 class ProcurementPageDataView(APIView):
@@ -21,11 +25,15 @@ class ProcurementPageDataView(APIView):
         header, _ = ProcurementPageHeader.objects.get_or_create(id=1)
         header_data = ProcurementPageHeaderSerializer(header, context=context).data
 
+        categories = ProcurementCategory.objects.filter(is_active=True).order_by("order", "id")
+        categories_data = ProcurementCategorySerializer(categories, many=True, context=context).data
+
         tenders = ProcurementTenderItem.objects.filter(is_active=True).order_by("-year", "order", "-id")
         tenders_data = ProcurementTenderItemSerializer(tenders, many=True, context=context).data
 
         return Response({
             "language": lang,
             "header": header_data,
+            "categories": categories_data,
             "tenders": tenders_data,
         })
