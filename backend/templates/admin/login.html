@@ -28,17 +28,36 @@
 {% endblock %}
 
 {% block content %}
+<!-- Interactive 3D Background Canvas -->
+<canvas id="bg-3d-canvas"></canvas>
+
 <style>
-  /* Login Page Full-Viewport Experience: Perfect Center */
+  /* ==========================================================
+     Full Viewport 3D Dark Emerald Theme & Centered Perspective
+     ========================================================== */
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+  #bg-3d-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+  }
+
   body.cms-login-page,
   body.login {
-    background: radial-gradient(circle at 50% 20%, #0d382c 0%, #061f18 45%, #020f0b 100%) !important;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    background: radial-gradient(circle at 50% 25%, #083428 0%, #031c15 55%, #010c09 100%) !important;
     min-height: 100vh !important;
     height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
     margin: 0 !important;
     padding: 0 !important;
+    overflow-x: hidden !important;
   }
 
   body.cms-login-page #container,
@@ -52,15 +71,112 @@
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
+    position: relative;
+    z-index: 10;
   }
 
   body.cms-login-page #header,
   body.login #header {
-    background: rgba(4, 23, 17, 0.85) !important;
-    backdrop-filter: blur(12px) !important;
-    border-bottom: 1px solid rgba(34, 197, 94, 0.3) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+    background: rgba(4, 23, 17, 0.92) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1.5px solid rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6) !important;
     width: 100% !important;
+    padding: 18px 20px !important;
+    position: relative;
+    z-index: 20;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  body.cms-login-page #branding,
+  body.login #branding {
+    width: 100% !important;
+    max-width: 900px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  body.cms-login-page .branding-brand-wrap,
+  body.login .branding-brand-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 16px !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  body.cms-login-page .branding-emblem,
+  body.login .branding-emblem {
+    font-size: 2.6rem !important;
+    filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.6));
+    animation: emblemPulse 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes emblemPulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4)); }
+    100% { transform: scale(1.06); filter: drop-shadow(0 0 16px rgba(16, 185, 129, 0.8)); }
+  }
+
+  body.cms-login-page .branding-text-col,
+  body.login .branding-text-col {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  body.cms-login-page .branding-govt-title,
+  body.login .branding-govt-title {
+    font-size: 0.92rem !important;
+    font-weight: 800 !important;
+    color: #6ee7b7 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.14em !important;
+    margin-bottom: 4px !important;
+    display: block !important;
+    text-align: center !important;
+    text-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+  }
+
+  body.cms-login-page #header h1,
+  body.login #header h1,
+  body.cms-login-page #header h1 a,
+  body.login #header h1 a {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
+    font-size: 1.65rem !important;
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    letter-spacing: -0.015em !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+    display: block !important;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.2);
+    transition: color 0.2s ease, text-shadow 0.2s ease;
+  }
+
+  body.cms-login-page #header h1 a:hover {
+    color: #a7f3d0 !important;
+    text-shadow: 0 0 25px rgba(16, 185, 129, 0.7) !important;
+  }
+
+  @media (max-width: 640px) {
+    body.cms-login-page #header h1 a {
+      font-size: 1.25rem !important;
+    }
+    body.cms-login-page .branding-govt-title {
+      font-size: 0.78rem !important;
+      letter-spacing: 0.08em !important;
+    }
   }
 
   body.cms-login-page #main,
@@ -94,211 +210,449 @@
     align-items: center !important;
     justify-content: center !important;
     box-sizing: border-box !important;
+    perspective: 1200px !important;
   }
 
+  /* ==========================================================
+     3D Interactive Login Card Wrapper
+     ========================================================== */
   .login-card-wrapper {
     width: 100%;
     max-width: 440px;
     background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.2);
+    border-radius: 26px;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.2);
     overflow: hidden;
+    position: relative;
     margin: 0 auto !important;
-    animation: loginFadeIn 0.35s ease-out;
+    animation: cardEntrance3D 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+    transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.4, 1), box-shadow 0.3s ease;
+    will-change: transform;
   }
 
-  @keyframes loginFadeIn {
-    from {
+  @keyframes cardEntrance3D {
+    0% {
       opacity: 0;
-      transform: translateY(16px) scale(0.98);
+      transform: perspective(1200px) translateY(35px) rotateX(15deg) scale(0.92);
     }
-    to {
+    100% {
       opacity: 1;
-      transform: translateY(0) scale(1);
+      transform: perspective(1200px) translateY(0) rotateX(0deg) scale(1);
     }
   }
 
+  /* Shaking 3D animation for incorrect credentials */
+  .login-card-wrapper.shake-error {
+    animation: shakeCard3D 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
+  }
+
+  @keyframes shakeCard3D {
+    10%, 90% { transform: perspective(1200px) translate3d(-3px, 0, 10px) rotateY(-2deg); }
+    20%, 80% { transform: perspective(1200px) translate3d(5px, 0, 15px) rotateY(3deg); }
+    30%, 50%, 70% { transform: perspective(1200px) translate3d(-10px, 0, 20px) rotateY(-4deg); }
+    40%, 60% { transform: perspective(1200px) translate3d(10px, 0, 15px) rotateY(4deg); }
+  }
+
+  /* Progressive Scanner Line on top of card */
+  .progressive-line-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    z-index: 50;
+  }
+
+  .progressive-line {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #10b981 0%, #06b6d4 50%, #3b82f6 100%);
+    box-shadow: 0 0 14px #10b981, 0 0 8px #06b6d4;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .progressive-line.loading {
+    animation: progressiveIndeterminate 1.4s infinite ease-in-out;
+  }
+
+  @keyframes progressiveIndeterminate {
+    0% {
+      left: -35%;
+      width: 35%;
+    }
+    60% {
+      left: 100%;
+      width: 80%;
+    }
+    100% {
+      left: 100%;
+      width: 10%;
+    }
+  }
+
+  .progressive-line.success {
+    width: 100% !important;
+    left: 0 !important;
+    animation: none !important;
+    background: linear-gradient(90deg, #10b981 0%, #34d399 100%) !important;
+    box-shadow: 0 0 20px #10b981, 0 0 10px #34d399 !important;
+  }
+
+  .progressive-line.error {
+    width: 100% !important;
+    left: 0 !important;
+    animation: none !important;
+    background: linear-gradient(90deg, #ef4444 0%, #f43f5e 100%) !important;
+    box-shadow: 0 0 20px #ef4444 !important;
+  }
+
+  /* ==========================================================
+     Card Header with 3D Floating Emblem
+     ========================================================== */
   .login-card-header {
-    background: linear-gradient(135deg, #07271e 0%, #0d4233 100%);
+    background: linear-gradient(135deg, #042119 0%, #0a382c 100%);
     color: #ffffff;
-    padding: 28px 24px 24px;
+    padding: 34px 26px 26px;
     text-align: center;
     position: relative;
-    border-bottom: 3px solid #22c55e;
+    border-bottom: 3px solid #10b981;
+    transform-style: preserve-3d;
   }
 
   .login-emblem-badge {
-    width: 60px;
-    height: 60px;
+    width: 68px;
+    height: 68px;
     background: rgba(255, 255, 255, 0.12);
-    border: 2px solid rgba(74, 222, 128, 0.4);
-    border-radius: 16px;
+    border: 2px solid rgba(52, 211, 153, 0.45);
+    border-radius: 22px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    margin-bottom: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    font-size: 2.3rem;
+    margin-bottom: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(52, 211, 153, 0.25), 0 0 25px rgba(16, 185, 129, 0.3);
+    animation: emblemFloat3D 4s ease-in-out infinite alternate;
+    transform: translateZ(35px);
+    transition: transform 0.3s ease;
+  }
+
+  @keyframes emblemFloat3D {
+    0% { transform: translateZ(35px) translateY(0px) rotateY(-4deg); }
+    50% { transform: translateZ(48px) translateY(-6px) rotateY(4deg); }
+    100% { transform: translateZ(35px) translateY(0px) rotateY(-4deg); }
   }
 
   .login-card-title,
   .login-card-header h2,
   h2.login-card-title {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif !important;
-    font-size: 1.28rem !important;
+    font-size: 1.38rem !important;
     font-weight: 900 !important;
     color: #ffffff !important;
     margin: 0 0 4px 0 !important;
     letter-spacing: -0.02em !important;
+    transform: translateZ(25px);
   }
 
   .login-card-subtitle {
-    font-size: 0.82rem !important;
-    color: #86efac !important;
+    font-size: 0.85rem !important;
+    color: #6ee7b7 !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.06em !important;
-    margin: 0 0 12px 0 !important;
+    letter-spacing: 0.08em !important;
+    margin: 0 0 14px 0 !important;
+    transform: translateZ(20px);
   }
 
   .login-security-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(34, 197, 94, 0.18);
-    border: 1px solid rgba(74, 222, 128, 0.4);
-    color: #86efac;
-    font-size: 0.72rem;
+    background: rgba(16, 185, 129, 0.18);
+    border: 1px solid rgba(52, 211, 153, 0.4);
+    color: #a7f3d0;
+    font-size: 0.73rem;
     font-weight: 800;
-    padding: 3px 10px;
+    padding: 4px 13px;
     border-radius: 9999px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+    transform: translateZ(20px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
   }
 
+  /* ==========================================================
+     Card Body & Interactive 3D Form Elements
+     ========================================================== */
   .login-card-body {
-    padding: 28px 26px;
+    padding: 32px 28px 28px;
     background: #ffffff;
+    position: relative;
+    transform-style: preserve-3d;
   }
 
   .login-errornote {
     background: #fef2f2;
-    border: 1.5px solid #fecaca;
+    border: 1.5px solid #fca5a5;
     color: #991b1b;
-    padding: 12px 14px;
-    border-radius: 10px;
+    padding: 13px 16px;
+    border-radius: 14px;
     font-size: 0.86rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15);
+    animation: fadeInError3D 0.35s ease;
+    transform: translateZ(15px);
+  }
+
+  @keyframes fadeInError3D {
+    from { opacity: 0; transform: translateZ(0px) translateY(-10px); }
+    to { opacity: 1; transform: translateZ(15px) translateY(0); }
   }
 
   .login-field-group {
-    margin-bottom: 18px;
+    margin-bottom: 20px;
+    transform-style: preserve-3d;
   }
 
   .login-field-group label {
     display: block;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
     font-weight: 800;
     color: #0f172a;
-    margin-bottom: 6px;
+    margin-bottom: 7px;
+    transform: translateZ(15px);
   }
 
   .login-input-wrap {
     position: relative;
     display: flex;
     align-items: center;
+    transform-style: preserve-3d;
   }
 
   .login-input-icon {
     position: absolute;
-    left: 14px;
-    font-size: 1.05rem;
+    left: 15px;
+    font-size: 1.1rem;
     color: #64748b;
     pointer-events: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+    transform: translateZ(25px);
   }
 
   .login-input-wrap input[type="text"],
   .login-input-wrap input[type="password"] {
     width: 100% !important;
     box-sizing: border-box !important;
-    padding: 11px 14px 11px 42px !important;
-    font-size: 0.92rem !important;
+    padding: 13px 16px 13px 44px !important;
+    font-size: 0.94rem !important;
     font-weight: 600 !important;
     color: #0f172a !important;
     background: #f8fafc !important;
     border: 1.5px solid #cbd5e1 !important;
-    border-radius: 10px !important;
-    transition: all 0.2s ease !important;
+    border-radius: 14px !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transform: translateZ(15px);
   }
 
   .login-input-wrap input[type="text"]:focus,
   .login-input-wrap input[type="password"]:focus {
     background: #ffffff !important;
-    border-color: #16a34a !important;
+    border-color: #10b981 !important;
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2) !important;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2) !important;
+    transform: translateZ(25px) scale(1.01) !important;
   }
 
+  .login-input-wrap input.input-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2) !important;
+  }
+
+  /* Submit Button with 3D Depth Lift */
   .login-submit-btn {
     width: 100% !important;
-    background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 13px 20px !important;
-    border-radius: 10px !important;
+    padding: 15px 24px !important;
+    border-radius: 15px !important;
     font-weight: 900 !important;
-    font-size: 0.96rem !important;
+    font-size: 1rem !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
-    box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4) !important;
-    transition: all 0.2s ease !important;
-    margin-top: 22px !important;
+    gap: 10px !important;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    margin-top: 24px !important;
+    position: relative;
+    overflow: hidden;
+    transform: translateZ(25px);
   }
 
-  .login-submit-btn:hover {
-    background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 6px 18px rgba(22, 163, 74, 0.5) !important;
+  .login-submit-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669 0%, #065f46 100%) !important;
+    transform: translateZ(35px) translateY(-2px) !important;
+    box-shadow: 0 14px 35px rgba(16, 185, 129, 0.55) !important;
   }
 
+  .login-submit-btn:active:not(:disabled) {
+    transform: translateZ(20px) translateY(0) !important;
+  }
+
+  .login-submit-btn:disabled {
+    opacity: 0.85 !important;
+    cursor: wait !important;
+  }
+
+  /* Custom Loading Spinner */
+  .btn-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ==========================================================
+     3D Verified Success Overlay Animation
+     ========================================================== */
+  .verified-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    box-sizing: border-box;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+    transform-style: preserve-3d;
+  }
+
+  .verified-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .checkmark-circle {
+    width: 76px;
+    height: 76px;
+    background: #ecfdf5;
+    border: 3px solid #10b981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    color: #10b981;
+    margin-bottom: 18px;
+    box-shadow: 0 0 35px rgba(16, 185, 129, 0.35);
+    animation: checkmarkPop3D 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateZ(40px);
+  }
+
+  @keyframes checkmarkPop3D {
+    0% { transform: translateZ(0px) scale(0) rotate(-45deg); opacity: 0; }
+    80% { transform: translateZ(50px) scale(1.15) rotate(10deg); }
+    100% { transform: translateZ(40px) scale(1) rotate(0deg); opacity: 1; }
+  }
+
+  .verified-title {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: #064e3b;
+    margin: 0 0 6px 0;
+    text-align: center;
+    transform: translateZ(30px);
+  }
+
+  .verified-subtext {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #10b981;
+    margin: 0 0 22px 0;
+    text-align: center;
+    transform: translateZ(25px);
+  }
+
+  .launch-progress-bar {
+    width: 80%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+    transform: translateZ(20px);
+  }
+
+  .launch-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+    border-radius: 9999px;
+    transition: width 0.75s ease-out;
+  }
+
+  /* ==========================================================
+     Card Footer
+     ========================================================== */
   .login-card-footer {
-    padding: 16px 24px;
+    padding: 18px 24px;
     background: #f8fafc;
     border-top: 1px solid #e2e8f0;
     text-align: center;
+    transform-style: preserve-3d;
   }
 
   .login-back-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
     color: #0f172a;
     text-decoration: none;
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     font-weight: 800;
-    transition: color 0.2s ease;
+    transition: color 0.2s ease, transform 0.2s ease;
+    transform: translateZ(15px);
   }
 
   .login-back-link:hover {
-    color: #16a34a;
-  }
-
-  .login-copyright {
-    margin-top: 14px;
-    font-size: 0.72rem;
-    color: #94a3b8;
-    text-align: center;
+    color: #10b981;
+    transform: translateZ(25px);
   }
 </style>
 
-<div class="login-card-wrapper">
+<div class="login-card-wrapper" id="login-card">
+  <!-- Progressive Loading Line -->
+  <div class="progressive-line-container">
+    <div class="progressive-line" id="progressive-line"></div>
+  </div>
+
   <!-- Card Header -->
   <div class="login-card-header">
     <div class="login-emblem-badge">
@@ -313,28 +667,41 @@
 
   <!-- Card Form Body -->
   <div class="login-card-body">
-    {% if form.errors and not form.non_field_errors %}
-      <div class="login-errornote">
-        <span>⚠️</span>
-        <span>Please correct the errors in the fields below.</span>
+    <!-- Verified Success Overlay -->
+    <div class="verified-overlay" id="verified-overlay">
+      <div class="checkmark-circle">✓</div>
+      <h3 class="verified-title">Credentials Verified</h3>
+      <p class="verified-subtext">Session Authenticated • Launching CMS Dashboard...</p>
+      <div class="launch-progress-bar">
+        <div class="launch-progress-fill" id="launch-progress-fill"></div>
       </div>
-    {% endif %}
+    </div>
 
-    {% if form.non_field_errors %}
-      {% for error in form.non_field_errors %}
+    <!-- Error Notice Container (Dynamic JS & Backend Fallback) -->
+    <div id="dynamic-error-box">
+      {% if form.errors and not form.non_field_errors %}
         <div class="login-errornote">
           <span>⚠️</span>
-          <span>{{ error }}</span>
+          <span>Please correct the errors in the fields below.</span>
         </div>
-      {% endfor %}
-    {% endif %}
+      {% endif %}
 
-    {% if user.is_authenticated %}
-      <div class="login-errornote">
-        <span>⚠️</span>
-        <span>You are signed in as <strong>{{ username }}</strong>, but not authorized for this view.</span>
-      </div>
-    {% endif %}
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <div class="login-errornote">
+            <span>⚠️</span>
+            <span>{{ error|cut:"Note that both fields may be case-sensitive." }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      {% if user.is_authenticated %}
+        <div class="login-errornote">
+          <span>⚠️</span>
+          <span>You are signed in as <strong>{{ username }}</strong>, but not authorized for this view.</span>
+        </div>
+      {% endif %}
+    </div>
 
     <form action="{{ app_path }}" method="post" id="login-form">
       {% csrf_token %}
@@ -356,8 +723,9 @@
         </div>
       </div>
 
-      <button type="submit" class="login-submit-btn">
-        <span>🔐 Sign In to Console</span>
+      <button type="submit" class="login-submit-btn" id="submit-btn">
+        <span id="btn-icon">🔐</span>
+        <span id="btn-text">Sign In to Console</span>
       </button>
     </form>
   </div>
@@ -370,4 +738,255 @@
     </a>
   </div>
 </div>
+
+<!-- 3D Particle Canvas & Interactive Animation Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // ==========================================================
+  // 1. HTML5 Canvas 3D Particle Mesh Background
+  // ==========================================================
+  const canvas = document.getElementById("bg-3d-canvas");
+  if (canvas) {
+    const ctx = canvas.getContext("2d");
+    let width, height;
+    let particles = [];
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    const particleCount = Math.min(Math.floor(window.innerWidth / 20), 65);
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        z: Math.random() * 2 + 0.5,
+        radius: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        alpha: Math.random() * 0.5 + 0.2
+      });
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Connect near particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 130) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(16, 185, 129, ${0.18 * (1 - dist / 130)})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Render & update particles
+      particles.forEach(p => {
+        p.x += p.vx * p.z;
+        p.y += p.vy * p.z;
+
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius * p.z, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(52, 211, 153, ${p.alpha})`;
+        ctx.fill();
+      });
+
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+  }
+
+  // ==========================================================
+  // 2. Interactive 3D Perspective Card Tilt
+  // ==========================================================
+  const loginCard = document.getElementById("login-card");
+  const loginContainer = document.getElementById("content") || document.body;
+
+  loginContainer.addEventListener("mousemove", function (e) {
+    if (!loginCard) return;
+    const rect = loginCard.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+
+    // Calculate subtle 3D tilt angles (max ~8 deg)
+    const rotateX = (mouseY / (window.innerHeight / 2)) * -8;
+    const rotateY = (mouseX / (window.innerWidth / 2)) * 8;
+
+    loginCard.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(10px)`;
+    loginCard.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2 + 25}px 75px rgba(0, 0, 0, 0.65), 0 0 30px rgba(16, 185, 129, 0.15)`;
+  });
+
+  loginContainer.addEventListener("mouseleave", function () {
+    if (!loginCard) return;
+    loginCard.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+    loginCard.style.boxShadow = "0 30px 80px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.2)";
+  });
+
+  // ==========================================================
+  // 3. Form Submission & 3D Verified Overlay Logic
+  // ==========================================================
+  const loginForm = document.getElementById("login-form");
+  const progressiveLine = document.getElementById("progressive-line");
+  const submitBtn = document.getElementById("submit-btn");
+  const btnIcon = document.getElementById("btn-icon");
+  const btnText = document.getElementById("btn-text");
+  const dynamicErrorBox = document.getElementById("dynamic-error-box");
+  const verifiedOverlay = document.getElementById("verified-overlay");
+  const launchProgressFill = document.getElementById("launch-progress-fill");
+
+  const usernameInput = document.querySelector('input[name="username"]');
+  const passwordInput = document.querySelector('input[name="password"]');
+
+  // Trigger shake if backend rendered errors on load
+  if (dynamicErrorBox.children.length > 0 && dynamicErrorBox.innerText.trim() !== "") {
+    let initialError = dynamicErrorBox.innerText.trim();
+    triggerErrorState(initialError);
+  }
+
+  function resetFieldErrors() {
+    if (usernameInput) usernameInput.classList.remove("input-error");
+    if (passwordInput) passwordInput.classList.remove("input-error");
+  }
+
+  function triggerErrorState(msg) {
+    // 1. Shake 3D card animation
+    loginCard.classList.remove("shake-error");
+    void loginCard.offsetWidth; // Force reflow
+    loginCard.classList.add("shake-error");
+
+    // 2. Set error line
+    progressiveLine.className = "progressive-line error";
+
+    // 3. Highlight inputs
+    if (usernameInput) usernameInput.classList.add("input-error");
+    if (passwordInput) passwordInput.classList.add("input-error");
+
+    // 4. Clean error message: Remove "Note that both fields may be case-sensitive."
+    let cleanMsg = msg || "Please enter the correct username and password for a staff account.";
+    cleanMsg = cleanMsg.replace(/Note that both fields may be case-sensitive\./gi, "").trim();
+
+    // 5. Update Error Banner
+    dynamicErrorBox.innerHTML = `
+      <div class="login-errornote">
+        <span>❌</span>
+        <span>${cleanMsg}</span>
+      </div>
+    `;
+
+    // 6. Reset button
+    submitBtn.disabled = false;
+    btnIcon.innerHTML = "🔐";
+    btnText.textContent = "Sign In to Console";
+
+    // Clear error line after 2.5s
+    setTimeout(function () {
+      progressiveLine.className = "progressive-line";
+    }, 2500);
+  }
+
+  loginForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    resetFieldErrors();
+
+    const usernameVal = usernameInput ? usernameInput.value.trim() : "";
+    const passwordVal = passwordInput ? passwordInput.value.trim() : "";
+
+    if (!usernameVal || !passwordVal) {
+      triggerErrorState("Please enter both Username and Password.");
+      return;
+    }
+
+    // Start Progressive Loader Line & Button Loading state
+    progressiveLine.className = "progressive-line loading";
+    submitBtn.disabled = true;
+    btnIcon.innerHTML = `<div class="btn-spinner"></div>`;
+    btnText.textContent = "Verifying Credentials...";
+    dynamicErrorBox.innerHTML = "";
+
+    const formData = new FormData(loginForm);
+
+    fetch(loginForm.action || window.location.href, {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-Requested-With": "XMLHttpRequest"
+      }
+    })
+      .then(function (response) {
+        if (
+          response.redirected ||
+          (response.url && response.url.indexOf("/admin/") !== -1 && response.url.indexOf("/admin/login") === -1)
+        ) {
+          handleSuccessRedirect(response.url || "/admin/");
+          return null;
+        }
+        return response.text().then(function (html) {
+          return { status: response.status, html: html };
+        });
+      })
+      .then(function (res) {
+        if (!res) return; // Handled by redirect
+
+        const html = res.html;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        const hasErrors = doc.querySelector(".errornote, .login-errornote, .errorlist");
+        const isDashboard = doc.querySelector("#user-tools, #content-main, body.dashboard");
+
+        if (isDashboard || (!hasErrors && res.status === 200 && doc.querySelector("body:not(.login)"))) {
+          handleSuccessRedirect("/admin/");
+        } else {
+          let errorMsg = "Please enter the correct username and password for a staff account.";
+          if (hasErrors) {
+            errorMsg = hasErrors.innerText.replace(/[\r\n]+/g, " ").trim();
+          }
+          triggerErrorState(errorMsg);
+        }
+      })
+      .catch(function (err) {
+        console.warn("AJAX login fallback to standard form POST", err);
+        loginForm.submit();
+      });
+  });
+
+  function handleSuccessRedirect(targetUrl) {
+    // 1. Success line glow
+    progressiveLine.className = "progressive-line success";
+
+    // 2. Activate 3D Verified Overlay
+    verifiedOverlay.classList.add("active");
+
+    // 3. Fill progressive countdown bar
+    setTimeout(function () {
+      launchProgressFill.style.width = "100%";
+    }, 50);
+
+    // 4. Smooth redirect after animation completes
+    setTimeout(function () {
+      window.location.href = targetUrl || "/admin/";
+    }, 750);
+  }
+});
+</script>
 {% endblock %}
