@@ -109,7 +109,7 @@ export function ProcurementPreview({
               <Sparkles className="h-3.5 w-3.5" />
               Official Government Procurement Notice
             </span>
-            <h3 id="procurement-preview-title" className="text-2xl font-extrabold !text-white leading-snug tracking-tight">
+            <h3 id="procurement-preview-title" className="text-2xl font-extrabold !text-white leading-snug tracking-tight text-justify">
               {tender.title}
             </h3>
           </div>

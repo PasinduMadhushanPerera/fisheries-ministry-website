@@ -40,6 +40,8 @@ function getFileIcon(fileType: ProcurementNotice["fileType"]) {
 }
 
 function getStatusBadge(status: ProcurementNotice["status"]) {
+  if (!status || !status.trim()) return null
+
   switch (status) {
     case "Open":
       return (
@@ -60,12 +62,13 @@ function getStatusBadge(status: ProcurementNotice["status"]) {
         </span>
       )
     case "Closed":
-    default:
       return (
         <span className="rounded-md bg-slate-100 text-slate-700 border border-slate-300 px-2 py-0.5 text-[11px] font-bold">
           Closed
         </span>
       )
+    default:
+      return null
   }
 }
 
@@ -111,7 +114,7 @@ export function ProcurementFeatured({
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-base font-extrabold text-slate-900 leading-snug group-hover:text-[#256B29] transition-colors line-clamp-2">
+                  <h3 className="text-base font-extrabold text-slate-900 leading-snug group-hover:text-[#256B29] transition-colors line-clamp-2 text-justify">
                     {tender.title}
                   </h3>
 

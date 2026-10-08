@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from .models import ProcurementPageHeader, ProcurementTenderItem
+from .models import ProcurementPageHeader, ProcurementTenderItem, ProcurementTenderDocument
 
 
 class ProcurementPageHeaderAdminForm(forms.ModelForm):
@@ -19,19 +19,29 @@ class ProcurementTenderItemAdminForm(forms.ModelForm):
         model = ProcurementTenderItem
         fields = "__all__"
         widgets = {
+            "title_en": forms.Textarea(attrs={"rows": 2}),
+            "title_si": forms.Textarea(attrs={"rows": 2}),
+            "title_ta": forms.Textarea(attrs={"rows": 2}),
             "description_en": forms.Textarea(attrs={"rows": 3}),
             "description_si": forms.Textarea(attrs={"rows": 3}),
             "description_ta": forms.Textarea(attrs={"rows": 3}),
-            "detailed_scope_en": forms.Textarea(attrs={"rows": 4}),
-            "detailed_scope_si": forms.Textarea(attrs={"rows": 4}),
-            "detailed_scope_ta": forms.Textarea(attrs={"rows": 4}),
-            "submission_address_en": forms.Textarea(attrs={"rows": 2}),
-            "submission_address_si": forms.Textarea(attrs={"rows": 2}),
-            "submission_address_ta": forms.Textarea(attrs={"rows": 2}),
-            "eligibility_en": forms.Textarea(attrs={"rows": 2}),
-            "eligibility_si": forms.Textarea(attrs={"rows": 2}),
-            "eligibility_ta": forms.Textarea(attrs={"rows": 2}),
+            "additional_info_en": forms.Textarea(attrs={"rows": 4}),
+            "additional_info_si": forms.Textarea(attrs={"rows": 4}),
+            "additional_info_ta": forms.Textarea(attrs={"rows": 4}),
         }
+
+
+class ProcurementTenderDocumentInline(admin.StackedInline):
+    model = ProcurementTenderDocument
+    extra = 0
+    verbose_name = "Additional Document"
+    verbose_name_plural = "📂 Additional Tender Documents (Click 'Add Document' below to add more documents)"
+    fields = (
+        "order",
+        ("label_en", "label_si", "label_ta"),
+        ("document_file", "file_url"),
+        ("file_type", "file_size"),
+    )
 
 
 @admin.register(ProcurementPageHeader)
@@ -75,35 +85,32 @@ class ProcurementPageHeaderAdmin(admin.ModelAdmin):
 @admin.register(ProcurementTenderItem)
 class ProcurementTenderItemAdmin(admin.ModelAdmin):
     form = ProcurementTenderItemAdminForm
+    inlines = [ProcurementTenderDocumentInline]
     list_display = [
         "order",
-        "ref_number",
         "year",
         "title_en",
-        "publisher_en",
+        "ref_number",
         "category",
         "status",
-        "closing_date",
         "featured",
         "is_active",
     ]
-    list_display_links = ["ref_number", "title_en"]
+    list_display_links = ["title_en"]
     list_editable = ["order", "status", "featured", "is_active"]
     list_filter = ["year", "category", "status", "featured", "is_active"]
     search_fields = [
-        "ref_number",
         "title_en",
         "title_si",
         "title_ta",
+        "ref_number",
         "publisher_en",
-        "publisher_si",
-        "publisher_ta",
         "slug",
     ]
-    prepopulated_fields = {"slug": ("ref_number", "title_en")}
+    prepopulated_fields = {"slug": ("title_en",)}
 
     fieldsets = (
-        ("Tender Classification & Status", {
+        ("Classification & Status", {
             "fields": (
                 ("order", "slug"),
                 ("ref_number", "year"),
@@ -117,10 +124,8 @@ class ProcurementTenderItemAdmin(admin.ModelAdmin):
                 ("publisher_en", "category_label_en"),
                 "description_en",
                 "detailed_scope_en",
-                "submission_address_en",
-                ("tender_fee_en", "bid_security_en"),
-                "eligibility_en",
-                "contact_info_en",
+                "additional_info_en",
+                "doc_button_label_en",
             ),
         }),
         ("🇱🇰 Sinhala Content (සිංහල)", {
@@ -129,10 +134,8 @@ class ProcurementTenderItemAdmin(admin.ModelAdmin):
                 ("publisher_si", "category_label_si"),
                 "description_si",
                 "detailed_scope_si",
-                "submission_address_si",
-                ("tender_fee_si", "bid_security_si"),
-                "eligibility_si",
-                "contact_info_si",
+                "additional_info_si",
+                "doc_button_label_si",
             ),
         }),
         ("🇱🇰 Tamil Content (தமிழ்)", {
@@ -141,19 +144,24 @@ class ProcurementTenderItemAdmin(admin.ModelAdmin):
                 ("publisher_ta", "category_label_ta"),
                 "description_ta",
                 "detailed_scope_ta",
-                "submission_address_ta",
-                ("tender_fee_ta", "bid_security_ta"),
-                "eligibility_ta",
-                "contact_info_ta",
+                "additional_info_ta",
+                "doc_button_label_ta",
             ),
         }),
         ("📅 Important Dates", {
             "fields": (("published_date", "closing_date"),),
         }),
-        ("📄 Bidding Document & Downloads", {
+        ("📄 Primary Bidding Document & Downloads", {
             "fields": (
                 ("document_file", "file_url"),
                 ("file_type", "file_size"),
+            ),
+        }),
+        ("📎 Secondary Document & Downloads (e.g. SOR Document)", {
+            "fields": (
+                ("second_document_label_en", "second_document_label_si", "second_document_label_ta"),
+                ("second_document_file", "second_file_url"),
+                ("second_file_type", "second_file_size"),
             ),
         }),
     )

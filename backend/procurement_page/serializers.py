@@ -1,8 +1,10 @@
 from rest_framework import serializers
-from .models import ProcurementPageHeader, ProcurementTenderItem
+from .models import ProcurementPageHeader, ProcurementTenderItem, ProcurementTenderDocument
 
 
 def resolve_lang(obj, field_base: str, context: dict) -> str:
+    if not obj:
+        return ""
     lang = context.get("lang", "en")
     if lang in ["si", "ta"]:
         val = getattr(obj, f"{field_base}_{lang}", None)
@@ -38,12 +40,40 @@ class ProcurementPageHeaderSerializer(serializers.ModelSerializer):
     def get_library_title(self, obj): return resolve_lang(obj, "library_title", self.context)
 
 
+class ProcurementTenderDocumentSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    download_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProcurementTenderDocument
+        fields = [
+            "id",
+            "label",
+            "download_url",
+            "file_type",
+            "file_size",
+        ]
+
+    def get_label(self, obj):
+        label = resolve_lang(obj, "label", self.context)
+        return label or "Document can be downloaded from here"
+
+    def get_download_url(self, obj):
+        if obj.document_file:
+            request = self.context.get("request")
+            return request.build_absolute_uri(obj.document_file.url) if request else obj.document_file.url
+        return obj.file_url or "#"
+
+
 class ProcurementTenderItemSerializer(serializers.ModelSerializer):
+    ref_number = serializers.CharField()
     title = serializers.SerializerMethodField()
     publisher = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     category_label = serializers.SerializerMethodField()
     detailed_scope = serializers.SerializerMethodField()
+    additional_info = serializers.SerializerMethodField()
+    doc_button_label = serializers.SerializerMethodField()
     submission_address = serializers.SerializerMethodField()
     tender_fee = serializers.SerializerMethodField()
     bid_security = serializers.SerializerMethodField()
@@ -51,14 +81,18 @@ class ProcurementTenderItemSerializer(serializers.ModelSerializer):
     contact_info = serializers.SerializerMethodField()
     download_url = serializers.SerializerMethodField()
 
+    second_document_label = serializers.SerializerMethodField()
+    second_download_url = serializers.SerializerMethodField()
+    additional_documents = ProcurementTenderDocumentSerializer(many=True, read_only=True)
+
     class Meta:
         model = ProcurementTenderItem
         fields = [
             "id",
             "slug",
             "order",
-            "ref_number",
             "year",
+            "ref_number",
             "category",
             "category_label",
             "status",
@@ -67,32 +101,32 @@ class ProcurementTenderItemSerializer(serializers.ModelSerializer):
             "publisher",
             "description",
             "detailed_scope",
-            "published_date",
-            "closing_date",
+            "additional_info",
+            "doc_button_label",
             "submission_address",
             "tender_fee",
             "bid_security",
             "eligibility",
             "contact_info",
+            "published_date",
+            "closing_date",
             "download_url",
             "file_type",
             "file_size",
+            "second_document_label",
+            "second_download_url",
+            "second_file_type",
+            "second_file_size",
+            "additional_documents",
         ]
 
     def get_title(self, obj): return resolve_lang(obj, "title", self.context)
     def get_publisher(self, obj): return resolve_lang(obj, "publisher", self.context)
     def get_description(self, obj): return resolve_lang(obj, "description", self.context)
-    def get_category_label(self, obj):
-        label = resolve_lang(obj, "category_label", self.context)
-        if not label:
-            return obj.get_category_display()
-        return label
-
-    def get_detailed_scope(self, obj):
-        scope_text = resolve_lang(obj, "detailed_scope", self.context)
-        if scope_text:
-            return [line.strip() for line in scope_text.splitlines() if line.strip()]
-        return []
+    def get_additional_info(self, obj): return resolve_lang(obj, "additional_info", self.context)
+    def get_doc_button_label(self, obj):
+        label = resolve_lang(obj, "doc_button_label", self.context)
+        return label or "Document can be downloaded from here"
 
     def get_submission_address(self, obj): return resolve_lang(obj, "submission_address", self.context)
     def get_tender_fee(self, obj): return resolve_lang(obj, "tender_fee", self.context)
@@ -100,8 +134,43 @@ class ProcurementTenderItemSerializer(serializers.ModelSerializer):
     def get_eligibility(self, obj): return resolve_lang(obj, "eligibility", self.context)
     def get_contact_info(self, obj): return resolve_lang(obj, "contact_info", self.context)
 
+    def get_category_label(self, obj):
+        if not obj.category:
+            return ""
+        lang = self.context.get("lang", "en")
+        if lang in ["si", "ta"]:
+            val = getattr(obj, f"category_label_{lang}", None)
+            if val and str(val).strip():
+                return str(val).strip()
+
+        val_en = getattr(obj, "category_label_en", None)
+        if val_en and str(val_en).strip():
+            return str(val_en).strip()
+
+        display_name = obj.get_category_display()
+        if not display_name:
+            return ""
+        return display_name.split(" ", 1)[1] if (" " in display_name and not display_name[0].isalnum()) else display_name
+
+    def get_detailed_scope(self, obj):
+        scope_str = resolve_lang(obj, "detailed_scope", self.context)
+        if not scope_str or not scope_str.strip():
+            desc = self.get_description(obj)
+            return [desc] if desc else []
+        return [line.strip() for line in scope_str.split("\n") if line.strip()]
+
     def get_download_url(self, obj):
         if obj.document_file:
             request = self.context.get("request")
             return request.build_absolute_uri(obj.document_file.url) if request else obj.document_file.url
         return obj.file_url or "#"
+
+    def get_second_document_label(self, obj):
+        return resolve_lang(obj, "second_document_label", self.context)
+
+    def get_second_download_url(self, obj):
+        if obj.second_document_file:
+            request = self.context.get("request")
+            return request.build_absolute_uri(obj.second_document_file.url) if request else obj.second_document_file.url
+        return obj.second_file_url or ""
+

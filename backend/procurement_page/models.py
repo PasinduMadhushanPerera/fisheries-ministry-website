@@ -2,6 +2,7 @@ from pathlib import Path
 from uuid import uuid4
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 from common.models import TimeStampedModel
 
 
@@ -11,7 +12,21 @@ def procurement_upload_path(instance, filename):
     return f"procurement/{timezone.now():%Y/%m}/{safe_filename}"
 
 
+def format_file_size(size_bytes: int) -> str:
+    if not size_bytes or size_bytes <= 0:
+        return ""
+    if size_bytes < 1024:
+        return f"{size_bytes} B"
+    elif size_bytes < 1024 * 1024:
+        kb = round(size_bytes / 1024, 1)
+        return f"{int(kb) if kb.is_integer() else kb} KB"
+    else:
+        mb = round(size_bytes / (1024 * 1024), 1)
+        return f"{int(mb) if mb.is_integer() else mb} MB"
+
+
 CATEGORY_CHOICES = [
+    ("", "⚪ No Category (Unselected)"),
     ("harbour", "🏗️ Harbour & Civil Works"),
     ("equipment", "❄️ Equipment & Machinery"),
     ("it", "💻 IT, VMS & Communications"),
@@ -21,6 +36,7 @@ CATEGORY_CHOICES = [
 ]
 
 STATUS_CHOICES = [
+    ("", "⚪ No Status Badge (Unselected)"),
     ("Open", "🟢 Open for Bidding"),
     ("Closing Soon", "🟡 Closing Soon"),
     ("Closed", "🔴 Tender Closed"),
@@ -87,59 +103,109 @@ class ProcurementPageHeader(TimeStampedModel):
 # ==========================================================
 class ProcurementTenderItem(TimeStampedModel):
     order = models.PositiveIntegerField(default=1, help_text="Display priority sequence")
-    slug = models.SlugField(max_length=150, unique=True, help_text="Unique identifier slug (e.g. mirissa-harbour-dredging-2026)")
-    ref_number = models.CharField(max_length=100, verbose_name="Tender Ref No (e.g. MOF/PR/2026/04)")
+    slug = models.SlugField(max_length=150, unique=True, blank=True, help_text="Unique identifier slug (auto-generated if left blank)")
+    ref_number = models.CharField(max_length=100, blank=True, default="", verbose_name="Tender Ref No (e.g. MOF/PR/2026/04)")
     year = models.IntegerField(default=2026, help_text="Procurement Year (e.g. 2026, 2025, 2024)")
-    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default="harbour")
-    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="Open")
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, blank=True, default="")
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, blank=True, default="")
     featured = models.BooleanField(default=False, help_text="Check to display in top 'Featured Tenders' section")
     is_active = models.BooleanField(default=True, help_text="Display on live website")
 
     # 🇬🇧 English Content
-    title_en = models.CharField(max_length=255, verbose_name="Tender Title (English)")
-    publisher_en = models.CharField(max_length=255, verbose_name="Procuring Entity / Department (English)")
-    description_en = models.TextField(verbose_name="Short Description (English)")
+    title_en = models.CharField(max_length=500, verbose_name="Tender Title (English)")
+    publisher_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Procuring Entity / Department (English)")
+    description_en = models.TextField(blank=True, default="", verbose_name="Short Description (English)")
     category_label_en = models.CharField(max_length=100, blank=True, default="", verbose_name="Category Label (English)")
     detailed_scope_en = models.TextField(blank=True, default="", verbose_name="Detailed Scope / Key Requirements (English - One per line)")
+    additional_info_en = models.TextField(blank=True, default="", verbose_name="Additional Information / Zoom Meeting Details (English)")
     submission_address_en = models.TextField(blank=True, default="", verbose_name="Bid Submission Address (English)")
     tender_fee_en = models.CharField(max_length=150, blank=True, default="", verbose_name="Non-Refundable Tender Fee (English)")
     bid_security_en = models.CharField(max_length=150, blank=True, default="", verbose_name="Bid Security / Guarantee (English)")
     eligibility_en = models.TextField(blank=True, default="", verbose_name="Eligibility & Registration (English)")
     contact_info_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Inquiries Contact (English)")
+    doc_button_label_en = models.CharField(max_length=255, blank=True, default="Document can be downloaded from here", verbose_name="Primary Doc Download Label (English)")
 
     # 🇱🇰 Sinhala Content (සිංහල)
-    title_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Tender Title (සිංහල)")
+    title_si = models.CharField(max_length=500, blank=True, default="", verbose_name="Tender Title (සිංහල)")
     publisher_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Procuring Entity (සිංහල)")
     description_si = models.TextField(blank=True, default="", verbose_name="Short Description (සිංහල)")
     category_label_si = models.CharField(max_length=100, blank=True, default="", verbose_name="Category Label (සිංහල)")
     detailed_scope_si = models.TextField(blank=True, default="", verbose_name="Detailed Scope (සිංහල - එක් පේළියකට එකක්)")
+    additional_info_si = models.TextField(blank=True, default="", verbose_name="Additional Information (සිංහල)")
     submission_address_si = models.TextField(blank=True, default="", verbose_name="Submission Address (සිංහල)")
     tender_fee_si = models.CharField(max_length=150, blank=True, default="", verbose_name="Tender Fee (සිංහල)")
     bid_security_si = models.CharField(max_length=150, blank=True, default="", verbose_name="Bid Security (සිංහල)")
     eligibility_si = models.TextField(blank=True, default="", verbose_name="Eligibility (සිංහල)")
     contact_info_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Contact (සිංහල)")
+    doc_button_label_si = models.CharField(max_length=255, blank=True, default="ලේඛනය මෙතැනින් බාගත හැකිය", verbose_name="Primary Doc Download Label (සිංහල)")
 
     # 🇱🇰 Tamil Content (தமிழ்)
-    title_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Tender Title (தமிழ்)")
+    title_ta = models.CharField(max_length=500, blank=True, default="", verbose_name="Tender Title (தமிழ்)")
     publisher_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Procuring Entity (தமிழ்)")
     description_ta = models.TextField(blank=True, default="", verbose_name="Short Description (தமிழ்)")
     category_label_ta = models.CharField(max_length=100, blank=True, default="", verbose_name="Category Label (தமிழ்)")
     detailed_scope_ta = models.TextField(blank=True, default="", verbose_name="Detailed Scope (தமிழ் - ஒரு வரியில் ஒன்று)")
+    additional_info_ta = models.TextField(blank=True, default="", verbose_name="Additional Information (தமிழ்)")
     submission_address_ta = models.TextField(blank=True, default="", verbose_name="Submission Address (தமிழ்)")
     tender_fee_ta = models.CharField(max_length=150, blank=True, default="", verbose_name="Tender Fee (தமிழ்)")
     bid_security_ta = models.CharField(max_length=150, blank=True, default="", verbose_name="Bid Security (தமிழ்)")
     eligibility_ta = models.TextField(blank=True, default="", verbose_name="Eligibility (தமிழ்)")
     contact_info_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Contact (தமிழ்)")
+    doc_button_label_ta = models.CharField(max_length=255, blank=True, default="கேள்விப்பத்திர ஆவணத்தை இங்கிருந்து பதிவிறக்கம் செய்யலாம்", verbose_name="Primary Doc Download Label (தமிழ்)")
 
     # Dates & Metadata
     published_date = models.CharField(max_length=50, blank=True, default="", help_text="e.g. '2026-02-01'")
     closing_date = models.CharField(max_length=50, blank=True, default="", help_text="e.g. '2026-03-25'")
 
-    # Media & Downloads
-    document_file = models.FileField(upload_to=procurement_upload_path, blank=True, null=True, help_text="Upload PDF / DOCX Bidding Document")
+    # Primary Document & Downloads
+    document_file = models.FileField(upload_to=procurement_upload_path, blank=True, null=True, help_text="Upload Primary PDF / DOCX Bidding Document")
     file_url = models.CharField(max_length=500, blank=True, default="#", help_text="Direct link or external procurement URL")
     file_type = models.CharField(max_length=10, choices=FILE_TYPE_CHOICES, default="PDF")
-    file_size = models.CharField(max_length=50, default="2.4 MB", help_text="e.g. '2.4 MB' or '1.8 MB'")
+    file_size = models.CharField(max_length=50, blank=True, default="", help_text="Auto-calculated if blank, or enter e.g. '483 KB'")
+
+    # Secondary Document & Downloads (e.g. SOR document)
+    second_document_label_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Secondary Doc Download Label (English e.g. 'Document can be downloaded from here')")
+    second_document_label_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Secondary Doc Download Label (සිංහල)")
+    second_document_label_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Secondary Doc Download Label (தமிழ்)")
+    second_document_file = models.FileField(upload_to=procurement_upload_path, blank=True, null=True, help_text="Upload Secondary Document (e.g. SOR document)")
+    second_file_url = models.CharField(max_length=500, blank=True, default="", help_text="Direct link for secondary document")
+    second_file_type = models.CharField(max_length=10, choices=FILE_TYPE_CHOICES, default="PDF")
+    second_file_size = models.CharField(max_length=50, blank=True, default="", help_text="Auto-calculated if blank, or enter e.g. '753 KB'")
+
+    def save(self, *args, **kwargs):
+        # 1. Auto-generate slug if blank
+        if not self.slug or not str(self.slug).strip():
+            base = slugify(self.title_en[:100]) if self.title_en else f"proc-{uuid4().hex[:6]}"
+            slug = base
+            count = 1
+            while ProcurementTenderItem.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base}-{count}"
+                count += 1
+            self.slug = slug
+
+        # 2. Auto-calculate primary file size
+        if self.document_file:
+            if not self.file_size or not str(self.file_size).strip():
+                try:
+                    if hasattr(self.document_file, "size") and self.document_file.size:
+                        calc_size = format_file_size(self.document_file.size)
+                        if calc_size:
+                            self.file_size = calc_size
+                except Exception:
+                    pass
+
+        # 3. Auto-calculate secondary file size
+        if self.second_document_file:
+            if not self.second_file_size or not str(self.second_file_size).strip():
+                try:
+                    if hasattr(self.second_document_file, "size") and self.second_document_file.size:
+                        calc_size = format_file_size(self.second_document_file.size)
+                        if calc_size:
+                            self.second_file_size = calc_size
+                except Exception:
+                    pass
+
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ["-year", "order", "-id"]
@@ -147,4 +213,49 @@ class ProcurementTenderItem(TimeStampedModel):
         verbose_name_plural = "02. Procurement Tender Items"
 
     def __str__(self) -> str:
-        return f"[{self.ref_number}] {self.title_en} ({self.status})"
+        return f"[{self.ref_number or 'Tender'}] {self.title_en[:60]} ({self.status})"
+
+
+# ==========================================================
+# 03. Additional Tender Documents (Dynamic / Dynamic List)
+# ==========================================================
+class ProcurementTenderDocument(TimeStampedModel):
+    tender = models.ForeignKey(
+        ProcurementTenderItem,
+        on_delete=models.CASCADE,
+        related_name="additional_documents",
+        verbose_name="Procurement Tender Item"
+    )
+    order = models.PositiveIntegerField(default=1, help_text="Display priority order")
+
+    # Download Button Labels (Multilingual)
+    label_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Doc Download Label (English e.g. 'SOR Document' or 'Addendum 01')")
+    label_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Doc Download Label (සිංහල)")
+    label_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Doc Download Label (தமிழ்)")
+
+    # Document File & Details
+    document_file = models.FileField(upload_to=procurement_upload_path, blank=True, null=True, help_text="Upload PDF / DOCX Document")
+    file_url = models.CharField(max_length=500, blank=True, default="", help_text="Direct link or external document URL")
+    file_type = models.CharField(max_length=10, choices=FILE_TYPE_CHOICES, default="PDF")
+    file_size = models.CharField(max_length=50, blank=True, default="", help_text="Auto-calculated if blank, or enter e.g. '483 KB'")
+
+    def save(self, *args, **kwargs):
+        if self.document_file:
+            if not self.file_size or not str(self.file_size).strip():
+                try:
+                    if hasattr(self.document_file, "size") and self.document_file.size:
+                        calc_size = format_file_size(self.document_file.size)
+                        if calc_size:
+                            self.file_size = calc_size
+                except Exception:
+                    pass
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "03. Additional Tender Document"
+        verbose_name_plural = "03. Additional Tender Documents"
+
+    def __str__(self) -> str:
+        return f"Doc: {self.label_en or 'Document'} ({self.file_type})"
+

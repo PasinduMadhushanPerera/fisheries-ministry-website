@@ -1,19 +1,13 @@
 "use client"
 
+import { useMemo } from "react"
 import {
-  FileText,
-  FileType2,
-  FileSpreadsheet,
-  FileArchive,
-  Files,
   Download,
-  Eye,
   Building2,
   SearchX,
-  ShoppingBag,
+  FileText,
   Calendar,
   Clock,
-  Tag,
 } from "lucide-react"
 
 import type { ProcurementNotice } from "@/data/procurement-tenders"
@@ -29,22 +23,9 @@ interface ProcurementLibraryProps {
   onClearFilters: () => void
 }
 
-function getFileIcon(fileType: string) {
-  switch (fileType) {
-    case "PDF":
-      return FileText
-    case "DOCX":
-      return FileType2
-    case "XLSX":
-      return FileSpreadsheet
-    case "ZIP":
-      return FileArchive
-    default:
-      return Files
-  }
-}
-
 function getStatusBadge(status: ProcurementNotice["status"]) {
+  if (!status || !status.trim()) return null
+
   switch (status) {
     case "Open":
       return (
@@ -67,12 +48,13 @@ function getStatusBadge(status: ProcurementNotice["status"]) {
         </span>
       )
     case "Closed":
-    default:
       return (
         <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-600 border border-slate-200">
           Closed
         </span>
       )
+    default:
+      return null
   }
 }
 
@@ -82,17 +64,26 @@ export function ProcurementLibrary({
   setActiveYearTab,
   catalogueBadge,
   libraryTitle,
-  onSelectTender,
   onClearFilters,
 }: ProcurementLibraryProps) {
+  const availableYears = useMemo(() => {
+    const yearsSet = new Set<string>(["2026", "2025", "2024"])
+    if (tenders) {
+      tenders.forEach((t) => {
+        if (t.year) yearsSet.add(t.year.toString())
+      })
+    }
+    return Array.from(yearsSet).sort((a, b) => Number(b) - Number(a))
+  }, [tenders])
+
   return (
-    <section aria-label="Procurement notices library" className="bg-white py-12 sm:py-16">
+    <section aria-label="Procurement tenders list" className="bg-slate-50/70 py-12 sm:py-16 border-b border-slate-200">
       <Container>
-        {/* Header & Year Dropdown */}
+        {/* Header & Year Select */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-200 pb-6 mb-8">
           <div>
             <span className="text-xs font-extrabold uppercase tracking-wider text-[#256B29] flex items-center gap-1.5 mb-1">
-              <ShoppingBag className="h-4 w-4 text-[#256B29]" />
+              <FileText className="h-4 w-4 text-[#256B29]" />
               <span>{catalogueBadge || "Active & Archived Notices"}</span>
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
@@ -110,98 +101,117 @@ export function ProcurementLibrary({
               id="procurement-library-year-select"
               value={activeYearTab}
               onChange={(e) => setActiveYearTab(e.target.value)}
-              className="rounded-xl border border-slate-300 bg-slate-50 px-4 py-2 text-xs font-extrabold text-slate-900 focus:border-[#256B29] focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-100 transition-all cursor-pointer shadow-2xs"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-extrabold text-slate-900 focus:border-[#256B29] focus:outline-none focus:ring-4 focus:ring-emerald-100 transition-all cursor-pointer shadow-2xs"
             >
               <option value="All">All Years</option>
-              <option value="2026">2026</option>
-              <option value="2025">2025</option>
-              <option value="2024">2024</option>
+              {availableYears.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr}
+                </option>
+              ))}
             </select>
           </div>
         </div>
 
-        {/* Card Grid */}
+        {/* Distinct Card Item List */}
         {tenders.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-4">
             {tenders.map((tender) => {
-              const FileIcon = getFileIcon(tender.fileType)
+              const primaryUrl = tender.downloadUrl || tender.fileUrl || "#"
+              const secondaryUrl = tender.secondDownloadUrl || "#"
 
               return (
                 <article
                   key={tender.id}
-                  className="group flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-xs transition-all duration-300 hover:border-emerald-300 hover:shadow-xl hover:-translate-y-1"
+                  className="overflow-hidden rounded-2xl border border-slate-200/90 border-l-4 border-l-[#256B29] bg-white p-5 sm:p-6 shadow-xs transition-all duration-200 hover:border-[#256B29]/60 hover:shadow-md"
                 >
-                  <div className="space-y-4">
-                    {/* Header Badges */}
-                    <div className="flex items-center justify-between gap-2 flex-wrap">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="rounded-md bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 text-[11px] font-extrabold text-[#256B29]">
-                          REF: {tender.refNumber}
+                  <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                    {/* Left Side: Title & Info (~72% width on desktop) */}
+                    <div className="lg:w-[72%] space-y-3 min-w-0">
+                      {/* Title */}
+                      <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug text-justify">
+                        {tender.title}
+                      </h3>
+
+                      {/* Meta Tags: Publisher & Status if present */}
+                      {(tender.publisher || tender.status) && (
+                        <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-600">
+                          {tender.publisher && (
+                            <span className="flex items-center gap-1 text-slate-600">
+                              <Building2 className="h-3.5 w-3.5 text-[#256B29] shrink-0" />
+                              <span>{tender.publisher}</span>
+                            </span>
+                          )}
+                          {getStatusBadge(tender.status)}
+                        </div>
+                      )}
+
+                      {/* Additional Information Section (e.g. Zoom Meeting info) */}
+                      {tender.additionalInfo && (
+                        <div className="mt-3 rounded-2xl bg-emerald-50/50 p-4 border border-emerald-200/80 text-xs text-slate-800 leading-relaxed font-mono whitespace-pre-line shadow-2xs">
+                          {tender.additionalInfo}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Side: Download Buttons (~28% width on desktop) */}
+                    <div className="lg:w-[28%] flex flex-col items-stretch lg:items-end justify-start gap-3 shrink-0">
+                      {/* Primary Download Button */}
+                      <a
+                        href={primaryUrl}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex flex-col items-center justify-center rounded-2xl border border-[#256B29] bg-white px-4 py-3 text-center transition-all duration-200 hover:bg-emerald-50/80 hover:shadow-xs shadow-2xs w-full cursor-pointer"
+                      >
+                        <span className="text-xs font-bold text-[#256B29] group-hover:text-[#1b4d1d] leading-snug">
+                          {tender.docButtonLabel || "Document can be downloaded from here"}
                         </span>
-                      </div>
+                        <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-extrabold text-[#256B29] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                          <Download className="h-3 w-3" />
+                          <span>[{tender.fileType || "PDF"} {tender.fileSize}]</span>
+                        </span>
+                      </a>
 
-                      {getStatusBadge(tender.status)}
+                      {/* Secondary Download Button (if present, e.g. SOR Document) */}
+                      {(tender.secondDownloadUrl || tender.secondFileSize) && (
+                        <a
+                          href={secondaryUrl}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex flex-col items-center justify-center rounded-2xl border border-[#256B29] bg-white px-4 py-3 text-center transition-all duration-200 hover:bg-emerald-50/80 hover:shadow-xs shadow-2xs w-full cursor-pointer"
+                        >
+                          <span className="text-xs font-bold text-[#256B29] group-hover:text-[#1b4d1d] leading-snug">
+                            {tender.secondDocumentLabel || "Document can be downloaded from here"}
+                          </span>
+                          <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-extrabold text-[#256B29] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            <Download className="h-3 w-3" />
+                            <span>[{tender.secondFileType || "PDF"} {tender.secondFileSize}]</span>
+                          </span>
+                        </a>
+                      )}
+
+                      {/* Additional Dynamic Documents (if present) */}
+                      {tender.additionalDocuments && tender.additionalDocuments.map((doc) => (
+                        <a
+                          key={doc.id}
+                          href={doc.downloadUrl || "#"}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex flex-col items-center justify-center rounded-2xl border border-[#256B29] bg-white px-4 py-3 text-center transition-all duration-200 hover:bg-emerald-50/80 hover:shadow-xs shadow-2xs w-full cursor-pointer"
+                        >
+                          <span className="text-xs font-bold text-[#256B29] group-hover:text-[#1b4d1d] leading-snug">
+                            {doc.label || "Document can be downloaded from here"}
+                          </span>
+                          <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-extrabold text-[#256B29] bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                            <Download className="h-3 w-3" />
+                            <span>[{doc.fileType || "PDF"} {doc.fileSize}]</span>
+                          </span>
+                        </a>
+                      ))}
                     </div>
-
-                    {/* Title */}
-                    <h3 className="text-base font-extrabold text-slate-900 leading-snug group-hover:text-[#256B29] transition-colors line-clamp-2">
-                      {tender.title}
-                    </h3>
-
-                    {/* Publisher */}
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
-                      <Building2 className="h-3.5 w-3.5 text-[#256B29] shrink-0" />
-                      <span className="line-clamp-1">{tender.publisher}</span>
-                    </div>
-
-                    {/* Description - Justified Text */}
-                    <p className="text-xs text-slate-600 leading-relaxed text-justify line-clamp-3 font-normal">
-                      {tender.description}
-                    </p>
-
-                    {/* Dates Bar */}
-                    <div className="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
-                      <div>
-                        <span className="text-slate-400 block font-bold">Published:</span>
-                        <span className="font-semibold text-slate-700">{tender.publishedDate}</span>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 block font-bold">Closing Date:</span>
-                        <span className="font-extrabold text-slate-900">{tender.closingDate}</span>
-                      </div>
-                    </div>
-
-                    {/* File Info Bar */}
-                    <div className="flex items-center gap-2 pt-2 border-t border-slate-100 text-xs text-slate-600">
-                      <div className="flex items-center gap-1.5 font-bold text-slate-800 bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200">
-                        <FileIcon className="h-4 w-4 text-[#256B29]" />
-                        <span>{tender.fileType} Format</span>
-                      </div>
-                      <span className="text-slate-400">•</span>
-                      <span className="text-slate-600 font-medium">{tender.fileSize}</span>
-                    </div>
-                  </div>
-
-                  {/* View Details & Download Buttons */}
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
-                    <button
-                      type="button"
-                      onClick={() => onSelectTender(tender)}
-                      className="inline-flex min-h-[38px] flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#256B29] px-4 text-xs font-extrabold text-white hover:bg-[#1b4d1d] transition shadow-2xs cursor-pointer"
-                    >
-                      <Eye className="h-3.5 w-3.5" />
-                      <span>View details</span>
-                    </button>
-
-                    <a
-                      href={tender.downloadUrl}
-                      download
-                      className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-                      title="Download file"
-                    >
-                      <Download className="h-3.5 w-3.5 text-[#256B29]" />
-                      <span>Download</span>
-                    </a>
                   </div>
                 </article>
               )

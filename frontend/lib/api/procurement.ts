@@ -21,6 +21,8 @@ export interface ApiProcurementTenderItem {
   publisher: string
   description: string
   detailed_scope: string[]
+  additional_info?: string
+  doc_button_label?: string
   published_date: string
   closing_date: string
   submission_address: string
@@ -31,6 +33,10 @@ export interface ApiProcurementTenderItem {
   download_url: string
   file_type: "PDF" | "DOCX" | "XLSX" | "ZIP"
   file_size: string
+  second_document_label?: string
+  second_download_url?: string
+  second_file_type?: "PDF" | "DOCX" | "XLSX" | "ZIP"
+  second_file_size?: string
 }
 
 export interface ApiProcurementPageData {

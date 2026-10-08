@@ -1,9 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { ProcurementHero } from "@/components/services/procurement-hero"
 import { ProcurementToolbar } from "@/components/services/procurement-toolbar"
-import { ProcurementFeatured } from "@/components/services/procurement-featured"
 import { ProcurementLibrary } from "@/components/services/procurement-library"
 import { ProcurementPreview } from "@/components/services/procurement-preview"
 import { procurementNotices as defaultProcurementNotices, type ProcurementNotice } from "@/data/procurement-tenders"
@@ -43,7 +41,8 @@ export function ProcurementPageContent({ initialData }: ProcurementPageContentPr
 
   // Map API tenders or fallback to static list
   const tendersList: ProcurementNotice[] = useMemo(() => {
-    if (initialData?.tenders && initialData.tenders.length > 0) {
+    if (initialData !== undefined && initialData !== null) {
+      if (!initialData.tenders) return []
       return initialData.tenders.map((t) => ({
         id: t.slug || String(t.id),
         refNumber: t.ref_number,
@@ -51,6 +50,8 @@ export function ProcurementPageContent({ initialData }: ProcurementPageContentPr
         publisher: t.publisher,
         description: t.description,
         detailedScope: t.detailed_scope && t.detailed_scope.length > 0 ? t.detailed_scope : [t.description],
+        additionalInfo: t.additional_info,
+        docButtonLabel: t.doc_button_label,
         category: t.category as any,
         categoryLabel: t.category_label,
         publishedDate: t.published_date,
@@ -64,6 +65,10 @@ export function ProcurementPageContent({ initialData }: ProcurementPageContentPr
         fileSize: t.file_size,
         fileUrl: t.download_url,
         downloadUrl: t.download_url,
+        secondDocumentLabel: t.second_document_label,
+        secondDownloadUrl: t.second_download_url,
+        secondFileType: t.second_file_type as any,
+        secondFileSize: t.second_file_size,
         featured: t.featured,
         status: t.status,
         year: t.year,
@@ -139,10 +144,7 @@ export function ProcurementPageContent({ initialData }: ProcurementPageContentPr
 
   return (
     <>
-      {/* 1. Compact Page Hero if enabled */}
-      {/* <ProcurementHero initialHeader={initialData?.header} /> */}
-
-      {/* 2. Search & Filter Toolbar */}
+      {/* 1. Search & Filter Toolbar */}
       <ProcurementToolbar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -160,14 +162,7 @@ export function ProcurementPageContent({ initialData }: ProcurementPageContentPr
         onClearFilters={handleClearFilters}
       />
 
-      {/* 3. Featured Procurement Notices */}
-      <ProcurementFeatured
-        tenders={filteredTenders}
-        featuredBadge={initialData?.header?.featured_badge}
-        onSelectTender={(tender) => setSelectedTender(tender)}
-      />
-
-      {/* 4. Procurement Library Grid */}
+      {/* 2. Procurement Row List */}
       <ProcurementLibrary
         tenders={filteredTenders}
         activeYearTab={selectedYear}
@@ -178,7 +173,7 @@ export function ProcurementPageContent({ initialData }: ProcurementPageContentPr
         onClearFilters={handleClearFilters}
       />
 
-      {/* 5. Same-page Procurement Preview Modal */}
+      {/* 3. Same-page Procurement Preview Modal */}
       <ProcurementPreview
         tender={selectedTender}
         onClose={() => setSelectedTender(null)}
