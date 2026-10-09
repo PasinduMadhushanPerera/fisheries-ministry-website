@@ -130,8 +130,12 @@ def custom_get_app_list(request, app_label=None):
 admin.site.get_app_list = custom_get_app_list
 
 from django.views.generic.base import RedirectView
+from header_footer.views import custom_admin_password_change_view
 
 urlpatterns = [
+    # Custom Account Settings (Username & Password) View
+    path("admin/password_change/", custom_admin_password_change_view, name="admin_password_change"),
+
     # Graceful redirect for old / removed RTI header URL
     path("admin/rti_page/rtiheader/<path:subpath>", RedirectView.as_view(url="/admin/rti_page/rtiofficer/", permanent=False)),
     path("admin/rti_page/rtiheader/", RedirectView.as_view(url="/admin/rti_page/rtiofficer/", permanent=False)),

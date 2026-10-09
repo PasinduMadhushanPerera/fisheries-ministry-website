@@ -79,6 +79,9 @@ class WebsiteViewsCounterAdmin(admin.ModelAdmin):
         return not WebsiteViewsCounter.objects.exists()
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.urls import reverse
 from django.utils.html import format_html
 from .models import SiteMaintenanceSetting
 
@@ -121,4 +124,44 @@ class SiteMaintenanceSettingAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not SiteMaintenanceSetting.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def changelist_view(self, request, extra_context=None):
+        obj = SiteMaintenanceSetting.objects.first()
+        if obj:
+            return redirect(reverse('admin:header_footer_sitemaintenancesetting_change', args=[obj.pk]))
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        # Handle lock action if requested
+        if request.GET.get('lock') == '1':
+            request.session['maintenance_access_verified'] = False
+            messages.info(request, "🔒 Maintenance mode access has been locked.")
+            return redirect(reverse('admin:header_footer_sitemaintenancesetting_change', args=[object_id]))
+
+        # Security password verification check
+        if not request.session.get('maintenance_access_verified'):
+            error_message = None
+            if request.method == 'POST' and 'verify_admin_password' in request.POST:
+                password = request.POST.get('admin_password', '')
+                if request.user.check_password(password):
+                    request.session['maintenance_access_verified'] = True
+                    messages.success(request, "🔓 Admin identity verified successfully! Access granted to Maintenance Mode settings.")
+                    return redirect(request.path)
+                else:
+                    error_message = "❌ Invalid password! Please enter your correct admin password."
+
+            context = {
+                **self.admin_site.each_context(request),
+                'title': '🔒 Security Verification Required',
+                'error_message': error_message,
+                'opts': self.model._meta,
+                'object_id': object_id,
+            }
+            return render(request, 'admin/header_footer/maintenance_verify.html', context)
+
+        return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
 

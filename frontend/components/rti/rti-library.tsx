@@ -12,7 +12,6 @@ import {
   ExternalLink,
   Eye,
   Search,
-  Filter,
   X,
   ChevronDown,
   FolderOpen,
@@ -28,8 +27,6 @@ import {
 import { Container } from "@/components/ui/container"
 import type { ApiRtiCategory, ApiRtiDocumentItem } from "@/lib/api/rti"
 
-type FormatFilterPill = "All formats" | "PDF" | "Excel" | "Word" | "Archive"
-
 interface RtiLibraryProps {
   categories?: ApiRtiCategory[]
   documents?: ApiRtiDocumentItem[]
@@ -38,7 +35,6 @@ interface RtiLibraryProps {
 export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps) {
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>("All categories")
-  const [activeFormatFilter, setActiveFormatFilter] = useState<FormatFilterPill>("All formats")
 
   // Accordion state: Open first category or "biannual-reports" by default
   const defaultOpenCat = categories.find((c) => c.id === "biannual-reports")?.id || categories[0]?.id || "biannual-reports"
@@ -70,13 +66,11 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
 
   const isFiltered =
     searchQuery !== "" ||
-    activeCategoryFilter !== "All categories" ||
-    activeFormatFilter !== "All formats"
+    activeCategoryFilter !== "All categories"
 
   const clearFilters = () => {
     setSearchQuery("")
     setActiveCategoryFilter("All categories")
-    setActiveFormatFilter("All formats")
     setOpenCategory(defaultOpenCat)
   }
 
@@ -97,16 +91,9 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
         matchesCategory = doc.category === activeCategoryFilter
       }
 
-      // Format filter match
-      let matchesFormat = true
-      if (activeFormatFilter === "PDF") matchesFormat = doc.fileType === "PDF"
-      else if (activeFormatFilter === "Excel") matchesFormat = doc.fileType === "XLSX" || doc.fileType === "XLS" || doc.fileType === "CSV"
-      else if (activeFormatFilter === "Word") matchesFormat = doc.fileType === "DOCX" || doc.fileType === "DOC"
-      else if (activeFormatFilter === "Archive") matchesFormat = doc.fileType === "ZIP"
-
-      return matchesSearch && matchesCategory && matchesFormat
+      return matchesSearch && matchesCategory
     })
-  }, [documents, searchQuery, activeCategoryFilter, activeFormatFilter])
+  }, [documents, searchQuery, activeCategoryFilter])
 
   // Group items by category for rendering in accordion sections
   const groupedCategories = useMemo(() => {
@@ -218,27 +205,6 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                   </option>
                 ))}
               </select>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold text-slate-500 mr-1 flex items-center gap-1">
-                  <Filter className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-                  Format:
-                </span>
-                {(["All formats", "PDF", "Excel", "Word", "Archive"] as FormatFilterPill[]).map((fmt) => (
-                  <button
-                    key={fmt}
-                    type="button"
-                    onClick={() => setActiveFormatFilter(fmt)}
-                    className={`rounded-lg px-3 py-1 text-xs font-semibold transition-colors cursor-pointer ${
-                      activeFormatFilter === fmt
-                        ? "bg-[#0B3D3A] text-white"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200/70"
-                    }`}
-                  >
-                    {fmt}
-                  </button>
-                ))}
-              </div>
 
               {isFiltered && (
                 <button

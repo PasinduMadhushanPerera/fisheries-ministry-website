@@ -169,13 +169,98 @@
     text-shadow: 0 0 25px rgba(16, 185, 129, 0.7) !important;
   }
 
+  /* Responsive Media Queries for All Viewports & Split Window Displays */
   @media (max-width: 640px) {
-    body.cms-login-page #header h1 a {
-      font-size: 1.25rem !important;
+    body.cms-login-page #header,
+    body.login #header {
+      padding: 12px 14px !important;
     }
-    body.cms-login-page .branding-govt-title {
-      font-size: 0.78rem !important;
+
+    body.cms-login-page .branding-brand-wrap,
+    body.login .branding-brand-wrap {
+      flex-direction: column !important;
+      gap: 6px !important;
+      align-items: center !important;
+      text-align: center !important;
+    }
+
+    body.cms-login-page .branding-emblem,
+    body.login .branding-emblem {
+      font-size: 2.1rem !important;
+    }
+
+    body.cms-login-page #header h1 a,
+    body.login #header h1 a {
+      font-size: 1.15rem !important;
+      line-height: 1.25 !important;
+      text-align: center !important;
+    }
+
+    body.cms-login-page .branding-govt-title,
+    body.login .branding-govt-title {
+      font-size: 0.72rem !important;
       letter-spacing: 0.08em !important;
+      text-align: center !important;
+    }
+
+    body.cms-login-page #content,
+    body.login #content {
+      padding: 16px 12px 30px !important;
+    }
+
+    .login-card-wrapper {
+      max-width: 100% !important;
+      width: calc(100% - 8px) !important;
+      border-radius: 20px !important;
+    }
+
+    .login-card-header {
+      padding: 24px 18px 18px !important;
+    }
+
+    .login-card-body {
+      padding: 24px 18px 20px !important;
+    }
+
+    .login-emblem-badge {
+      width: 58px !important;
+      height: 58px !important;
+      font-size: 1.9rem !important;
+      margin-bottom: 10px !important;
+      border-radius: 18px !important;
+    }
+
+    .login-card-title,
+    .login-card-header h2 {
+      font-size: 1.2rem !important;
+    }
+
+    .login-security-pill {
+      font-size: 0.68rem !important;
+      padding: 3px 10px !important;
+    }
+
+    .login-submit-btn {
+      padding: 13px 18px !important;
+      font-size: 0.94rem !important;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .login-card-header {
+      padding: 20px 14px 14px !important;
+    }
+    .login-card-body {
+      padding: 18px 14px 16px !important;
+    }
+    .login-input-wrap input[type="text"],
+    .login-input-wrap input[type="password"] {
+      padding: 11px 12px 11px 38px !important;
+      font-size: 0.88rem !important;
+    }
+    .login-input-icon {
+      left: 12px !important;
+      font-size: 1rem !important;
     }
   }
 
@@ -761,7 +846,7 @@
         <div class="login-input-wrap">
           <span class="login-input-icon">🔑</span>
           {{ form.password }}
-          <input type="hidden" name="next" value="{{ next }}">
+          <input type="hidden" name="next" value="{% firstof next '/admin/' %}">
         </div>
       </div>
 
@@ -980,9 +1065,9 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(function (response) {
         if (
           response.redirected ||
-          (response.url && response.url.indexOf("/admin/") !== -1 && response.url.indexOf("/admin/login") === -1)
+          (response.url && response.url.indexOf("/admin/login") === -1)
         ) {
-          handleSuccessRedirect(response.url || "/admin/");
+          handleSuccessRedirect("/admin/");
           return null;
         }
         return response.text().then(function (html) {
@@ -999,7 +1084,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const hasErrors = doc.querySelector(".errornote, .login-errornote, .errorlist");
         const isDashboard = doc.querySelector("#user-tools, #content-main, body.dashboard");
 
-        if (isDashboard || (!hasErrors && res.status === 200 && doc.querySelector("body:not(.login)"))) {
+        if (isDashboard || (!hasErrors && res.status === 200 && !doc.querySelector("body.login"))) {
           handleSuccessRedirect("/admin/");
         } else {
           let errorMsg = "Please enter the correct username and password for a staff account.";

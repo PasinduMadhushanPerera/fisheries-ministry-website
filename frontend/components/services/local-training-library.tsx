@@ -267,18 +267,8 @@ export function LocalTrainingLibrary({
                   </div>
                 </div>
 
-                {/* Right: Action Buttons (Details, Open, Download) matching RTI */}
+                {/* Right: Action Buttons (Open, Download) */}
                 <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
-                  <button
-                    type="button"
-                    onClick={() => onSelectProgramme(programme)}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50 cursor-pointer shadow-2xs"
-                    title="View details"
-                  >
-                    <Eye className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                    <span>Details</span>
-                  </button>
-
                   <a
                     href={targetUrl}
                     target="_blank"
@@ -293,11 +283,11 @@ export function LocalTrainingLibrary({
                   <a
                     href={targetUrl}
                     download
-                    className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#388E3C] px-3.5 text-xs font-bold text-white transition hover:bg-[#256B29] shadow-2xs cursor-pointer"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#388E3C] px-3.5 text-xs font-bold !text-white transition hover:bg-[#256B29] shadow-2xs cursor-pointer"
                     title="Download file"
                   >
-                    <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>Download</span>
+                    <Download className="h-3.5 w-3.5 !text-white" aria-hidden="true" />
+                    <span className="!text-white">Download</span>
                   </a>
                 </div>
               </div>

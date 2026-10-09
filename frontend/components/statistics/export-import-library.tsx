@@ -12,7 +12,6 @@ import {
   ExternalLink,
   Eye,
   Search,
-  Filter,
   X,
   ArrowRight,
   FolderOpen,
@@ -31,7 +30,6 @@ import type {
   ApiExportImportReport,
 } from "@/lib/api/export-import-statistics"
 
-type FormatCategory = "All formats" | "PDF" | "Excel" | "CSV" | "Archive"
 type SortOption = "Newest first" | "Oldest first"
 
 interface ExportImportLibraryProps {
@@ -62,20 +60,15 @@ export function ExportImportLibrary({
 
   const [selectedYear, setSelectedYear] = useState<string>("All years")
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [selectedFormat, setSelectedFormat] = useState<FormatCategory>("All formats")
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
-
-
 
   const isFiltered =
     searchQuery !== "" ||
-    selectedYear !== "All years" ||
-    selectedFormat !== "All formats"
+    selectedYear !== "All years"
 
   const clearFilters = () => {
     setSearchQuery("")
     setSelectedYear("All years")
-    setSelectedFormat("All formats")
     setSortOrder("Newest first")
   }
 
@@ -102,15 +95,7 @@ export function ExportImportLibrary({
         report.title.toLowerCase().includes(query) ||
         (report.description && report.description.toLowerCase().includes(query))
 
-      // Format match
-      let matchesFormat = true
-      if (selectedFormat === "PDF") matchesFormat = report.fileType === "PDF"
-      else if (selectedFormat === "Excel")
-        matchesFormat = report.fileType === "XLSX" || report.fileType === "XLS"
-      else if (selectedFormat === "CSV") matchesFormat = report.fileType === "CSV"
-      else if (selectedFormat === "Archive") matchesFormat = report.fileType === "ZIP"
-
-      return matchesYear && matchesSearch && matchesFormat
+      return matchesYear && matchesSearch
     })
 
     // Sort order
@@ -121,7 +106,7 @@ export function ExportImportLibrary({
     }
 
     return result
-  }, [allReports, selectedYear, searchQuery, selectedFormat, sortOrder])
+  }, [allReports, selectedYear, searchQuery, sortOrder])
 
   // Group filtered reports by Year
   const groupedByYear = useMemo(() => {
@@ -270,41 +255,18 @@ export function ExportImportLibrary({
                   <option value="Oldest first">Oldest first</option>
                 </select>
               </div>
-            </div>
-          </div>
 
-          {/* Format Tabs Bar */}
-          <div className="mt-5 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 mr-1 flex items-center gap-1">
-                <Filter className="h-3 w-3" /> Formats:
-              </span>
-              {(["All formats", "PDF", "Excel", "CSV", "Archive"] as FormatCategory[]).map((fmt) => (
+              {isFiltered && (
                 <button
-                  key={fmt}
                   type="button"
-                  onClick={() => setSelectedFormat(fmt)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                    selectedFormat === fmt
-                      ? "bg-[#256B29] text-white shadow-2xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                  onClick={clearFilters}
+                  className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer ml-auto sm:ml-0"
                 >
-                  {fmt}
+                  <X className="h-3.5 w-3.5" />
+                  <span>Reset filters</span>
                 </button>
-              ))}
+              )}
             </div>
-
-            {isFiltered && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Reset all filters</span>
-              </button>
-            )}
           </div>
         </div>
 

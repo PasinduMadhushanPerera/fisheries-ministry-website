@@ -14,7 +14,6 @@ import {
   ExternalLink,
   Eye,
   Search,
-  Filter,
   X,
   ChevronDown,
   ArrowRight,
@@ -65,24 +64,20 @@ export function FisheryInformationLibrary({
   }, [items])
 
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>("All")
   const [sortOrder, setSortOrder] = useState<SortOption>("Title A–Z")
 
   // Accordion state: Open the first category by default
   const defaultOpenCat = allCategories.length > 0 ? allCategories[0].id : "landing-site-maps"
   const [openCategory, setOpenCategory] = useState<string | null>(defaultOpenCat)
 
-
-
   const toggleCategory = (catId: string) => {
     setOpenCategory((prev) => (prev === catId ? null : catId))
   }
 
-  const isFiltered = searchQuery !== "" || activeCategoryFilter !== "All"
+  const isFiltered = searchQuery !== ""
 
   const clearFilters = () => {
     setSearchQuery("")
-    setActiveCategoryFilter("All")
     setSortOrder("Title A–Z")
     setOpenCategory(defaultOpenCat)
   }
@@ -99,11 +94,7 @@ export function FisheryInformationLibrary({
         (item.location && item.location.toLowerCase().includes(query)) ||
         (item.year && item.year.toString().includes(query))
 
-      // Category filter pill match
-      const matchesCategory =
-        activeCategoryFilter === "All" || item.category === activeCategoryFilter
-
-      return matchesSearch && matchesCategory
+      return matchesSearch
     })
 
     // Sort
@@ -116,21 +107,18 @@ export function FisheryInformationLibrary({
     }
 
     return result
-  }, [allItems, searchQuery, activeCategoryFilter, sortOrder])
+  }, [allItems, searchQuery, sortOrder])
 
   // Visible Categories to display (accounting for active filters and newly created categories)
   const visibleCategories = useMemo(() => {
     return allCategories.filter((cat) => {
-      if (activeCategoryFilter !== "All" && activeCategoryFilter !== cat.id) {
-        return false
-      }
       if (searchQuery.trim() !== "") {
         const catItems = filteredItems.filter((i) => i.category === cat.id)
         return catItems.length > 0
       }
       return true
     })
-  }, [allCategories, activeCategoryFilter, searchQuery, filteredItems])
+  }, [allCategories, searchQuery, filteredItems])
 
   // Helper for format badge styling
   const getFormatBadge = (type: string) => {
@@ -252,72 +240,34 @@ export function FisheryInformationLibrary({
             </div>
 
             {/* Sort Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
-                Sort:
-              </span>
-              <select
-                value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value as SortOption)}
-                className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none cursor-pointer"
-                aria-label="Sort information items"
-              >
-                <option value="Title A–Z">Title A–Z</option>
-                <option value="Newest first">Newest first</option>
-                <option value="Oldest first">Oldest first</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Quick Filter Pills Bar */}
-          <div className="mt-5 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 mr-1 flex items-center gap-1">
-                <Filter className="h-3 w-3" /> Categories:
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveCategoryFilter("All")
-                  setOpenCategory(defaultOpenCat)
-                }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                  activeCategoryFilter === "All"
-                    ? "bg-[#256B29] text-white shadow-2xs"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                All
-              </button>
-              {allCategories.map((cat) => (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => {
-                    setActiveCategoryFilter(cat.id)
-                    setOpenCategory(cat.id)
-                  }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                    activeCategoryFilter === cat.id
-                      ? "bg-[#256B29] text-white shadow-2xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
+                  Sort:
+                </span>
+                <select
+                  value={sortOrder}
+                  onChange={(e) => setSortOrder(e.target.value as SortOption)}
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none cursor-pointer"
+                  aria-label="Sort information items"
                 >
-                  {cat.title}
-                </button>
-              ))}
-            </div>
+                  <option value="Title A–Z">Title A–Z</option>
+                  <option value="Newest first">Newest first</option>
+                  <option value="Oldest first">Oldest first</option>
+                </select>
+              </div>
 
-            {isFiltered && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Reset all filters</span>
-              </button>
-            )}
+              {isFiltered && (
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer ml-auto sm:ml-0"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  <span>Reset filters</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

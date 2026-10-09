@@ -81,7 +81,6 @@ export function DownloadsLibrary({
   const [selectedYear, setSelectedYear] = useState<string>("All years")
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>("All categories")
   const [showAllCategories, setShowAllCategories] = useState<boolean>(false)
-  const [activeFormatFilter, setActiveFormatFilter] = useState<FormatFilterPill>("All formats")
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
 
   // Accordion state: Open first category by default
@@ -163,14 +162,12 @@ export function DownloadsLibrary({
   const isFiltered =
     searchQuery !== "" ||
     selectedYear !== "All years" ||
-    activeCategoryFilter !== "All categories" ||
-    activeFormatFilter !== "All formats"
+    activeCategoryFilter !== "All categories"
 
   const clearFilters = () => {
     setSearchQuery("")
     setSelectedYear("All years")
     setActiveCategoryFilter("All categories")
-    setActiveFormatFilter("All formats")
     setSortOrder("Newest first")
     setOpenCategory(categoriesList[0]?.id || "project-disclosures")
   }
@@ -196,22 +193,7 @@ export function DownloadsLibrary({
         activeCategoryFilter === "All categories" ||
         doc.category === activeCategoryFilter
 
-      // Format filter match
-      let matchesFormat = true
-      if (activeFormatFilter === "PDF") matchesFormat = doc.fileType === "PDF"
-      else if (activeFormatFilter === "Excel")
-        matchesFormat =
-          doc.fileType === "XLSX" || doc.fileType === "XLS" || doc.fileType === "CSV"
-      else if (activeFormatFilter === "Word")
-        matchesFormat = doc.fileType === "DOCX" || doc.fileType === "DOC"
-      else if (activeFormatFilter === "PowerPoint")
-        matchesFormat = doc.fileType === "PPTX" || doc.fileType === "PPT"
-      else if (activeFormatFilter === "Archive")
-        matchesFormat = doc.fileType === "ZIP"
-      else if (activeFormatFilter === "Image")
-        matchesFormat = doc.fileType === "PNG" || doc.fileType === "JPG"
-
-      return matchesSearch && matchesYear && matchesCategory && matchesFormat
+      return matchesSearch && matchesYear && matchesCategory
     })
 
     if (sortOrder === "Title A–Z") {
@@ -228,7 +210,6 @@ export function DownloadsLibrary({
     searchQuery,
     selectedYear,
     activeCategoryFilter,
-    activeFormatFilter,
     sortOrder,
   ])
 
@@ -382,42 +363,6 @@ export function DownloadsLibrary({
                   <span>Reset Filters</span>
                 </button>
               )}
-            </div>
-          </div>
-
-          {/* Format Filter Pills */}
-          <div className="mt-5 pt-5 border-t border-slate-100">
-            <div className="flex items-center gap-2 mb-2">
-              <Files className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
-              <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                Filter by File Format
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {(
-                [
-                  "All formats",
-                  "PDF",
-                  "Excel",
-                  "Word",
-                  "PowerPoint",
-                  "Archive",
-                  "Image",
-                ] as FormatFilterPill[]
-              ).map((format) => (
-                <button
-                  key={format}
-                  type="button"
-                  onClick={() => setActiveFormatFilter(format)}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                    activeFormatFilter === format
-                      ? "bg-slate-900 text-white shadow-2xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
-                >
-                  {format}
-                </button>
-              ))}
             </div>
           </div>
         </div>

@@ -275,6 +275,88 @@
     transform: translateY(-1px) !important;
   }
 
+  .header-maintenance-btn {
+    background: rgba(234, 179, 8, 0.18) !important;
+    color: #fef08a !important;
+    border: 1px solid rgba(250, 204, 21, 0.45) !important;
+    padding: 6px 12px !important;
+    border-radius: var(--radius-sm) !important;
+    font-weight: 800 !important;
+    font-size: 0.80rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .header-maintenance-btn:hover {
+    background: #eab308 !important;
+    color: #0f172a !important;
+    border-color: #eab308 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(234, 179, 8, 0.35) !important;
+  }
+
+  .header-maintenance-btn.maint-active {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #fca5a5 !important;
+    animation: maintPulse 2s infinite !important;
+    box-shadow: 0 0 12px rgba(220, 38, 38, 0.6) !important;
+  }
+
+  @keyframes maintPulse {
+    0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+  }
+
+  /* Prominent Extra Large Toggle Container for Maintenance Mode Checkbox */
+  .field-is_maintenance_mode,
+  div.field-is_maintenance_mode {
+    background: linear-gradient(135deg, #fef2f2 0%, #ffe4e6 100%) !important;
+    border: 2px solid #f87171 !important;
+    border-radius: 16px !important;
+    padding: 20px 24px !important;
+    margin: 16px 0 24px !important;
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.12) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+  }
+
+  .field-is_maintenance_mode > div,
+  .field-is_maintenance_mode .flex-container {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  .field-is_maintenance_mode input[type="checkbox"],
+  #id_is_maintenance_mode {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    cursor: pointer !important;
+    accent-color: #dc2626 !important;
+    transform: scale(1.4) !important;
+    margin: 0 8px 0 4px !important;
+  }
+
+  .field-is_maintenance_mode label,
+  .field-is_maintenance_mode label.vCheckboxLabel {
+    font-size: 1.12rem !important;
+    font-weight: 900 !important;
+    color: #991b1b !important;
+    cursor: pointer !important;
+    line-height: 1.4 !important;
+  }
+
   #user-tools #logout-form {
     display: inline-flex !important;
     margin: 0 !important;
@@ -2329,6 +2411,11 @@
     <span>🌐</span>
     <span>View Live Site</span>
   </a>
+  <a href="/admin/header_footer/sitemaintenancesetting/" id="header-maintenance-btn" class="header-maintenance-btn" title="Site Maintenance Settings & Security Control">
+    <span id="maint-btn-icon">🚨</span>
+    <span id="maint-btn-label">Maintenance Mode</span>
+    <span id="maint-btn-status-badge" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 9999px; background: rgba(255,255,255,0.2); color: #ffffff; font-weight: 800; margin-left: 2px;">OFF</span>
+  </a>
   <a href="{% url 'admin:password_change' %}" class="header-action-btn" title="Change Password">
     <span>🔑</span>
     <span>Password</span>
@@ -2346,6 +2433,38 @@
 {{ block.super }}
 <script>
   (function() {
+    function updateHeaderMaintenanceStatus() {
+      fetch('/api/v1/header-footer/maintenance/')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          const btn = document.getElementById('header-maintenance-btn');
+          const icon = document.getElementById('maint-btn-icon');
+          const label = document.getElementById('maint-btn-label');
+          const badge = document.getElementById('maint-btn-status-badge');
+          if (!btn) return;
+          if (data && data.is_maintenance_mode) {
+            btn.classList.add('maint-active');
+            if (icon) icon.textContent = '🔴';
+            if (label) label.textContent = 'Maintenance ON';
+            if (badge) {
+              badge.textContent = 'ACTIVE';
+              badge.style.background = '#ffffff';
+              badge.style.color = '#dc2626';
+            }
+          } else {
+            btn.classList.remove('maint-active');
+            if (icon) icon.textContent = '🚨';
+            if (label) label.textContent = 'Maintenance Mode';
+            if (badge) {
+              badge.textContent = 'OFF';
+              badge.style.background = 'rgba(255,255,255,0.2)';
+              badge.style.color = '#ffffff';
+            }
+          }
+        })
+        .catch(function(err) { console.warn('Maintenance status header fetch error:', err); });
+    }
+
     function setupTomorrowDateShortcuts() {
       // Find all datetime shortcut containers in Django admin
       const shortcuts = document.querySelectorAll('.datetimeshortcuts');
@@ -2405,9 +2524,13 @@
     });
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupTomorrowDateShortcuts);
+      document.addEventListener('DOMContentLoaded', function() {
+        setupTomorrowDateShortcuts();
+        updateHeaderMaintenanceStatus();
+      });
     } else {
       setupTomorrowDateShortcuts();
+      updateHeaderMaintenanceStatus();
     }
 
     // Observe dynamic additions (e.g. adding new inline item rows)

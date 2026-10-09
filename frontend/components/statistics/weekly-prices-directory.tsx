@@ -10,7 +10,6 @@ import {
   Download,
   FileText,
   FolderOpen,
-  Filter,
   ArrowRight,
   X,
   ArrowUpDown,
@@ -24,7 +23,6 @@ import type {
   ApiWeeklyPricesHeader,
 } from "@/lib/api/weekly-fish-prices"
 
-type FilterPill = "All" | "Latest" | "This Month" | "This Year"
 type SortOption = "Newest first" | "Oldest first"
 
 interface WeeklyPricesDirectoryProps {
@@ -55,7 +53,6 @@ export function WeeklyPricesDirectory({
 
   const [selectedYear, setSelectedYear] = useState<string>("All years")
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [activeFilter, setActiveFilter] = useState<FilterPill>("All")
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
 
   // Track open monthly accordions (closed by default)
@@ -66,19 +63,15 @@ export function WeeklyPricesDirectory({
   }
 
   const isFiltered =
-    searchQuery !== "" || selectedYear !== "All years" || activeFilter !== "All"
+    searchQuery !== "" || selectedYear !== "All years"
 
   const clearFilters = () => {
     setSearchQuery("")
     setSelectedYear("All years")
-    setActiveFilter("All")
     setSortOrder("Newest first")
   }
 
-  // Find newest item in dataset for Latest / This Month pill logic
-  const newestItem = allReports[0] || null
-
-  // Filter reports based on year, search, and filter pills
+  // Filter reports based on year and search
   const filteredReports = useMemo(() => {
     const result = allReports.filter((report) => {
       // Year check
@@ -95,22 +88,7 @@ export function WeeklyPricesDirectory({
         report.publishedDate.toLowerCase().includes(query) ||
         report.year.toString().includes(query)
 
-      // Quick filter pill logic
-      let matchesPill = true
-      if (activeFilter === "Latest" && newestItem) {
-        matchesPill =
-          report.year === newestItem.year &&
-          report.monthNumber === newestItem.monthNumber &&
-          report.week === newestItem.week
-      } else if (activeFilter === "This Month" && newestItem) {
-        matchesPill =
-          report.year === newestItem.year &&
-          report.monthNumber === newestItem.monthNumber
-      } else if (activeFilter === "This Year" && newestItem) {
-        matchesPill = report.year === newestItem.year
-      }
-
-      return matchesYear && matchesSearch && matchesPill
+      return matchesYear && matchesSearch
     })
 
     // Sort order
@@ -131,7 +109,7 @@ export function WeeklyPricesDirectory({
     }
 
     return result
-  }, [allReports, selectedYear, searchQuery, activeFilter, sortOrder, newestItem])
+  }, [allReports, selectedYear, searchQuery, sortOrder])
 
   // Group filtered reports by Month & Year
   const groupedByMonth = useMemo(() => {
@@ -244,41 +222,18 @@ export function WeeklyPricesDirectory({
                   <option value="Oldest first">Oldest first</option>
                 </select>
               </div>
-            </div>
-          </div>
 
-          {/* Filter Pills Bar */}
-          <div className="mt-5 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 mr-1 flex items-center gap-1">
-                <Filter className="h-3 w-3" /> Quick filters:
-              </span>
-              {(["All", "Latest", "This Month", "This Year"] as FilterPill[]).map((pill) => (
+              {isFiltered && (
                 <button
-                  key={pill}
                   type="button"
-                  onClick={() => setActiveFilter(pill)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                    activeFilter === pill
-                      ? "bg-[#256B29] text-white shadow-2xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                  onClick={clearFilters}
+                  className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer ml-auto sm:ml-0"
                 >
-                  {pill}
+                  <X className="h-3.5 w-3.5" />
+                  <span>Reset filters</span>
                 </button>
-              ))}
+              )}
             </div>
-
-            {isFiltered && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Reset all filters</span>
-              </button>
-            )}
           </div>
         </div>
 

@@ -12,7 +12,6 @@ import {
   Eye,
   Search,
   FolderOpen,
-  Filter,
   X,
   ArrowRight,
   ArrowUpDown,
@@ -29,7 +28,6 @@ import type {
   ApiMonthlyProductionReport,
 } from "@/lib/api/monthly-fish-production"
 
-type QuickFilter = "All" | "Latest" | "This Month" | "This Year"
 type SortOption = "Newest first" | "Oldest first" | "Month A–Z"
 
 interface MonthlyProductionLibraryProps {
@@ -60,7 +58,6 @@ export function MonthlyProductionLibrary({
 
   const [selectedYear, setSelectedYear] = useState<string>("All years")
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [activeFilter, setActiveFilter] = useState<QuickFilter>("All")
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
 
   // Track open year accordions (closed by default)
@@ -70,21 +67,15 @@ export function MonthlyProductionLibrary({
     setOpenYears((prev) => ({ ...prev, [year]: !prev[year] }))
   }
 
-
-
   const isFiltered =
     searchQuery !== "" ||
-    selectedYear !== "All years" ||
-    activeFilter !== "All"
+    selectedYear !== "All years"
 
   const clearFilters = () => {
     setSearchQuery("")
     setSelectedYear("All years")
-    setActiveFilter("All")
     setSortOrder("Newest first")
   }
-
-  const newestItem = allReports[0] || null
 
   // Primary Featured Item (e.g. highlighted production report)
   const featuredReport = useMemo(() => {
@@ -107,21 +98,7 @@ export function MonthlyProductionLibrary({
         report.title.toLowerCase().includes(query) ||
         (report.description && report.description.toLowerCase().includes(query))
 
-      // Quick filter pill logic
-      let matchesPill = true
-      if (activeFilter === "Latest" && newestItem) {
-        matchesPill =
-          report.year === newestItem.year &&
-          report.monthNumber === newestItem.monthNumber
-      } else if (activeFilter === "This Month" && newestItem) {
-        matchesPill =
-          report.year === newestItem.year &&
-          report.monthNumber === newestItem.monthNumber
-      } else if (activeFilter === "This Year" && newestItem) {
-        matchesPill = report.year === newestItem.year
-      }
-
-      return matchesYear && matchesSearch && matchesPill
+      return matchesYear && matchesSearch
     })
 
     // Sort order
@@ -134,7 +111,7 @@ export function MonthlyProductionLibrary({
     }
 
     return result
-  }, [allReports, selectedYear, searchQuery, activeFilter, sortOrder, newestItem])
+  }, [allReports, selectedYear, searchQuery, sortOrder])
 
   // Group filtered reports by Year
   const groupedByYear = useMemo(() => {
@@ -314,41 +291,18 @@ export function MonthlyProductionLibrary({
                   <option value="Month A–Z">Month A–Z</option>
                 </select>
               </div>
-            </div>
-          </div>
 
-          {/* Filter Pills Bar */}
-          <div className="mt-5 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 mr-1 flex items-center gap-1">
-                <Filter className="h-3 w-3" /> Quick filters:
-              </span>
-              {(["All", "Latest", "This Month", "This Year"] as QuickFilter[]).map((pill) => (
+              {isFiltered && (
                 <button
-                  key={pill}
                   type="button"
-                  onClick={() => setActiveFilter(pill)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                    activeFilter === pill
-                      ? "bg-[#256B29] text-white shadow-2xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                  onClick={clearFilters}
+                  className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer ml-auto sm:ml-0"
                 >
-                  {pill}
+                  <X className="h-3.5 w-3.5" />
+                  <span>Reset filters</span>
                 </button>
-              ))}
+              )}
             </div>
-
-            {isFiltered && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Reset all filters</span>
-              </button>
-            )}
           </div>
         </div>
 

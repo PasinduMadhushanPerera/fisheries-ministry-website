@@ -13,7 +13,6 @@ import {
   ExternalLink,
   Eye,
   Search,
-  Filter,
   X,
   ArrowRight,
   Sparkles,
@@ -33,15 +32,6 @@ import type {
   ApiAnnualStatisticsDocument,
   ApiAnnualStatisticsHeader,
 } from "@/lib/api/annual-statistics"
-
-type FormatCategory =
-  | "All formats"
-  | "PDF"
-  | "Excel"
-  | "Word"
-  | "CSV"
-  | "PowerPoint"
-  | "Archive"
 
 type SortOption = "Newest first" | "Oldest first" | "Title A–Z"
 
@@ -72,7 +62,6 @@ export function AnnualReportsLibrary({
   }, [availableYears, allReports])
 
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [selectedFormat, setSelectedFormat] = useState<FormatCategory>("All formats")
   const [selectedYear, setSelectedYear] = useState<string>("All years")
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
 
@@ -83,17 +72,13 @@ export function AnnualReportsLibrary({
     setOpenYears((prev) => ({ ...prev, [year]: !prev[year] }))
   }
 
-
-
   // Clear filters action
   const isFiltered =
     searchQuery !== "" ||
-    selectedFormat !== "All formats" ||
     selectedYear !== "All years"
 
   const clearFilters = () => {
     setSearchQuery("")
-    setSelectedFormat("All formats")
     setSelectedYear("All years")
     setSortOrder("Newest first")
   }
@@ -113,19 +98,7 @@ export function AnnualReportsLibrary({
       const matchesYear =
         selectedYear === "All years" || doc.year.toString() === selectedYear
 
-      // Format match
-      let matchesFormat = true
-      if (selectedFormat === "PDF") matchesFormat = doc.fileType === "PDF"
-      else if (selectedFormat === "Excel")
-        matchesFormat = doc.fileType === "XLSX" || doc.fileType === "XLS"
-      else if (selectedFormat === "Word")
-        matchesFormat = doc.fileType === "DOCX" || doc.fileType === "DOC"
-      else if (selectedFormat === "CSV") matchesFormat = doc.fileType === "CSV"
-      else if (selectedFormat === "PowerPoint")
-        matchesFormat = doc.fileType === "PPTX" || doc.fileType === "PPT"
-      else if (selectedFormat === "Archive") matchesFormat = doc.fileType === "ZIP"
-
-      return matchesSearch && matchesYear && matchesFormat
+      return matchesSearch && matchesYear
     })
 
     // Sort order
@@ -138,7 +111,7 @@ export function AnnualReportsLibrary({
     }
 
     return result
-  }, [allReports, searchQuery, selectedYear, selectedFormat, sortOrder])
+  }, [allReports, searchQuery, selectedYear, sortOrder])
 
   // Group filtered reports by Year
   const groupedByYear = useMemo(() => {
@@ -378,51 +351,18 @@ export function AnnualReportsLibrary({
                   <option value="Title A–Z">Title A–Z</option>
                 </select>
               </div>
-            </div>
-          </div>
 
-          {/* Format Tabs Bar */}
-          <div className="mt-5 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-slate-500 mr-1 flex items-center gap-1">
-                <Filter className="h-3 w-3" /> Formats:
-              </span>
-              {(
-                [
-                  "All formats",
-                  "PDF",
-                  "Excel",
-                  "Word",
-                  "CSV",
-                  "PowerPoint",
-                  "Archive",
-                ] as FormatCategory[]
-              ).map((fmt) => (
+              {isFiltered && (
                 <button
-                  key={fmt}
                   type="button"
-                  onClick={() => setSelectedFormat(fmt)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                    selectedFormat === fmt
-                      ? "bg-[#256B29] text-white shadow-2xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                  onClick={clearFilters}
+                  className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer ml-auto sm:ml-0"
                 >
-                  {fmt}
+                  <X className="h-3.5 w-3.5" />
+                  <span>Reset filters</span>
                 </button>
-              ))}
+              )}
             </div>
-
-            {isFiltered && (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer"
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Reset all filters</span>
-              </button>
-            )}
           </div>
         </div>
 
