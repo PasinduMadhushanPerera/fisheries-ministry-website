@@ -58,13 +58,30 @@ export const viewport: Viewport = {
   themeColor: "#388E3C",
 }
 
+import { fetchHeaderFooterData } from "@/lib/api/header-footer"
+import { MaintenanceScreen } from "@/components/layout/maintenance-screen"
+
 type RootLayoutProps = Readonly<{
   children: React.ReactNode
 }>
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: RootLayoutProps) {
+  const headerFooterData = await fetchHeaderFooterData()
+
+  if (headerFooterData?.maintenance?.is_maintenance_mode) {
+    return (
+      <html lang="en" className={notoSans.variable}>
+        <body className="font-[var(--font-noto-sans)] antialiased">
+          <LanguageProvider>
+            <MaintenanceScreen maintenanceData={headerFooterData.maintenance} />
+          </LanguageProvider>
+        </body>
+      </html>
+    )
+  }
+
   return (
     <html lang="en" className={notoSans.variable}>
       <body className="font-[var(--font-noto-sans)] antialiased">

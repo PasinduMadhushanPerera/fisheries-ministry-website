@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import HeaderSetting, FooterSetting, FooterLink, FooterAward
+from .models import HeaderSetting, FooterSetting, FooterLink, FooterAward, SiteMaintenanceSetting
 
 
 class HeaderSettingSerializer(serializers.ModelSerializer):
@@ -105,3 +105,36 @@ class FooterSettingSerializer(serializers.ModelSerializer):
     def get_awards(self, obj):
         awards = FooterAward.objects.filter(is_active=True).order_by("order", "id")
         return FooterAwardSerializer(awards, many=True, context=self.context).data
+
+
+def resolve_lang(obj, field_base: str, context: dict) -> str:
+    if not obj:
+        return ""
+    lang = context.get("lang", "en")
+    if lang in ["si", "ta"]:
+        val = getattr(obj, f"{field_base}_{lang}", None)
+        if val and str(val).strip():
+            return str(val).strip()
+    return getattr(obj, f"{field_base}_en", "")
+
+
+class SiteMaintenanceSettingSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    message = serializers.SerializerMethodField()
+    estimated_restoration = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SiteMaintenanceSetting
+        fields = [
+            "is_maintenance_mode",
+            "title",
+            "message",
+            "estimated_restoration",
+            "contact_phone",
+            "contact_email",
+        ]
+
+    def get_title(self, obj): return resolve_lang(obj, "title", self.context)
+    def get_message(self, obj): return resolve_lang(obj, "message", self.context)
+    def get_estimated_restoration(self, obj): return resolve_lang(obj, "estimated_restoration", self.context)
+

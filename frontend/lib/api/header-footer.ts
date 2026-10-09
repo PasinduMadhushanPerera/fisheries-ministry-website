@@ -58,9 +58,19 @@ export type ApiFooterSetting = {
   awards?: ApiFooterAward[]
 }
 
+export type ApiSiteMaintenanceSetting = {
+  is_maintenance_mode: boolean
+  title: string
+  message: string
+  estimated_restoration: string
+  contact_phone: string
+  contact_email: string
+}
+
 export type HeaderFooterData = {
   header: ApiHeaderSetting
   footer: ApiFooterSetting
+  maintenance?: ApiSiteMaintenanceSetting
   total_views?: number
 }
 

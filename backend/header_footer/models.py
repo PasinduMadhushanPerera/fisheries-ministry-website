@@ -287,3 +287,87 @@ class WebsiteViewsCounter(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"Total Website Views: {self.total_views:,}"
+
+
+# ==========================================================
+# 05. Site Maintenance Mode Control (Global System Toggle)
+# ==========================================================
+class SiteMaintenanceSetting(TimeStampedModel):
+    """
+    Global Site Maintenance Mode configuration.
+    Toggling is_maintenance_mode ON will display an official maintenance page across the entire public website.
+    """
+    is_maintenance_mode = models.BooleanField(
+        default=False,
+        verbose_name="🚨 ENABLE MAINTENANCE MODE (වෙබ් අඩවිය නඩත්තු තත්වයට පත් කරන්න)",
+        help_text="Check this box to switch the website to Maintenance Mode. Uncheck to bring the live website back online for users.",
+    )
+
+    # 🇬🇧 English Content
+    title_en = models.CharField(
+        max_length=255,
+        default="Website Under Scheduled Maintenance",
+        verbose_name="Title (English)",
+    )
+    message_en = models.TextField(
+        default="The official website of the Ministry of Fisheries, Aquatic and Ocean Resources is currently undergoing scheduled system updates to serve you better. We apologize for any inconvenience caused.",
+        verbose_name="Message (English)",
+    )
+    estimated_restoration_en = models.CharField(
+        max_length=200,
+        default="Expected Restoration: Today at 6:00 PM",
+        verbose_name="Estimated Restoration Time (English)",
+    )
+
+    # 🇱🇰 Sinhala Content (සිංහල)
+    title_si = models.CharField(
+        max_length=255,
+        default="වෙබ් අඩවියේ සැලසුම් කළ නඩත්තු කටයුත්තක් සිදු වෙමින් පවතී",
+        verbose_name="Title (සිංහල)",
+    )
+    message_si = models.TextField(
+        default="ඔබට වඩාත් උසස් සේවාවක් සැපයීම සඳහා ධීවර, ජලජ සහ සාගර සම්පත් අමාත්‍යාංශයේ නිල වෙබ් අඩවියේ පද්ධති නඩත්තු කිරීමක් මේ වන විට සිදුවෙමින් පවතී. සිදු වන අපහසුතාවයට අපගේ කණගාටුව ප්‍රකාශ කරමු.",
+        verbose_name="Message (සිංහල)",
+    )
+    estimated_restoration_si = models.CharField(
+        max_length=200,
+        default="නැවත සේවාව ආරම්භ වන වේලාව: අද ප.ව. 6:00 ට",
+        verbose_name="Estimated Restoration Time (සිංහල)",
+    )
+
+    # 🇱🇰 Tamil Content (தமிழ்)
+    title_ta = models.CharField(
+        max_length=255,
+        default="இணையதளம் திட்டமிடப்பட்ட பராமரிப்பில் உள்ளது",
+        verbose_name="Title (தமிழ்)",
+    )
+    message_ta = models.TextField(
+        default="உங்களுக்கு சிறந்த சேவையை வழங்குவதற்காக கடற்றொழில் அமைச்சின் உத்தியோகபூர்வ இணையதளம் தற்போது கணினி புதுப்பித்தலுக்கு உட்பட்டுள்ளது. ஏற்படும் சிரமத்திற்கு வருந்துகிறோம்.",
+        verbose_name="Message (தமிழ்)",
+    )
+    estimated_restoration_ta = models.CharField(
+        max_length=200,
+        default="எதிர்பார்க்கப்படும் சேவை மீட்டமைப்பு: இன்று மாலை 6:00 மணிக்கு",
+        verbose_name="Estimated Restoration Time (தமிழ்)",
+    )
+
+    # Emergency Contacts
+    contact_phone = models.CharField(
+        max_length=100,
+        default="+94 11 244 6183 / +94 11 244 6184",
+        verbose_name="Emergency Contact Phone",
+    )
+    contact_email = models.CharField(
+        max_length=100,
+        default="info@fisheries.gov.lk",
+        verbose_name="Emergency Contact Email",
+    )
+
+    class Meta:
+        verbose_name = "00. Site Maintenance Mode Settings (නඩත්තු ප්‍රකාරය)"
+        verbose_name_plural = "00. Site Maintenance Mode Settings (නඩත්තු ප්‍රකාරය)"
+
+    def __str__(self) -> str:
+        status = "🔴 ACTIVE (Maintenance ON)" if self.is_maintenance_mode else "🟢 INACTIVE (Site Live)"
+        return f"Maintenance Mode Status: {status}"
+

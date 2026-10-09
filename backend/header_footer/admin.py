@@ -77,3 +77,48 @@ class WebsiteViewsCounterAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not WebsiteViewsCounter.objects.exists()
+
+
+from django.utils.html import format_html
+from .models import SiteMaintenanceSetting
+
+
+@admin.register(SiteMaintenanceSetting)
+class SiteMaintenanceSettingAdmin(admin.ModelAdmin):
+    list_display = ["status_badge", "title_en", "estimated_restoration_en", "updated_at"]
+    list_display_links = ["status_badge", "title_en"]
+
+    fieldsets = (
+        ("⚠️ MASTER MAINTENANCE MODE TOGGLE (ප්‍රධාන පාලන ස්වීචය)", {
+            "description": (
+                '<div style="background: #fff3cd; color: #856404; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin-bottom: 15px;">'
+                '<strong style="font-size: 14px;">🚨 අවධානයට (IMPORTANT):</strong><br/>'
+                'මෙහි ඇති Checkbox එක <strong>Check (Enable)</strong> කළ විට, සජීවී වෙබ් අඩවිය (Live Website) නැරඹීමට පැමිණෙන සියලුම පරිශීලකයින්ට වෙබ් අඩවිය නඩත්තු වෙමින් පවතින බවට පැහැදිලි පණිවුඩය (Maintenance Page) පමණක් දර්ශනය වේ.<br/>'
+                'නඩත්තු කටයුතු නිම වූ පසු මෙය <strong>Uncheck (Disable)</strong> කර Save කරන්න.'
+                '</div>'
+            ),
+            "fields": ("is_maintenance_mode",),
+        }),
+        ("🇬🇧 English Maintenance Page Content", {
+            "fields": ("title_en", "message_en", "estimated_restoration_en"),
+        }),
+        ("🇱🇰 Sinhala Maintenance Page Content (සිංහල)", {
+            "fields": ("title_si", "message_si", "estimated_restoration_si"),
+        }),
+        ("🇱🇰 Tamil Maintenance Page Content (தமிழ்)", {
+            "fields": ("title_ta", "message_ta", "estimated_restoration_ta"),
+        }),
+        ("📞 Emergency Contact Information", {
+            "fields": ("contact_phone", "contact_email"),
+        }),
+    )
+
+    def status_badge(self, obj):
+        if obj.is_maintenance_mode:
+            return format_html('<span style="background: #fee2e2; color: #dc2626; padding: 6px 14px; border-radius: 9999px; font-weight: bold; border: 1px solid #fca5a5; font-size: 12px;">🔴 MAINTENANCE MODE ON</span>')
+        return format_html('<span style="background: #dcfce7; color: #16a34a; padding: 6px 14px; border-radius: 9999px; font-weight: bold; border: 1px solid #86efac; font-size: 12px;">🟢 WEBSITE LIVE</span>')
+    status_badge.short_description = "Maintenance Status"
+
+    def has_add_permission(self, request):
+        return not SiteMaintenanceSetting.objects.exists()
+

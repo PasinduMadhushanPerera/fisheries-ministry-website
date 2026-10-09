@@ -226,9 +226,7 @@
     position: relative;
     margin: 0 auto !important;
     animation: cardEntrance3D 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    transform-style: preserve-3d;
-    transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.4, 1), box-shadow 0.3s ease;
-    will-change: transform;
+    transform: none !important;
   }
 
   @keyframes cardEntrance3D {
@@ -242,16 +240,60 @@
     }
   }
 
-  /* Shaking 3D animation for incorrect credentials */
+  /* Shaking animation & Angry Mode for incorrect credentials */
   .login-card-wrapper.shake-error {
     animation: shakeCard3D 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both !important;
   }
 
   @keyframes shakeCard3D {
-    10%, 90% { transform: perspective(1200px) translate3d(-3px, 0, 10px) rotateY(-2deg); }
-    20%, 80% { transform: perspective(1200px) translate3d(5px, 0, 15px) rotateY(3deg); }
-    30%, 50%, 70% { transform: perspective(1200px) translate3d(-10px, 0, 20px) rotateY(-4deg); }
-    40%, 60% { transform: perspective(1200px) translate3d(10px, 0, 15px) rotateY(4deg); }
+    10%, 90% { transform: translate3d(-4px, 0, 0); }
+    20%, 80% { transform: translate3d(6px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-10px, 0, 0); }
+    40%, 60% { transform: translate3d(10px, 0, 0); }
+  }
+
+  /* Angry Rejection Mode */
+  .login-card-wrapper.angry-mode {
+    border: 2px solid #ef4444 !important;
+    box-shadow: 0 25px 85px rgba(239, 68, 68, 0.5), 0 0 35px rgba(239, 68, 68, 0.35) !important;
+  }
+
+  .login-card-header.angry-mode {
+    background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%) !important;
+    border-bottom-color: #ef4444 !important;
+  }
+
+  .login-emblem-badge.angry-mode {
+    background: rgba(239, 68, 68, 0.25) !important;
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 35px #ef4444, inset 0 0 15px #f87171 !important;
+    animation: angryEmblemPulse 0.4s ease-in-out infinite alternate !important;
+  }
+
+  @keyframes angryEmblemPulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 10px #ef4444); }
+    100% { transform: scale(1.15); filter: drop-shadow(0 0 25px #f87171); }
+  }
+
+  .login-security-pill.angry-mode {
+    background: rgba(239, 68, 68, 0.3) !important;
+    border-color: #f87171 !important;
+    color: #fca5a5 !important;
+    box-shadow: 0 0 18px rgba(239, 68, 68, 0.5) !important;
+  }
+
+  .login-errornote.angry-banner {
+    background: #fef2f2 !important;
+    border: 2px solid #ef4444 !important;
+    color: #991b1b !important;
+    box-shadow: 0 6px 20px rgba(239, 68, 68, 0.25) !important;
+    animation: angryBannerBounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  }
+
+  @keyframes angryBannerBounce {
+    0% { transform: scale(0.9); opacity: 0; }
+    70% { transform: scale(1.03); }
+    100% { transform: scale(1); opacity: 1; }
   }
 
   /* Progressive Scanner Line on top of card */
@@ -814,33 +856,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ==========================================================
-  // 2. Interactive 3D Perspective Card Tilt
+  // 2. Static Centered Card Position (No Mouse Motion Tilt)
   // ==========================================================
   const loginCard = document.getElementById("login-card");
-  const loginContainer = document.getElementById("content") || document.body;
-
-  loginContainer.addEventListener("mousemove", function (e) {
-    if (!loginCard) return;
-    const rect = loginCard.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-
-    const mouseX = e.clientX - centerX;
-    const mouseY = e.clientY - centerY;
-
-    // Calculate subtle 3D tilt angles (max ~8 deg)
-    const rotateX = (mouseY / (window.innerHeight / 2)) * -8;
-    const rotateY = (mouseX / (window.innerWidth / 2)) * 8;
-
-    loginCard.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateZ(10px)`;
-    loginCard.style.boxShadow = `${-rotateY * 2}px ${rotateX * 2 + 25}px 75px rgba(0, 0, 0, 0.65), 0 0 30px rgba(16, 185, 129, 0.15)`;
-  });
-
-  loginContainer.addEventListener("mouseleave", function () {
-    if (!loginCard) return;
+  if (loginCard) {
     loginCard.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
-    loginCard.style.boxShadow = "0 30px 80px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.2)";
-  });
+  }
 
   // ==========================================================
   // 3. Form Submission & 3D Verified Overlay Logic
@@ -869,12 +890,26 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function triggerErrorState(msg) {
-    // 1. Shake 3D card animation
+    const cardHeader = document.querySelector(".login-card-header");
+    const emblemBadge = document.querySelector(".login-emblem-badge");
+    const securityPill = document.querySelector(".login-security-pill");
+
+    // 1. Activate Angry Rejection Mode
     loginCard.classList.remove("shake-error");
     void loginCard.offsetWidth; // Force reflow
-    loginCard.classList.add("shake-error");
+    loginCard.classList.add("shake-error", "angry-mode");
 
-    // 2. Set error line
+    if (cardHeader) cardHeader.classList.add("angry-mode");
+    if (emblemBadge) {
+      emblemBadge.classList.add("angry-mode");
+      emblemBadge.innerHTML = "😠";
+    }
+    if (securityPill) {
+      securityPill.classList.add("angry-mode");
+      securityPill.innerHTML = "🛑 REJECTED — INVALID CREDENTIALS";
+    }
+
+    // 2. Set error progressive line
     progressiveLine.className = "progressive-line error";
 
     // 3. Highlight inputs
@@ -885,10 +920,10 @@ document.addEventListener("DOMContentLoaded", function () {
     let cleanMsg = msg || "Please enter the correct username and password for a staff account.";
     cleanMsg = cleanMsg.replace(/Note that both fields may be case-sensitive\./gi, "").trim();
 
-    // 5. Update Error Banner
+    // 5. Update Error Banner with Angry Styling
     dynamicErrorBox.innerHTML = `
-      <div class="login-errornote">
-        <span>❌</span>
+      <div class="login-errornote angry-banner">
+        <span style="font-size: 1.3rem;">😠</span>
         <span>${cleanMsg}</span>
       </div>
     `;
@@ -898,10 +933,20 @@ document.addEventListener("DOMContentLoaded", function () {
     btnIcon.innerHTML = "🔐";
     btnText.textContent = "Sign In to Console";
 
-    // Clear error line after 2.5s
+    // 7. Clear Angry Mode & restore normal header state after 2.8s
     setTimeout(function () {
       progressiveLine.className = "progressive-line";
-    }, 2500);
+      loginCard.classList.remove("angry-mode");
+      if (cardHeader) cardHeader.classList.remove("angry-mode");
+      if (emblemBadge) {
+        emblemBadge.classList.remove("angry-mode");
+        emblemBadge.innerHTML = "🏛️";
+      }
+      if (securityPill) {
+        securityPill.classList.remove("angry-mode");
+        securityPill.innerHTML = "🔒 Authorized Personnel Only";
+      }
+    }, 2800);
   }
 
   loginForm.addEventListener("submit", function (e) {
