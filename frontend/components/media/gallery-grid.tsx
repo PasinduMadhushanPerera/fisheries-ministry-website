@@ -111,9 +111,6 @@ export function GalleryGrid({
                       <h3 className="text-base font-extrabold leading-snug text-slate-900 line-clamp-2 transition-colors group-hover:text-[#256B29]">
                         {stripHtml(album.title)}
                       </h3>
-                      <p className="mt-2 text-xs leading-relaxed text-slate-600 line-clamp-2 font-normal">
-                        {stripHtml(album.description)}
-                      </p>
                     </div>
 
                     {/* Action Button */}

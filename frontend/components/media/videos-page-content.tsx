@@ -95,10 +95,10 @@ export function VideosPageContent({ initialData }: VideosPageContentProps) {
       // Search keyword filter
       if (
         keyword &&
-        !item.title.toLowerCase().includes(keyword) &&
-        !item.description.toLowerCase().includes(keyword) &&
-        !item.location.toLowerCase().includes(keyword) &&
-        !item.category_label.toLowerCase().includes(keyword)
+        !(item.title || "").toLowerCase().includes(keyword) &&
+        !(item.description || "").toLowerCase().includes(keyword) &&
+        !(item.location || "").toLowerCase().includes(keyword) &&
+        !(item.category_label || "").toLowerCase().includes(keyword)
       ) {
         return false
       }

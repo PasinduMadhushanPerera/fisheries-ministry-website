@@ -178,20 +178,20 @@ export function VideoDetailContent({ video }: VideoDetailContentProps) {
                 <a
                   href={video.video_file_url}
                   download
-                  className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs sm:text-sm font-bold text-white hover:bg-[#1b4d1d] transition shadow-xs"
+                  className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs sm:text-sm font-bold !text-white text-white hover:bg-[#1b4d1d] hover:!text-white transition shadow-xs"
                 >
-                  <Download className="h-4 w-4" />
-                  <span>Download Video File</span>
+                  <Download className="h-4 w-4 text-white" />
+                  <span className="!text-white text-white font-bold">Download Video File</span>
                 </a>
               ) : externalWatchUrl ? (
                 <a
                   href={externalWatchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs sm:text-sm font-bold text-white hover:bg-[#1b4d1d] transition shadow-xs"
+                  className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs sm:text-sm font-bold !text-white text-white hover:bg-[#1b4d1d] hover:!text-white transition shadow-xs"
                 >
-                  <ExternalLink className="h-4 w-4" />
-                  <span>Watch on YouTube</span>
+                  <ExternalLink className="h-4 w-4 text-white" />
+                  <span className="!text-white text-white font-bold">Watch on YouTube</span>
                 </a>
               ) : null}
             </div>

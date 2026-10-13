@@ -1,9 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
 import {
-  ArrowRight,
   ChevronLeft,
   ChevronRight,
   Images,
@@ -210,15 +208,7 @@ export function GalleryPreview({ album, onClose }: GalleryPreviewProps) {
         </div>
 
         {/* Modal Action Bar Footer */}
-        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-slate-200 px-6 py-4 bg-slate-50">
-          <Link
-            href={`/media-centre/gallery/${album.slug}`}
-            className="inline-flex min-h-[40px] items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
-          >
-            <span>View Full Page Collection</span>
-            <ArrowRight className="h-3.5 w-3.5 text-[#256B29]" />
-          </Link>
-
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-slate-200 px-6 py-4 bg-slate-50">
           <button
             type="button"
             onClick={onClose}

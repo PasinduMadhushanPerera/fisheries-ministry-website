@@ -98,10 +98,6 @@ export function FeaturedVideo({
                 </button>
               </h3>
 
-              <p className="mt-4 text-xs sm:text-sm leading-relaxed text-slate-300">
-                {stripHtml(featuredVideo.description)}
-              </p>
-
               <div className="mt-6 flex flex-wrap gap-4 border-y border-white/10 py-4 text-xs text-slate-300">
                 <div className="flex items-center gap-1.5">
                   <CalendarDays className="h-4 w-4 text-emerald-300" aria-hidden="true" />

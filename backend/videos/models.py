@@ -233,11 +233,14 @@ class VideoItem(TimeStampedModel):
         verbose_name="Category Label (English - Auto-Synced)",
     )
     description_en = models.TextField(
+        blank=True,
+        default="",
         verbose_name="Video Summary / Description (English)",
     )
     location_en = models.CharField(
         max_length=150,
-        default="Colombo, Sri Lanka",
+        blank=True,
+        default="",
         verbose_name="Location / District (English)",
     )
 

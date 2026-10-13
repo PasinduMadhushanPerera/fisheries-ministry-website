@@ -19,6 +19,13 @@ class VideoItemAdminForm(forms.ModelForm):
             "description_ta": forms.Textarea(attrs={"rows": 3}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if "description_en" in self.fields:
+            self.fields["description_en"].required = False
+        if "location_en" in self.fields:
+            self.fields["location_en"].required = False
+
 
 @admin.register(VideoPageHeader)
 class VideoPageHeaderAdmin(admin.ModelAdmin):

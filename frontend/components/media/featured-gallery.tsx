@@ -110,10 +110,6 @@ export function FeaturedGallery() {
                   </button>
                 </h3>
 
-                <p className="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  {featuredAlbum.description}
-                </p>
-
                 <button
                   type="button"
                   onClick={openModal}

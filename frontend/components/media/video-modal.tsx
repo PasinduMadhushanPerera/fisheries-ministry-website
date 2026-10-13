@@ -1,9 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import Link from "next/link"
 import {
-  ArrowRight,
   CalendarDays,
   Clock3,
   Download,
@@ -172,16 +170,6 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
               </div>
             )}
           </div>
-
-          {/* Video Description */}
-          <div className="p-6 sm:p-8 space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400">
-              Video Summary & Overview
-            </h4>
-            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">
-              {stripHtml(video.description)}
-            </p>
-          </div>
         </div>
 
         {/* Modal Action Bar Footer */}
@@ -191,30 +179,23 @@ export function VideoModal({ video, onClose }: VideoModalProps) {
               <a
                 href={video.video_file_url}
                 download
-                className="inline-flex min-h-[38px] items-center gap-2 rounded-xl bg-[#256B29] px-4 text-xs font-bold text-white hover:bg-[#1b4d1d] transition"
+                className="inline-flex min-h-[38px] items-center gap-2 rounded-xl bg-[#256B29] px-4 text-xs font-bold !text-white text-white hover:bg-[#1b4d1d] hover:!text-white transition"
               >
-                <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Download Video</span>
+                <Download className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                <span className="!text-white text-white font-bold">Download Video</span>
               </a>
             ) : externalWatchUrl ? (
               <a
                 href={externalWatchUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[38px] items-center gap-2 rounded-xl bg-[#256B29] px-4 text-xs font-bold text-white hover:bg-[#1b4d1d] transition"
+                className="inline-flex min-h-[38px] items-center gap-2 rounded-xl bg-[#256B29] px-4 text-xs font-bold !text-white text-white hover:bg-[#1b4d1d] hover:!text-white transition"
               >
-                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                <span>Watch on YouTube</span>
+                <ExternalLink className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+                <span className="!text-white text-white font-bold">Watch on YouTube</span>
               </a>
             ) : null}
 
-            <Link
-              href={`/media-centre/videos/${video.slug}`}
-              className="inline-flex min-h-[38px] items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
-            >
-              <span>Full Page</span>
-              <ArrowRight className="h-3 w-3 text-[#256B29]" />
-            </Link>
           </div>
 
           <button

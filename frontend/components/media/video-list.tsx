@@ -110,10 +110,6 @@ export function VideoList({
                         {stripHtml(video.title)}
                       </button>
                     </h3>
-
-                    <p className="mt-3 text-xs leading-relaxed text-slate-600 line-clamp-3">
-                      {stripHtml(video.description)}
-                    </p>
                   </div>
                 </div>
 

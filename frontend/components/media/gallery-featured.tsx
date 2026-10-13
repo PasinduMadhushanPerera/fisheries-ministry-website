@@ -65,11 +65,6 @@ export function GalleryFeatured({
                 </div>
               </div>
 
-              {/* Description */}
-              <p className="text-xs sm:text-sm text-slate-700 leading-relaxed max-w-2xl line-clamp-3">
-                {stripHtml(featuredAlbum.description)}
-              </p>
-
               {/* Action Button */}
               <div className="pt-2">
                 <button
