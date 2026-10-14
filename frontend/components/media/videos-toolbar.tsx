@@ -1,6 +1,6 @@
 "use client"
 
-import { Search, RotateCcw, Filter } from "lucide-react"
+import { Search, RotateCcw } from "lucide-react"
 import { Container } from "@/components/ui/container"
 
 interface VideosToolbarProps {
@@ -34,9 +34,8 @@ export function VideosToolbar({
   return (
     <section aria-label="Videos search and filters" className="border-b border-slate-200 bg-white py-6 shadow-2xs">
       <Container>
-        <div className="flex flex-col gap-5">
-          {/* Top row: Search input + Sort + Clear button */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        {/* Search input + Sort + Clear button */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             {/* Search Box */}
             <div className="relative flex-1 max-w-xl">
               <Search
@@ -90,33 +89,6 @@ export function VideosToolbar({
               </span>
             </div>
           </div>
-
-          {/* Bottom row: Category Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 pr-1 shrink-0">
-              <Filter className="h-3.5 w-3.5 text-[#256B29]" />
-              <span>Category:</span>
-            </span>
-
-            {categories.map((cat) => {
-              const isSelected = selectedCategory === cat.key
-              return (
-                <button
-                  key={cat.key}
-                  type="button"
-                  onClick={() => setSelectedCategory(cat.key)}
-                  className={`inline-flex min-h-9 items-center rounded-xl px-3.5 text-xs font-bold whitespace-nowrap transition cursor-pointer ${
-                    isSelected
-                      ? "bg-[#256B29] text-white shadow-xs"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 border border-slate-200/80"
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              )
-            })}
-          </div>
-        </div>
       </Container>
     </section>
   )

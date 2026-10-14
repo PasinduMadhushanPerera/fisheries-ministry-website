@@ -150,6 +150,13 @@ class FooterSetting(TimeStampedModel):
         default="2026",
         help_text="Custom copyright year string (e.g. '2026' or '2026-2027'). If left blank, current year will be used.",
     )
+    developed_by_text = models.CharField(
+        max_length=255,
+        blank=True,
+        default="Design & Developed by IT UNIT",
+        verbose_name="Development Details / Credits",
+        help_text="Development details, designer/developer credits displayed on a separate line below the copyright text.",
+    )
     last_updated_text = models.CharField(
         max_length=100,
         default="25 August 2026",

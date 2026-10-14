@@ -31,7 +31,7 @@ class HeaderSettingAdmin(admin.ModelAdmin):
 
 @admin.register(FooterSetting)
 class FooterSettingAdmin(admin.ModelAdmin):
-    list_display = ["ministry_name", "telephone", "email", "copyright_year", "copyright_text", "last_updated_text", "updated_at"]
+    list_display = ["ministry_name", "telephone", "email", "copyright_year", "copyright_text", "developed_by_text", "last_updated_text", "updated_at"]
     fieldsets = (
         ("Column 1: Ministry Branding", {
             "fields": ("government_badge", "ministry_name", "about_text", "gov_portal_label", "gov_portal_url"),
@@ -44,8 +44,8 @@ class FooterSettingAdmin(admin.ModelAdmin):
             "description": "Specify official social media channel links displayed in the bottom footer bar. Leave a URL blank or uncheck master toggle to hide.",
         }),
         ("Bottom Bar Copyright & Information", {
-            "fields": ("copyright_year", "copyright_text", "last_updated_text"),
-            "description": "Customize copyright year, copyright notice, and last updated text.",
+            "fields": ("copyright_year", "copyright_text", "developed_by_text", "last_updated_text"),
+            "description": "Customize copyright year, copyright notice, development details / credits, and last updated text.",
         }),
     )
 

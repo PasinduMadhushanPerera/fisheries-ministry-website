@@ -44,6 +44,7 @@ export type ApiFooterSetting = {
   email: string
   copyright_text: string
   copyright_year?: string
+  developed_by_text?: string
   last_updated_text?: string
   enable_social_media?: boolean
   facebook_url?: string

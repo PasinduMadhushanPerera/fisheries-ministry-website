@@ -132,6 +132,10 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
   const copyrightText =
     initialFooter?.copyright_text ||
     "Ministry of Fisheries, Aquatic and Ocean Resources. Official Government Website."
+  const developedByText =
+    initialFooter?.developed_by_text !== undefined
+      ? initialFooter.developed_by_text
+      : "Design & Developed by IT UNIT"
   const lastUpdatedText = initialFooter?.last_updated_text || "25 August 2026"
 
   const enableSocialMedia = initialFooter?.enable_social_media ?? true
@@ -292,30 +296,19 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
           </Container>
         </div>
 
-        {/* Bottom Copyright, Last Updated, Live Views & Social Bar */}
-        <Container className="flex flex-col gap-3 py-3.5 text-xs text-slate-400 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
-            <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-            <span>© {copyrightYear} {copyrightText}</span>
-            <span className="hidden sm:inline text-slate-600">•</span>
-            <span className="inline-flex items-center gap-1 text-slate-300 font-medium">
-              <Clock className="h-3 w-3 text-emerald-400" />
-              Last updated: {lastUpdatedText}
-            </span>
-            <span className="hidden sm:inline text-slate-600">•</span>
-            {/* Live Updatable Website Views Badge */}
-            <span className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500/15 border border-emerald-400/30 px-2 py-0.5 text-[11px] font-semibold text-emerald-300">
-              <Eye className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-              <span>Website Views: <strong className="text-white font-extrabold">{viewsCount !== null ? viewsCount.toLocaleString() : "..."}</strong></span>
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <nav aria-label="Legal links">
-              <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-medium text-slate-400">
-                {legalLinks.map((link) => (
-                  <li key={link.label + link.href}>
-                    <Link href={link.href} className="transition hover:text-emerald-300">
+        {/* Tier 1: Legal Policies, System Status & Social Channels */}
+        <div className="border-t border-white/10 bg-black/15 py-3">
+          <Container className="flex flex-col items-center justify-center gap-3 lg:flex-row lg:items-center lg:justify-between text-center lg:text-left">
+            {/* Left: Policy & Governance Links */}
+            <nav aria-label="Legal links" className="w-full lg:w-auto flex justify-center lg:justify-start">
+              <ul className="flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1.5 text-[11px] font-medium text-slate-300">
+                {legalLinks.map((link, idx) => (
+                  <li key={link.label + link.href} className="flex items-center gap-x-3">
+                    {idx > 0 && <span className="text-white/20 select-none">•</span>}
+                    <Link
+                      href={link.href}
+                      className="transition-colors hover:text-emerald-300 hover:underline underline-offset-2"
+                    >
                       {link.label}
                     </Link>
                   </li>
@@ -323,77 +316,115 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
               </ul>
             </nav>
 
-            {/* Right-Aligned Social Media Buttons */}
-            {hasAnySocial && (
-              <>
-                <div className="hidden h-4 w-px bg-white/20 sm:block" />
+            {/* Right: Last Updated, Live Views Counter & Social Media */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 sm:gap-4 text-[11px] w-full lg:w-auto">
+              {/* Last Updated */}
+              <div className="inline-flex items-center gap-1.5 text-slate-300 font-medium">
+                <Clock className="h-3 w-3 text-emerald-400 shrink-0" aria-hidden="true" />
+                <span>Last updated: <span className="text-slate-100 font-semibold">{lastUpdatedText}</span></span>
+              </div>
 
-                <div className="flex items-center gap-2">
-                  {facebookUrl && (
-                    <a
-                      href={facebookUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Official Facebook Page"
-                      className="flex h-7 w-7 items-center justify-center rounded-md bg-white/10 text-white transition hover:bg-blue-600 hover:text-white cursor-pointer"
-                      title="Official Facebook Page"
-                    >
-                      <FacebookIcon className="h-3.5 w-3.5" />
-                    </a>
-                  )}
-                  {youtubeUrl && (
-                    <a
-                      href={youtubeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Official YouTube Channel"
-                      className="flex h-7 w-7 items-center justify-center rounded-md bg-white/10 text-white transition hover:bg-red-600 hover:text-white cursor-pointer"
-                      title="Official YouTube Channel"
-                    >
-                      <YoutubeIcon className="h-3.5 w-3.5" />
-                    </a>
-                  )}
-                  {linkedinUrl && (
-                    <a
-                      href={linkedinUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Official LinkedIn Page"
-                      className="flex h-7 w-7 items-center justify-center rounded-md bg-white/10 text-white transition hover:bg-sky-600 hover:text-white cursor-pointer"
-                      title="Official LinkedIn Page"
-                    >
-                      <LinkedinIcon className="h-3.5 w-3.5" />
-                    </a>
-                  )}
-                  {twitterUrl && (
-                    <a
-                      href={twitterUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Official X (Twitter) Page"
-                      className="flex h-7 w-7 items-center justify-center rounded-md bg-white/10 text-white transition hover:bg-black hover:text-white cursor-pointer"
-                      title="Official X (Twitter) Page"
-                    >
-                      <TwitterIcon className="h-3.5 w-3.5" />
-                    </a>
-                  )}
-                  {instagramUrl && (
-                    <a
-                      href={instagramUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Official Instagram Page"
-                      className="flex h-7 w-7 items-center justify-center rounded-md bg-white/10 text-white transition hover:bg-pink-600 hover:text-white cursor-pointer"
-                      title="Official Instagram Page"
-                    >
-                      <InstagramIcon className="h-3.5 w-3.5" />
-                    </a>
-                  )}
-                </div>
-              </>
+              <span className="hidden sm:inline text-white/20 select-none">•</span>
+
+              {/* Live Website Views Badge */}
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 text-[11px] font-semibold text-emerald-300 shadow-xs">
+                <Eye className="h-3.5 w-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
+                <span>Website Views: <strong className="text-white font-extrabold">{viewsCount !== null ? viewsCount.toLocaleString() : "..."}</strong></span>
+              </div>
+
+              {/* Social Media Channels */}
+              {hasAnySocial && (
+                <>
+                  <div className="hidden h-4 w-px bg-white/20 sm:block" />
+
+                  <div className="flex items-center justify-center gap-1.5">
+                    {facebookUrl && (
+                      <a
+                        href={facebookUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Official Facebook Page"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-blue-600 hover:text-white cursor-pointer"
+                        title="Official Facebook Page"
+                      >
+                        <FacebookIcon className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {youtubeUrl && (
+                      <a
+                        href={youtubeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Official YouTube Channel"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-red-600 hover:text-white cursor-pointer"
+                        title="Official YouTube Channel"
+                      >
+                        <YoutubeIcon className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {linkedinUrl && (
+                      <a
+                        href={linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Official LinkedIn Page"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-sky-600 hover:text-white cursor-pointer"
+                        title="Official LinkedIn Page"
+                      >
+                        <LinkedinIcon className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {twitterUrl && (
+                      <a
+                        href={twitterUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Official X (Twitter) Page"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-black hover:text-white cursor-pointer"
+                        title="Official X (Twitter) Page"
+                      >
+                        <TwitterIcon className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                    {instagramUrl && (
+                      <a
+                        href={instagramUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Official Instagram Page"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white transition hover:bg-pink-600 hover:text-white cursor-pointer"
+                        title="Official Instagram Page"
+                      >
+                        <InstagramIcon className="h-3.5 w-3.5" />
+                      </a>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </Container>
+        </div>
+
+        {/* Tier 2: Official Copyright & Development Credits (Bottom-most bar) */}
+        <div className="border-t border-white/10 bg-black/30 py-3 text-[11px]">
+          <Container className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:items-center sm:justify-between text-slate-300 text-center sm:text-left">
+            {/* Copyright Statement */}
+            <div className="flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left w-full sm:w-auto">
+              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" aria-hidden="true" />
+              <span className="font-normal text-slate-300">
+                © {copyrightYear} {copyrightText}
+              </span>
+            </div>
+
+            {/* Development Attribution */}
+            {developedByText && (
+              <div className="flex items-center justify-center sm:justify-end gap-1.5 text-slate-400 text-center sm:text-right font-medium w-full sm:w-auto">
+                <span className="inline-block h-1 w-1 rounded-full bg-emerald-400 sm:hidden shrink-0" />
+                <span>{developedByText}</span>
+              </div>
             )}
-          </div>
-        </Container>
+          </Container>
+        </div>
       </footer>
 
       <BackToTop />

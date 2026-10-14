@@ -72,6 +72,7 @@ class FooterSettingSerializer(serializers.ModelSerializer):
             "email",
             "copyright_text",
             "copyright_year",
+            "developed_by_text",
             "last_updated_text",
             "enable_social_media",
             "facebook_url",
