@@ -9,7 +9,22 @@ class MenuItem(TimeStampedModel):
     """
     title = models.CharField(
         max_length=120,
-        help_text="Navigation tab title (e.g. 'About Us', 'Services', 'Opportunities').",
+        verbose_name="Title (English)",
+        help_text="Navigation tab title in English (e.g. 'About Us', 'Services', 'Opportunities').",
+    )
+    title_si = models.CharField(
+        max_length=150,
+        blank=True,
+        default="",
+        verbose_name="Title (සිංහල)",
+        help_text="Navigation tab title in Sinhala (e.g. 'අප ගැන', 'සංඛ්‍යාලේඛන').",
+    )
+    title_ta = models.CharField(
+        max_length=150,
+        blank=True,
+        default="",
+        verbose_name="Title (தமிழ்)",
+        help_text="Navigation tab title in Tamil (e.g. 'எங்களைப் பற்றி', 'புள்ளிவிவரங்கள்').",
     )
     url = models.CharField(
         max_length=255,
@@ -26,7 +41,22 @@ class MenuItem(TimeStampedModel):
     description = models.CharField(
         max_length=255,
         blank=True,
+        verbose_name="Description (English)",
         help_text="Optional subtitle/description displayed under dropdown item title.",
+    )
+    description_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Description (සිංහල)",
+        help_text="Optional description in Sinhala.",
+    )
+    description_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        verbose_name="Description (தமிழ்)",
+        help_text="Optional description in Tamil.",
     )
     badge = models.CharField(
         max_length=40,

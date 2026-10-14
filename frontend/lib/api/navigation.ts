@@ -4,8 +4,12 @@ import { getApiBaseUrl } from "../utils"
 export type ApiMenuItem = {
   id: number
   title: string
+  title_si?: string
+  title_ta?: string
   url: string
   description?: string
+  description_si?: string
+  description_ta?: string
   badge?: string
   order: number
   is_external?: boolean
@@ -54,8 +58,8 @@ export async function getDynamicNavigation(): Promise<NavigationItem[]> {
               const staticChild = findStaticChildItem(child.url, child.title, mainNavigation)
               return {
                 label: child.title,
-                label_si: staticChild?.label_si,
-                label_ta: staticChild?.label_ta,
+                label_si: (child.title_si && child.title_si.trim()) ? child.title_si : staticChild?.label_si,
+                label_ta: (child.title_ta && child.title_ta.trim()) ? child.title_ta : staticChild?.label_ta,
                 href: child.url,
               }
             })
@@ -63,8 +67,8 @@ export async function getDynamicNavigation(): Promise<NavigationItem[]> {
 
       return {
         label: item.title,
-        label_si: staticItem?.label_si,
-        label_ta: staticItem?.label_ta,
+        label_si: (item.title_si && item.title_si.trim()) ? item.title_si : staticItem?.label_si,
+        label_ta: (item.title_ta && item.title_ta.trim()) ? item.title_ta : staticItem?.label_ta,
         href: item.url,
         children,
       }
