@@ -72,7 +72,7 @@ export interface ContactSubmissionPayload {
   name: string
   email: string
   phone?: string
-  subject: string
+  subject?: string
   department_name?: string
   message: string
 }

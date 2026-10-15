@@ -152,6 +152,10 @@ export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting
                   className="min-h-11 min-w-0 flex-1 border-0 px-4 text-xs font-medium text-slate-950 outline-none placeholder:text-slate-400"
                 />
 
+                {language !== "en" && (
+                  <input type="hidden" name="lang" value={language} />
+                )}
+
                 <button
                   type="submit"
                   aria-label="Submit website search"
@@ -165,7 +169,7 @@ export function SiteHeader({ initialHeader }: { initialHeader?: ApiHeaderSetting
               </form>
 
               <Link
-                href="/search"
+                href={language !== "en" ? `/search?lang=${language}` : "/search"}
                 aria-label="Search the website"
                 className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-slate-300 text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-200 xl:hidden"
               >

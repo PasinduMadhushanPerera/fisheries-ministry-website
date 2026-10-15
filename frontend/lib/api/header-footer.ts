@@ -39,6 +39,10 @@ export type ApiFooterSetting = {
   about_text: string
   gov_portal_label: string
   gov_portal_url: string
+  quick_links_title?: string
+  info_links_title?: string
+  contact_title?: string
+  awards_title?: string
   hq_address: string
   telephone: string
   email: string
@@ -46,6 +50,8 @@ export type ApiFooterSetting = {
   copyright_year?: string
   developed_by_text?: string
   last_updated_text?: string
+  last_updated_prefix?: string
+  website_views_prefix?: string
   enable_social_media?: boolean
   facebook_url?: string
   youtube_url?: string

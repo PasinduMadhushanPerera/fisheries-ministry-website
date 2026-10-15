@@ -235,7 +235,19 @@ class ContactPageSettingsSerializer(serializers.ModelSerializer):
 
 
 class ContactSubmissionSerializer(serializers.ModelSerializer):
+    subject = serializers.CharField(
+        max_length=255,
+        required=False,
+        allow_blank=True,
+        default="General Inquiry",
+    )
+
     class Meta:
         model = ContactSubmission
         fields = ["id", "name", "email", "phone", "subject", "department_name", "message", "submitted_at"]
         read_only_fields = ["id", "submitted_at"]
+
+    def validate_subject(self, value):
+        if not value or not str(value).strip():
+            return "General Inquiry"
+        return str(value).strip()

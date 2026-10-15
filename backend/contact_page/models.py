@@ -270,7 +270,7 @@ class ContactSubmission(models.Model):
     name = models.CharField(max_length=255, verbose_name="Full Name")
     email = models.EmailField(verbose_name="Email Address")
     phone = models.CharField(max_length=100, blank=True, default="", verbose_name="Phone Number")
-    subject = models.CharField(max_length=255, verbose_name="Subject")
+    subject = models.CharField(max_length=255, blank=True, default="General Inquiry", verbose_name="Subject")
     department_name = models.CharField(max_length=255, blank=True, default="", verbose_name="Department Concerned")
     message = models.TextField(verbose_name="Message Content")
 

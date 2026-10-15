@@ -31,21 +31,71 @@ class HeaderSettingAdmin(admin.ModelAdmin):
 
 @admin.register(FooterSetting)
 class FooterSettingAdmin(admin.ModelAdmin):
-    list_display = ["ministry_name", "telephone", "email", "copyright_year", "copyright_text", "developed_by_text", "last_updated_text", "updated_at"]
+    list_display = ["ministry_name", "telephone", "email", "copyright_year", "updated_at"]
     fieldsets = (
-        ("Column 1: Ministry Branding", {
-            "fields": ("government_badge", "ministry_name", "about_text", "gov_portal_label", "gov_portal_url"),
+        ("🇬🇧 English Footer Content", {
+            "fields": (
+                "government_badge",
+                "ministry_name",
+                "about_text",
+                "gov_portal_label",
+                "quick_links_title_en",
+                "info_links_title_en",
+                "contact_title_en",
+                "awards_title_en",
+                "hq_address",
+                "copyright_text",
+                "developed_by_text",
+                "last_updated_text",
+                "last_updated_prefix_en",
+                "website_views_prefix_en",
+            ),
+            "description": "Primary English text content displayed throughout the footer columns and bottom bar.",
         }),
-        ("Column 4: Head Office Contact Details", {
-            "fields": ("hq_address", "telephone", "email"),
+        ("🇱🇰 Sinhala Footer Content (සිංහල)", {
+            "fields": (
+                "government_badge_si",
+                "ministry_name_si",
+                "about_text_si",
+                "gov_portal_label_si",
+                "quick_links_title_si",
+                "info_links_title_si",
+                "contact_title_si",
+                "awards_title_si",
+                "hq_address_si",
+                "copyright_text_si",
+                "developed_by_text_si",
+                "last_updated_text_si",
+                "last_updated_prefix_si",
+                "website_views_prefix_si",
+            ),
+            "description": "Sinhala translations for footer titles, about description, address, and bottom bar info.",
         }),
-        ("Official Social Media Profiles", {
+        ("🇱🇰 Tamil Footer Content (தமிழ்)", {
+            "fields": (
+                "government_badge_ta",
+                "ministry_name_ta",
+                "about_text_ta",
+                "gov_portal_label_ta",
+                "quick_links_title_ta",
+                "info_links_title_ta",
+                "contact_title_ta",
+                "awards_title_ta",
+                "hq_address_ta",
+                "copyright_text_ta",
+                "developed_by_text_ta",
+                "last_updated_text_ta",
+                "last_updated_prefix_ta",
+                "website_views_prefix_ta",
+            ),
+            "description": "Tamil translations for footer titles, about description, address, and bottom bar info.",
+        }),
+        ("📞 Contact Numbers & Global URLs", {
+            "fields": ("gov_portal_url", "telephone", "email", "copyright_year"),
+        }),
+        ("🌐 Official Social Media Profiles", {
             "fields": ("enable_social_media", "facebook_url", "youtube_url", "linkedin_url", "twitter_url", "instagram_url"),
             "description": "Specify official social media channel links displayed in the bottom footer bar. Leave a URL blank or uncheck master toggle to hide.",
-        }),
-        ("Bottom Bar Copyright & Information", {
-            "fields": ("copyright_year", "copyright_text", "developed_by_text", "last_updated_text"),
-            "description": "Customize copyright year, copyright notice, development details / credits, and last updated text.",
         }),
     )
 
@@ -55,11 +105,20 @@ class FooterSettingAdmin(admin.ModelAdmin):
 
 @admin.register(FooterLink)
 class FooterLinkAdmin(admin.ModelAdmin):
-    list_display = ["label", "url", "column", "order", "is_active", "is_external"]
+    list_display = ["label", "label_si", "label_ta", "url", "column", "order", "is_active", "is_external"]
     list_display_links = ["label"]
     list_editable = ["order", "is_active"]
     list_filter = ["column", "is_active", "is_external"]
-    search_fields = ["label", "url"]
+    search_fields = ["label", "label_si", "label_ta", "url"]
+    fieldsets = (
+        ("Link Target & Position", {
+            "fields": ("column", "url", "is_external", "order", "is_active"),
+        }),
+        ("Link Labels (Multilingual)", {
+            "fields": ("label", "label_si", "label_ta"),
+            "description": "Label in English, Sinhala (සිංහල), and Tamil (தமிழ்).",
+        }),
+    )
 
 
 @admin.register(FooterAward)

@@ -49,6 +49,7 @@ def custom_get_app_list(request, app_label=None):
         "rti_page",
         "downloads_page",
         "contact_page",
+        "privacy_page",
         "internal_affairs",
         "navigation",
         "pages",
@@ -114,12 +115,14 @@ def custom_get_app_list(request, app_label=None):
             return 25
         if label == "contact_page":
             return 26
-        if label == "internal_affairs":
+        if label == "privacy_page":
             return 27
-        if label == "navigation":
+        if label == "internal_affairs":
             return 28
-        if label == "pages":
+        if label == "navigation":
             return 29
+        if label == "pages":
+            return 30
         if label == "auth":
             return 90
         return 99
@@ -165,6 +168,8 @@ urlpatterns = [
     path("api/v1/rti/", include("rti_page.urls")),
     path("api/v1/downloads/", include("downloads_page.urls")),
     path("api/v1/contact/", include("contact_page.urls")),
+    path("api/v1/privacy/", include("privacy_page.urls")),
+    path("api/v1/search/", include("search_api.urls")),
     path("api/v1/about/", include("about.urls")),
     path("api/v1/minister/", include("minister_profile.urls")),
     path("api/v1/deputy-minister/", include("deputy_minister_profile.urls")),

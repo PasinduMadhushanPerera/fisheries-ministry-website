@@ -12,9 +12,7 @@ import {
   Files,
   Download,
   ExternalLink,
-  Eye,
   Search,
-  Filter,
   X,
   ChevronDown,
   FolderOpen,
@@ -41,35 +39,139 @@ import type {
   ApiDownloadCategory,
   ApiDownloadDocumentItem,
 } from "@/lib/api/downloads"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 
 interface DownloadsLibraryProps {
   categories?: ApiDownloadCategory[]
   documents?: ApiDownloadDocumentItem[]
 }
 
-type FormatFilterPill =
-  | "All formats"
-  | "PDF"
-  | "Excel"
-  | "Word"
-  | "PowerPoint"
-  | "Archive"
-  | "Image"
-
 type SortOption = "Newest first" | "Oldest first" | "Title A–Z"
+
+const contentByLang = {
+  en: {
+    searchPlaceholder: "Search documents, reports, charters...",
+    yearLabel: "Year:",
+    allYears: "All years",
+    sortLabel: "Sort:",
+    sortNewest: "Newest first",
+    sortOldest: "Oldest first",
+    sortAZ: "Title A–Z",
+    resetFilters: "Reset Filters",
+    showingDocs: (count: number, catCount: number) =>
+      `Showing ${count} available document${count === 1 ? "" : "s"} across ${catCount} categories`,
+    collapseAll: "Collapse all",
+    expandFirst: "Expand first category",
+    noDocsFoundTitle: "No matching downloads found",
+    noDocsFoundDesc:
+      "We couldn’t find any documents matching your active search and filter parameters.",
+    clearAllFilters: "Clear all filters",
+    selectedBadge: "Selected",
+    fileSuffix: (count: number) => (count === 1 ? "file" : "files"),
+    emptyCategory: "No documents currently available under this category.",
+    yearPrefix: "Year:",
+    openBtn: "Open",
+    getBtn: "Get",
+    downloadBtn: "Download",
+    docBadge: (type: string) => `${type} Document`,
+    publishedPrefix: "Published:",
+    modalPubYear: "Publication Year:",
+    modalFileType: "File Type:",
+    modalFileSize: "File Size:",
+    modalLang: "Language:",
+    modalSource: "Official Source:",
+    modalSourceVal: "Ministry of Fisheries",
+    modalVersions: "📄 Available Language File Versions:",
+    closeBtn: "Close",
+    openFileBtn: "Open file",
+  },
+  si: {
+    searchPlaceholder: "ලේඛන, වාර්තා, ප්‍රඥප්ති සොයන්න...",
+    yearLabel: "වසර:",
+    allYears: "සියලුම වසර",
+    sortLabel: "තෝරන්න:",
+    sortNewest: "නවතම ඒවා පළමුව",
+    sortOldest: "පැරණි ඒවා පළමුව",
+    sortAZ: "මාතෘකාව A–Z",
+    resetFilters: "පෙරහන් ඉවත් කරන්න",
+    showingDocs: (count: number, catCount: number) =>
+      `ප්‍රවර්ග ${catCount} ක් යටතේ ලබාගත හැකි ලේඛන ${count} ක් පෙන්වයි`,
+    collapseAll: "සියල්ල හකුළන්න",
+    expandFirst: "පළමු ප්‍රවර්ගය දිගහරින්න",
+    noDocsFoundTitle: "ගැලපෙන බාගත කිරීම් හමු නොවීය",
+    noDocsFoundDesc: "ඔබගේ සෙවුමට ගැලපෙන කිසිදු ලේඛනයක් සොයාගත නොහැකි විය.",
+    clearAllFilters: "සියලු පෙරහන් ඉවත් කරන්න",
+    selectedBadge: "තෝරාගත්",
+    fileSuffix: (count: number) => (count === 1 ? "ගොනුව" : "ගොනු"),
+    emptyCategory: "මෙම ප්‍රවර්ගය යටතේ දැනට ලේඛන නොමැත.",
+    yearPrefix: "වසර:",
+    openBtn: "විවෘත කරන්න",
+    getBtn: "බාගත",
+    downloadBtn: "බාගත කරන්න",
+    docBadge: (type: string) => `${type} ලේඛනය`,
+    publishedPrefix: "ප්‍රකාශිත දිනය:",
+    modalPubYear: "ප්‍රකාශිත වසර:",
+    modalFileType: "ගොනු ආකෘතිය:",
+    modalFileSize: "ගොනු ප්‍රමාණය:",
+    modalLang: "භාෂාව:",
+    modalSource: "නිල මූලාශ්‍රය:",
+    modalSourceVal: "ධීවර අමාත්‍යාංශය",
+    modalVersions: "📄 ලබාගත හැකි භාෂා අනුවාද ගොනු:",
+    closeBtn: "වසන්න",
+    openFileBtn: "ගොනුව බලන්න",
+  },
+  ta: {
+    searchPlaceholder: "ஆவணங்கள், அறிக்கைகள், சாசனங்களைத் தேடுக...",
+    yearLabel: "வருடம்:",
+    allYears: "அனைத்து வருடங்களும்",
+    sortLabel: "வரிசைப்படுத்துக:",
+    sortNewest: "புதியது முதலில்",
+    sortOldest: "பழையது முதலில்",
+    sortAZ: "தலைப்பு A–Z",
+    resetFilters: "வடிப்பான்களை மீட்டமைக்க",
+    showingDocs: (count: number, catCount: number) =>
+      `${catCount} வகைகளில் கிடைக்கும் ${count} ஆவணங்கள் காட்டப்படுகின்றன`,
+    collapseAll: "அனைத்தையும் சுருக்குக",
+    expandFirst: "முதல் வகையை விரிக்கவும்",
+    noDocsFoundTitle: "பொருந்தக்கூடிய பதிவிறக்கங்கள் எதுவும் காணப்படவில்லை",
+    noDocsFoundDesc: "உங்கள் தேடலுடன் பொருந்தக்கூடிய ஆவணங்கள் எதுவும் கிடைக்கவில்லை.",
+    clearAllFilters: "அனைத்து வடிப்பான்களையும் நீக்குக",
+    selectedBadge: "தேர்ந்தெடுக்கப்பட்டது",
+    fileSuffix: (count: number) => (count === 1 ? "கோப்பு" : "கோப்புகள்"),
+    emptyCategory: "இந்த வகையின் கீழ் தற்போது ஆவணங்கள் எதுவும் இல்லை.",
+    yearPrefix: "வருடம்:",
+    openBtn: "திறக்குக",
+    getBtn: "பதிவிறக்குக",
+    downloadBtn: "பதிவிறக்குக",
+    docBadge: (type: string) => `${type} ஆவணம்`,
+    publishedPrefix: "வெளியிடப்பட்டது:",
+    modalPubYear: "வெளியீட்டு ஆண்டு:",
+    modalFileType: "கோப்பு வகை:",
+    modalFileSize: "கோப்பின் அளவு:",
+    modalLang: "மொழி:",
+    modalSource: "உத்தியோகபூர்வ ஆதாரம்:",
+    modalSourceVal: "கடற்றொழில் அமைச்சு",
+    modalVersions: "📄 கிடைக்கும் மொழி கோப்பு பதிப்புகள்:",
+    closeBtn: "மூடுக",
+    openFileBtn: "கோப்பைத் திறக்குக",
+  },
+}
 
 export function DownloadsLibrary({
   categories: apiCategories,
   documents: apiDocuments,
 }: DownloadsLibraryProps) {
+  const { language } = useLanguage()
+  const c = contentByLang[language === "si" || language === "ta" ? language : "en"]
+
   const categoriesList =
     apiCategories !== undefined && apiCategories !== null
       ? apiCategories
-      : fallbackCategories.map((c) => ({
-          id: c.id,
-          title: c.title,
-          description: c.description,
-          icon: c.id,
+      : fallbackCategories.map((cat) => ({
+          id: cat.id,
+          title: cat.title,
+          description: cat.description,
+          icon: cat.id,
         }))
 
   const rawDocumentsList =
@@ -79,8 +181,9 @@ export function DownloadsLibrary({
 
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [selectedYear, setSelectedYear] = useState<string>("All years")
-  const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>("All categories")
-  const [showAllCategories, setShowAllCategories] = useState<boolean>(false)
+  const [activeCategoryFilter, setActiveCategoryFilter] =
+    useState<string>("All categories")
+  const [, setShowAllCategories] = useState<boolean>(false)
   const [sortOrder, setSortOrder] = useState<SortOption>("Newest first")
 
   // Accordion state: Open first category by default
@@ -89,7 +192,8 @@ export function DownloadsLibrary({
   )
 
   // Modal State
-  const [selectedDoc, setSelectedDoc] = useState<ApiDownloadDocumentItem | null>(null)
+  const [selectedDoc, setSelectedDoc] =
+    useState<ApiDownloadDocumentItem | null>(null)
 
   // Extract unique years from documents
   const availableYears = useMemo(() => {
@@ -97,7 +201,10 @@ export function DownloadsLibrary({
     rawDocumentsList.forEach((doc) => {
       if (doc.year) years.add(doc.year.toString())
     })
-    return ["All years", ...Array.from(years).sort((a, b) => Number(b) - Number(a))]
+    return [
+      "All years",
+      ...Array.from(years).sort((a, b) => Number(b) - Number(a)),
+    ]
   }, [rawDocumentsList])
 
   // Keyboard Escape listener for Modal
@@ -232,25 +339,40 @@ export function DownloadsLibrary({
       case "XLSX":
       case "XLS":
       case "CSV":
-        return <FileSpreadsheet className="h-5 w-5 text-[#256B29]" aria-hidden="true" />
+        return (
+          <FileSpreadsheet
+            className="h-5 w-5 text-[#256B29]"
+            aria-hidden="true"
+          />
+        )
       case "DOCX":
       case "DOC":
         return <FileType className="h-5 w-5 text-blue-600" aria-hidden="true" />
       case "PPTX":
       case "PPT":
-        return <Presentation className="h-5 w-5 text-amber-600" aria-hidden="true" />
+        return (
+          <Presentation className="h-5 w-5 text-amber-600" aria-hidden="true" />
+        )
       case "ZIP":
-        return <FileArchive className="h-5 w-5 text-slate-700" aria-hidden="true" />
+        return (
+          <FileArchive className="h-5 w-5 text-slate-700" aria-hidden="true" />
+        )
       case "PNG":
       case "JPG":
-        return <ImageIcon className="h-5 w-5 text-purple-600" aria-hidden="true" />
+        return (
+          <ImageIcon className="h-5 w-5 text-purple-600" aria-hidden="true" />
+        )
       default:
         return <Files className="h-5 w-5 text-slate-600" aria-hidden="true" />
     }
   }
 
   // Helper for category header icons
-  const getCategoryHeaderIcon = (iconName: string, catId: string, isOpen: boolean) => {
+  const getCategoryHeaderIcon = (
+    iconName: string,
+    catId: string,
+    isOpen: boolean
+  ) => {
     const key = iconName || catId
     const iconClass = `h-5 w-5 ${isOpen ? "!text-white" : "text-[#256B29]"}`
     switch (key) {
@@ -296,7 +418,7 @@ export function DownloadsLibrary({
             {/* Search Input */}
             <div className="relative flex-1 max-w-md">
               <label htmlFor="search-downloads" className="sr-only">
-                Search documents, forms, reports or policies
+                {c.searchPlaceholder}
               </label>
               <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                 <Search className="h-4 w-4" aria-hidden="true" />
@@ -306,7 +428,7 @@ export function DownloadsLibrary({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search documents, reports, charters..."
+                placeholder={c.searchPlaceholder}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50/50 py-2.5 pl-10 pr-9 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#388E3C] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#388E3C]/20"
               />
               {searchQuery && (
@@ -324,7 +446,9 @@ export function DownloadsLibrary({
             <div className="flex flex-wrap items-center gap-3">
               {/* Year Filter */}
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-slate-500">Year:</span>
+                <span className="text-xs font-semibold text-slate-500">
+                  {c.yearLabel}
+                </span>
                 <select
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(e.target.value)}
@@ -332,7 +456,7 @@ export function DownloadsLibrary({
                 >
                   {availableYears.map((yr) => (
                     <option key={yr} value={yr}>
-                      {yr}
+                      {yr === "All years" ? c.allYears : yr}
                     </option>
                   ))}
                 </select>
@@ -340,15 +464,17 @@ export function DownloadsLibrary({
 
               {/* Sort Order */}
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-semibold text-slate-500">Sort:</span>
+                <span className="text-xs font-semibold text-slate-500">
+                  {c.sortLabel}
+                </span>
                 <select
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value as SortOption)}
                   className="rounded-xl border border-slate-200 bg-white py-2 pl-3 pr-8 text-xs font-semibold text-slate-700 shadow-2xs focus:border-[#388E3C] focus:outline-none focus:ring-1 focus:ring-[#388E3C]"
                 >
-                  <option value="Newest first">Newest first</option>
-                  <option value="Oldest first">Oldest first</option>
-                  <option value="Title A–Z">Title A–Z</option>
+                  <option value="Newest first">{c.sortNewest}</option>
+                  <option value="Oldest first">{c.sortOldest}</option>
+                  <option value="Title A–Z">{c.sortAZ}</option>
                 </select>
               </div>
 
@@ -360,7 +486,7 @@ export function DownloadsLibrary({
                   className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>Reset Filters</span>
+                  <span>{c.resetFilters}</span>
                 </button>
               )}
             </div>
@@ -370,25 +496,21 @@ export function DownloadsLibrary({
         {/* Results Summary Bar */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <p className="text-xs sm:text-sm font-semibold text-slate-600">
-            Showing{" "}
-            <span className="font-bold text-slate-900">
-              {filteredDocs.length}
-            </span>{" "}
-            available document{filteredDocs.length === 1 ? "" : "s"} across{" "}
-            <span className="font-bold text-slate-900">
-              {categoriesList.length}
-            </span>{" "}
-            categories
+            {c.showingDocs(filteredDocs.length, categoriesList.length)}
           </p>
 
           <button
             type="button"
             onClick={() =>
-              setOpenCategory(openCategory ? null : categoriesList[0]?.id || "project-disclosures")
+              setOpenCategory(
+                openCategory
+                  ? null
+                  : categoriesList[0]?.id || "project-disclosures"
+              )
             }
             className="text-xs font-bold text-[#388E3C] hover:underline cursor-pointer"
           >
-            {openCategory ? "Collapse all" : "Expand first category"}
+            {openCategory ? c.collapseAll : c.expandFirst}
           </button>
         </div>
 
@@ -399,18 +521,17 @@ export function DownloadsLibrary({
               <FolderSearch className="h-6 w-6" aria-hidden="true" />
             </div>
             <h3 className="mt-4 text-base font-bold text-slate-900">
-              No matching downloads found
+              {c.noDocsFoundTitle}
             </h3>
             <p className="mt-1 text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
-              We couldn’t find any documents matching your active search and
-              filter parameters.
+              {c.noDocsFoundDesc}
             </p>
             <button
               type="button"
               onClick={clearFilters}
               className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-[#388E3C] px-4 py-2 text-xs font-bold text-white shadow-2xs hover:bg-[#256B29]"
             >
-              Clear all filters
+              {c.clearAllFilters}
             </button>
           </div>
         ) : (
@@ -447,7 +568,11 @@ export function DownloadsLibrary({
                             : "bg-emerald-100 text-[#256B29]"
                         }`}
                       >
-                        {getCategoryHeaderIcon(category.icon, category.id, isOpen)}
+                        {getCategoryHeaderIcon(
+                          category.icon,
+                          category.id,
+                          isOpen
+                        )}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -460,7 +585,7 @@ export function DownloadsLibrary({
                           </h3>
                           {highlightedCat === category.id && (
                             <span className="inline-flex items-center rounded-full bg-[#256B29] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-2xs">
-                              Selected
+                              {c.selectedBadge}
                             </span>
                           )}
                         </div>
@@ -480,7 +605,8 @@ export function DownloadsLibrary({
                             : "bg-slate-100 text-slate-700 border-slate-300"
                         }`}
                       >
-                        {category.items.length} {category.items.length === 1 ? "file" : "files"}
+                        {category.items.length}{" "}
+                        {c.fileSuffix(category.items.length)}
                       </span>
 
                       <div
@@ -500,7 +626,7 @@ export function DownloadsLibrary({
                     <div className="border-t border-slate-200 bg-white p-5 sm:p-6">
                       {category.items.length === 0 ? (
                         <p className="text-xs text-slate-500 italic py-2 text-center">
-                          No documents currently available under this category.
+                          {c.emptyCategory}
                         </p>
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -524,25 +650,32 @@ export function DownloadsLibrary({
                                     <span className="text-[11px] font-semibold text-slate-500">
                                       {doc.fileSize}
                                     </span>
-                                    {doc.availableLanguages && doc.availableLanguages.length > 0 && (
-                                      <div className="flex items-center gap-1">
-                                        {doc.availableLanguages.includes("en") && (
-                                          <span className="rounded bg-sky-50 px-1 py-0.5 text-[9px] font-extrabold text-sky-700 border border-sky-200/80">
-                                            EN
-                                          </span>
-                                        )}
-                                        {doc.availableLanguages.includes("si") && (
-                                          <span className="rounded bg-amber-50 px-1 py-0.5 text-[9px] font-extrabold text-amber-700 border border-amber-200/80">
-                                            SI
-                                          </span>
-                                        )}
-                                        {doc.availableLanguages.includes("ta") && (
-                                          <span className="rounded bg-rose-50 px-1 py-0.5 text-[9px] font-extrabold text-rose-700 border border-rose-200/80">
-                                            TA
-                                          </span>
-                                        )}
-                                      </div>
-                                    )}
+                                    {doc.availableLanguages &&
+                                      doc.availableLanguages.length > 0 && (
+                                        <div className="flex items-center gap-1">
+                                          {doc.availableLanguages.includes(
+                                            "en"
+                                          ) && (
+                                            <span className="rounded bg-sky-50 px-1 py-0.5 text-[9px] font-extrabold text-sky-700 border border-sky-200/80">
+                                              EN
+                                            </span>
+                                          )}
+                                          {doc.availableLanguages.includes(
+                                            "si"
+                                          ) && (
+                                            <span className="rounded bg-amber-50 px-1 py-0.5 text-[9px] font-extrabold text-amber-700 border border-amber-200/80">
+                                              SI
+                                            </span>
+                                          )}
+                                          {doc.availableLanguages.includes(
+                                            "ta"
+                                          ) && (
+                                            <span className="rounded bg-rose-50 px-1 py-0.5 text-[9px] font-extrabold text-rose-700 border border-rose-200/80">
+                                              TA
+                                            </span>
+                                          )}
+                                        </div>
+                                      )}
                                   </div>
                                 </div>
 
@@ -553,8 +686,14 @@ export function DownloadsLibrary({
 
                                 {/* Date / Year */}
                                 <div className="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
-                                  {doc.year && <span>Year: {doc.year}</span>}
-                                  {doc.year && doc.publishedDate && <span>•</span>}
+                                  {doc.year && (
+                                    <span>
+                                      {c.yearPrefix} {doc.year}
+                                    </span>
+                                  )}
+                                  {doc.year && doc.publishedDate && (
+                                    <span>•</span>
+                                  )}
                                   {doc.publishedDate && (
                                     <span>{doc.publishedDate}</span>
                                   )}
@@ -573,7 +712,7 @@ export function DownloadsLibrary({
                                     className="h-3.5 w-3.5 text-slate-500"
                                     aria-hidden="true"
                                   />
-                                  <span>Open</span>
+                                  <span>{c.openBtn}</span>
                                 </a>
 
                                 <a
@@ -585,7 +724,9 @@ export function DownloadsLibrary({
                                     className="h-3.5 w-3.5 text-white !text-white"
                                     aria-hidden="true"
                                   />
-                                  <span className="text-white !text-white">Get</span>
+                                  <span className="text-white !text-white">
+                                    {c.getBtn}
+                                  </span>
                                 </a>
                               </div>
                             </div>
@@ -628,11 +769,11 @@ export function DownloadsLibrary({
                 </div>
                 <div>
                   <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-800 uppercase tracking-wide">
-                    {selectedDoc.fileType} Document
+                    {c.docBadge(selectedDoc.fileType)}
                   </span>
                   {selectedDoc.publishedDate && (
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Published: {selectedDoc.publishedDate}
+                      {c.publishedPrefix} {selectedDoc.publishedDate}
                     </p>
                   )}
                 </div>
@@ -653,7 +794,7 @@ export function DownloadsLibrary({
                 {selectedDoc.year && (
                   <div className="flex justify-between py-1 border-b border-slate-200/70">
                     <span className="font-semibold text-slate-500">
-                      Publication Year:
+                      {c.modalPubYear}
                     </span>
                     <span className="font-bold text-slate-900">
                       {selectedDoc.year}
@@ -662,7 +803,7 @@ export function DownloadsLibrary({
                 )}
                 <div className="flex justify-between py-1 border-b border-slate-200/70">
                   <span className="font-semibold text-slate-500">
-                    File Type:
+                    {c.modalFileType}
                   </span>
                   <span className="font-bold text-slate-900">
                     {selectedDoc.fileType}
@@ -670,7 +811,7 @@ export function DownloadsLibrary({
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/70">
                   <span className="font-semibold text-slate-500">
-                    File Size:
+                    {c.modalFileSize}
                   </span>
                   <span className="font-bold text-slate-900">
                     {selectedDoc.fileSize}
@@ -679,7 +820,7 @@ export function DownloadsLibrary({
                 {selectedDoc.language && (
                   <div className="flex justify-between py-1 border-b border-slate-200/70">
                     <span className="font-semibold text-slate-500">
-                      Language:
+                      {c.modalLang}
                     </span>
                     <span className="font-bold text-slate-900">
                       {selectedDoc.language}
@@ -688,19 +829,21 @@ export function DownloadsLibrary({
                 )}
                 <div className="flex justify-between py-1">
                   <span className="font-semibold text-slate-500">
-                    Official Source:
+                    {c.modalSource}
                   </span>
                   <span className="font-bold text-[#256B29]">
-                    Ministry of Fisheries
+                    {c.modalSourceVal}
                   </span>
                 </div>
               </div>
 
               {/* Language Specific File Versions */}
-              {(selectedDoc.fileUrlEn || selectedDoc.fileUrlSi || selectedDoc.fileUrlTa) && (
+              {(selectedDoc.fileUrlEn ||
+                selectedDoc.fileUrlSi ||
+                selectedDoc.fileUrlTa) && (
                 <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 p-3.5">
                   <span className="block text-xs font-extrabold text-emerald-950 mb-2">
-                    📄 Available Language File Versions:
+                    {c.modalVersions}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {selectedDoc.fileUrlEn && (
@@ -743,7 +886,7 @@ export function DownloadsLibrary({
                   onClick={() => setSelectedDoc(null)}
                   className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
                 >
-                  Close
+                  {c.closeBtn}
                 </button>
                 <a
                   href={selectedDoc.fileUrl}
@@ -755,7 +898,7 @@ export function DownloadsLibrary({
                     className="h-3.5 w-3.5 text-slate-500"
                     aria-hidden="true"
                   />
-                  <span>Open file</span>
+                  <span>{c.openFileBtn}</span>
                 </a>
                 <a
                   href={selectedDoc.downloadUrl || selectedDoc.fileUrl}
@@ -763,7 +906,7 @@ export function DownloadsLibrary({
                   className="inline-flex items-center gap-1.5 rounded-xl bg-[#388E3C] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#256B29]"
                 >
                   <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>Download</span>
+                  <span>{c.downloadBtn}</span>
                 </a>
               </div>
             </div>

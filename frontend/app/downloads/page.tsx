@@ -27,20 +27,31 @@ export default async function DownloadsPage({ searchParams }: PageProps) {
 
   const [initialData, headerFooterData] = await Promise.all([
     fetchDownloadsPageData(currentLang),
-    fetchHeaderFooterData().catch(() => null),
+    fetchHeaderFooterData(currentLang).catch(() => null),
   ])
+
+  const breadcrumbItems =
+    currentLang === "si"
+      ? [
+          { label: "මුල් පිටුව", href: "/?lang=si" },
+          { label: "බාගත කිරීම්" },
+        ]
+      : currentLang === "ta"
+      ? [
+          { label: "முகப்பு", href: "/?lang=ta" },
+          { label: "பதிவிறக்கங்கள்" },
+        ]
+      : [
+          { label: "Home", href: "/" },
+          { label: "Downloads" },
+        ]
 
   return (
     <>
       <SiteHeader initialHeader={headerFooterData?.header} />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
-        <Breadcrumb
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Downloads" },
-          ]}
-        />
+        <Breadcrumb items={breadcrumbItems} />
 
         <DownloadsPageContent initialData={initialData} />
       </main>

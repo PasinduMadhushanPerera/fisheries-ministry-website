@@ -110,28 +110,172 @@ class FooterSetting(TimeStampedModel):
     """
     Manages common Footer elements across all website pages.
     """
+    # Column 1: Ministry Branding
     government_badge = models.CharField(
         max_length=150,
         default="Government of Sri Lanka",
+        verbose_name="Government Badge (English)",
         help_text="Small pill badge text in footer column 1",
     )
+    government_badge_si = models.CharField(
+        max_length=150,
+        blank=True,
+        default="ශ්‍රී ලංකා රජය",
+        verbose_name="Government Badge (සිංහල)",
+    )
+    government_badge_ta = models.CharField(
+        max_length=150,
+        blank=True,
+        default="இலங்கை அரசாங்கம்",
+        verbose_name="Government Badge (தமிழ்)",
+    )
+
     ministry_name = models.CharField(
         max_length=255,
         default="Ministry of Fisheries, Aquatic and Ocean Resources",
+        verbose_name="Ministry Name (English)",
     )
+    ministry_name_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="ධීවර, ජලජ සහ සාගර සම්පත් අමාත්‍යාංශය",
+        verbose_name="Ministry Name (සිංහල)",
+    )
+    ministry_name_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="கடற்றொழில், நீரியல் மற்றும் பெருங்கடல் வளங்கள் அமைச்சு",
+        verbose_name="Ministry Name (தமிழ்)",
+    )
+
     about_text = models.TextField(
         default="Providing public information, official announcements, downloadable forms, and institutional access for Sri Lanka's fisheries, aquaculture, and ocean resources sector.",
+        verbose_name="About Text (English)",
     )
+    about_text_si = models.TextField(
+        blank=True,
+        default="ශ්‍රී ලංකාවේ ධීවර, ජලජීවී වගා සහ සාගර සම්පත් ක්ෂේත්‍රය සඳහා පොදු තොරතුරු, නිල නිවේදන, බාගත හැකි ආකෘති පත්‍ර සහ ආයතනික ප්‍රවේශය සැපයීම.",
+        verbose_name="About Text (සිංහල)",
+    )
+    about_text_ta = models.TextField(
+        blank=True,
+        default="இலங்கையின் கடற்றொழில், நீரியல் வளர்ப்பு மற்றும் பெருங்கடல் வளங்கள் துறைக்கான பொதுத் தகவல்கள், உத்தியோகபூர்வ அறிவிப்புகள், பதிவிறக்கம் செய்யக்கூடிய படிவங்கள் மற்றும் நிறுவன அணுகலை வழங்குதல்.",
+        verbose_name="About Text (தமிழ்)",
+    )
+
     gov_portal_label = models.CharField(
         max_length=100,
         default="Visit Sri Lanka Gov.lk",
+        verbose_name="Gov Portal Button Label (English)",
+    )
+    gov_portal_label_si = models.CharField(
+        max_length=100,
+        blank=True,
+        default="ශ්‍රී ලංකා Gov.lk වෙත පිවිසෙන්න",
+        verbose_name="Gov Portal Button Label (සිංහල)",
+    )
+    gov_portal_label_ta = models.CharField(
+        max_length=100,
+        blank=True,
+        default="இலங்கை Gov.lk போர்ட்டலுக்குச் செல்க",
+        verbose_name="Gov Portal Button Label (தமிழ்)",
     )
     gov_portal_url = models.CharField(
         max_length=255,
         default="https://www.gov.lk/",
     )
+
+    # Column Titles
+    quick_links_title_en = models.CharField(
+        max_length=100,
+        blank=True,
+        default="Quick Links",
+        verbose_name="Column 2 Title (English)",
+    )
+    quick_links_title_si = models.CharField(
+        max_length=100,
+        blank=True,
+        default="ක්ෂණික සබැඳි",
+        verbose_name="Column 2 Title (සිංහල)",
+    )
+    quick_links_title_ta = models.CharField(
+        max_length=100,
+        blank=True,
+        default="விரைவு இணைப்புகள்",
+        verbose_name="Column 2 Title (தமிழ்)",
+    )
+
+    info_links_title_en = models.CharField(
+        max_length=100,
+        blank=True,
+        default="Information & Portals",
+        verbose_name="Column 3 Title (English)",
+    )
+    info_links_title_si = models.CharField(
+        max_length=100,
+        blank=True,
+        default="තොරතුරු සහ ද්වාර",
+        verbose_name="Column 3 Title (සිංහල)",
+    )
+    info_links_title_ta = models.CharField(
+        max_length=100,
+        blank=True,
+        default="தகவல்கள் & போர்ட்டல்கள்",
+        verbose_name="Column 3 Title (தமிழ்)",
+    )
+
+    contact_title_en = models.CharField(
+        max_length=100,
+        blank=True,
+        default="Contact & Support",
+        verbose_name="Column 4 Title (English)",
+    )
+    contact_title_si = models.CharField(
+        max_length=100,
+        blank=True,
+        default="සම්බන්ධීකරණය සහ සහාය",
+        verbose_name="Column 4 Title (සිංහල)",
+    )
+    contact_title_ta = models.CharField(
+        max_length=100,
+        blank=True,
+        default="தொடர்பு & ஆதரவு",
+        verbose_name="Column 4 Title (தமிழ்)",
+    )
+
+    awards_title_en = models.CharField(
+        max_length=100,
+        blank=True,
+        default="Recognitions & Awards",
+        verbose_name="Awards Section Title (English)",
+    )
+    awards_title_si = models.CharField(
+        max_length=100,
+        blank=True,
+        default="ඇගයීම් සහ සම්මාන",
+        verbose_name="Awards Section Title (සිංහල)",
+    )
+    awards_title_ta = models.CharField(
+        max_length=100,
+        blank=True,
+        default="அங்கீகாரங்கள் & விருதுகள்",
+        verbose_name="Awards Section Title (தமிழ்)",
+    )
+
+    # Column 4: Contact info
     hq_address = models.TextField(
         default="New Secretariat, Maligawatta, Colombo 10, Sri Lanka",
+        verbose_name="HQ Address (English)",
+    )
+    hq_address_si = models.TextField(
+        blank=True,
+        default="නව ලේකම් කාර්යාලය, මාළිගාවත්ත, කොළඹ 10, ශ්‍රී ලංකාව",
+        verbose_name="HQ Address (සිංහල)",
+    )
+    hq_address_ta = models.TextField(
+        blank=True,
+        default="புதிய செயலகம், மாளிகாவத்தை, கொழும்பு 10, இலங்கை",
+        verbose_name="HQ Address (தமிழ்)",
     )
     telephone = models.CharField(
         max_length=100,
@@ -140,9 +284,24 @@ class FooterSetting(TimeStampedModel):
     email = models.EmailField(
         default="info@fisheries.gov.lk",
     )
+
+    # Bottom bar details
     copyright_text = models.CharField(
         max_length=255,
         default="Ministry of Fisheries, Aquatic and Ocean Resources. Official Government Website.",
+        verbose_name="Copyright Statement (English)",
+    )
+    copyright_text_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="ධීවර, ජලජ සහ සාගර සම්පත් අමාත්‍යාංශය. නිල රාජ්‍ය වෙබ් අඩවිය.",
+        verbose_name="Copyright Statement (සිංහල)",
+    )
+    copyright_text_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="கடற்றொழில், நீரியல் மற்றும் பெருங்கடல் வளங்கள் அமைச்சு. உத்தியோகபூர்வ அரசாங்க வலைத்தளம்.",
+        verbose_name="Copyright Statement (தமிழ்)",
     )
     copyright_year = models.CharField(
         max_length=20,
@@ -154,13 +313,77 @@ class FooterSetting(TimeStampedModel):
         max_length=255,
         blank=True,
         default="Design & Developed by IT UNIT",
-        verbose_name="Development Details / Credits",
+        verbose_name="Development Details / Credits (English)",
         help_text="Development details, designer/developer credits displayed on a separate line below the copyright text.",
     )
+    developed_by_text_si = models.CharField(
+        max_length=255,
+        blank=True,
+        default="තොරතුරු තාක්ෂණ ඒකකය (IT UNIT) මඟින් නිර්මාණය සහ සංවර්ධනය කරන ලදී",
+        verbose_name="Development Details / Credits (සිංහල)",
+    )
+    developed_by_text_ta = models.CharField(
+        max_length=255,
+        blank=True,
+        default="தகவல் தொழில்நுட்பப் பிரிவினால் (IT UNIT) வடிவமைக்கப்பட்டு உருவாக்கப்பட்டது",
+        verbose_name="Development Details / Credits (தமிழ்)",
+    )
+
     last_updated_text = models.CharField(
         max_length=100,
         default="25 August 2026",
+        verbose_name="Last Updated Date (English)",
         help_text="Last updated date string displayed in footer bottom bar",
+    )
+    last_updated_text_si = models.CharField(
+        max_length=100,
+        blank=True,
+        default="2026 අගෝස්තු 25",
+        verbose_name="Last Updated Date (සිංහල)",
+    )
+    last_updated_text_ta = models.CharField(
+        max_length=100,
+        blank=True,
+        default="25 ஆகஸ்ட் 2026",
+        verbose_name="Last Updated Date (தமிழ்)",
+    )
+
+    last_updated_prefix_en = models.CharField(
+        max_length=50,
+        blank=True,
+        default="Last updated:",
+        verbose_name="Last Updated Prefix (English)",
+    )
+    last_updated_prefix_si = models.CharField(
+        max_length=50,
+        blank=True,
+        default="අවසන් වරට යාවත්කාලීන කළේ:",
+        verbose_name="Last Updated Prefix (සිංහල)",
+    )
+    last_updated_prefix_ta = models.CharField(
+        max_length=50,
+        blank=True,
+        default="கடைசியாக புதுப்பிக்கப்பட்டது:",
+        verbose_name="Last Updated Prefix (தமிழ்)",
+    )
+
+    website_views_prefix_en = models.CharField(
+        max_length=50,
+        blank=True,
+        default="Website Views:",
+        verbose_name="Website Views Prefix (English)",
+    )
+    website_views_prefix_si = models.CharField(
+        max_length=50,
+        blank=True,
+        default="වෙබ් අඩවි පිවිසුම්:",
+        verbose_name="Website Views Prefix (සිංහල)",
+    )
+    website_views_prefix_ta = models.CharField(
+        max_length=50,
+        blank=True,
+        default="தளப் பார்வைகள்:",
+        verbose_name="Website Views Prefix (தமிழ்)",
     )
 
     # Social Media Links
@@ -262,6 +485,8 @@ class FooterLink(TimeStampedModel):
 
     column = models.CharField(max_length=20, choices=COLUMN_CHOICES, default="quick")
     label = models.CharField(max_length=150, help_text="Link text (e.g. 'Downloads Centre')")
+    label_si = models.CharField(max_length=150, blank=True, default="", verbose_name="Link Label (සිංහල)")
+    label_ta = models.CharField(max_length=150, blank=True, default="", verbose_name="Link Label (தமிழ்)")
     url = models.CharField(max_length=255, help_text="Target URL (e.g. '/downloads' or 'https://...')")
     is_external = models.BooleanField(default=False)
     order = models.PositiveIntegerField(default=1, db_index=True)

@@ -6,17 +6,82 @@ import { Sparkles, ExternalLink, Download, Eye, X } from "lucide-react"
 import { Container } from "@/components/ui/container"
 import { downloadDocuments, type DownloadDocument } from "@/data/download-documents"
 import type { ApiDownloadDocumentItem } from "@/lib/api/downloads"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 
 interface FeaturedDownloadsProps {
   featuredDocuments?: ApiDownloadDocumentItem[]
 }
 
+const contentByLang = {
+  en: {
+    sectionTitle: "Featured Publications & Disclosures",
+    sectionSubtitle:
+      "Key project disclosures, strategic policies, and public charters highlighted for easy access.",
+    featuredBadge: "Featured",
+    publishedPrefix: "Published:",
+    openBtn: "Open",
+    downloadBtn: "Download",
+    modalBadge: "Featured Download",
+    modalPubYear: "Publication Year:",
+    modalFileType: "File Type:",
+    modalFileSize: "File Size:",
+    modalLang: "Language:",
+    modalSource: "Official Source:",
+    modalSourceVal: "Ministry of Fisheries",
+    modalVersions: "📄 Available Language File Versions:",
+    closeBtn: "Close",
+    openFileBtn: "Open file",
+  },
+  si: {
+    sectionTitle: "විශේෂ ප්‍රකාශන සහ නිල අනාවරණයන්",
+    sectionSubtitle:
+      "පහසුවෙන් ප්‍රවේශ විය හැකි වන පරිදි ඉස්මතු කර දක්වා ඇති ප්‍රධාන ව්‍යාපෘති අනාවරණයන්, උපායමාර්ගික ප්‍රතිපත්ති සහ මහජන ප්‍රඥප්ති.",
+    featuredBadge: "විශේෂාංගගත",
+    publishedPrefix: "ප්‍රකාශිත දිනය:",
+    openBtn: "විවෘත කරන්න",
+    downloadBtn: "බාගත කරන්න",
+    modalBadge: "විශේෂාංගගත බාගත කිරීම",
+    modalPubYear: "ප්‍රකාශිත වසර:",
+    modalFileType: "ගොනු ආකෘතිය:",
+    modalFileSize: "ගොනු ප්‍රමාණය:",
+    modalLang: "භාෂාව:",
+    modalSource: "නිල මූලාශ්‍රය:",
+    modalSourceVal: "ධීවර අමාත්‍යාංශය",
+    modalVersions: "📄 ලබාගත හැකි භාෂා අනුවාද ගොනු:",
+    closeBtn: "වසන්න",
+    openFileBtn: "ගොනුව බලන්න",
+  },
+  ta: {
+    sectionTitle: "சிறப்பு வெளியீடுகள் & வெளிப்பாடுகள்",
+    sectionSubtitle:
+      "எளிதான அணுகலுக்காக முன்னிலைப்படுத்தப்பட்ட முக்கிய திட்ட வெளிப்பாடுகள், மூலோபாயக் கொள்கைகள் மற்றும் பொது சாசனங்கள்.",
+    featuredBadge: "சிறப்பு",
+    publishedPrefix: "வெளியிடப்பட்டது:",
+    openBtn: "திறக்குக",
+    downloadBtn: "பதிவிறக்குக",
+    modalBadge: "சிறப்பு பதிவிறக்கம்",
+    modalPubYear: "வெளியீட்டு ஆண்டு:",
+    modalFileType: "கோப்பு வகை:",
+    modalFileSize: "கோப்பின் அளவு:",
+    modalLang: "மொழி:",
+    modalSource: "உத்தியோகபூர்வ ஆதாரம்:",
+    modalSourceVal: "கடற்றொழில் அமைச்சு",
+    modalVersions: "📄 கிடைக்கும் மொழி கோப்பு பதிப்புகள்:",
+    closeBtn: "மூடுக",
+    openFileBtn: "கோப்பைத் திறக்குக",
+  },
+}
+
 export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps) {
+  const { language } = useLanguage()
+  const c = contentByLang[language === "si" || language === "ta" ? language : "en"]
+
   const [selectedDoc, setSelectedDoc] = useState<ApiDownloadDocumentItem | DownloadDocument | null>(null)
 
-  const items = featuredDocuments !== undefined && featuredDocuments !== null
-    ? featuredDocuments
-    : downloadDocuments.filter((doc) => doc.featured)
+  const items =
+    featuredDocuments !== undefined && featuredDocuments !== null
+      ? featuredDocuments
+      : downloadDocuments.filter((doc) => doc.featured)
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -46,10 +111,10 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              Featured Publications & Disclosures
+              {c.sectionTitle}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600">
-              Key project disclosures, strategic policies, and public charters highlighted for easy access.
+              {c.sectionSubtitle}
             </p>
           </div>
         </div>
@@ -66,7 +131,7 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                 <div className="flex items-center justify-between gap-2">
                   <span className="inline-flex items-center gap-1 rounded-full bg-amber-100/80 px-2.5 py-0.5 text-xs font-bold text-amber-800 border border-amber-200">
                     <Sparkles className="h-3 w-3" aria-hidden="true" />
-                    <span>Featured</span>
+                    <span>{c.featuredBadge}</span>
                   </span>
 
                   <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-700">
@@ -83,7 +148,7 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
 
                 {doc.publishedDate && (
                   <p className="mt-3 text-[11px] text-slate-500 font-medium">
-                    Published: {doc.publishedDate}
+                    {c.publishedPrefix} {doc.publishedDate}
                   </p>
                 )}
               </div>
@@ -97,7 +162,7 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                   className="flex-1 inline-flex min-h-[36px] items-center justify-center gap-1 rounded-xl border border-slate-300 bg-white px-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                 >
                   <ExternalLink className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                  <span>Open</span>
+                  <span>{c.openBtn}</span>
                 </a>
 
                 <a
@@ -106,7 +171,7 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                   className="flex-1 inline-flex min-h-[36px] items-center justify-center gap-1.5 rounded-xl bg-[#256B29] px-2 text-xs font-extrabold text-white !text-white transition hover:bg-[#1b4d1d] hover:text-white hover:!text-white shadow-2xs"
                 >
                   <Download className="h-3.5 w-3.5 text-white !text-white" aria-hidden="true" />
-                  <span className="text-white !text-white">Download</span>
+                  <span className="text-white !text-white">{c.downloadBtn}</span>
                 </a>
               </div>
             </div>
@@ -141,11 +206,11 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                 </div>
                 <div>
                   <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">
-                    Featured Download
+                    {c.modalBadge}
                   </span>
                   {selectedDoc.publishedDate && (
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Published: {selectedDoc.publishedDate}
+                      {c.publishedPrefix} {selectedDoc.publishedDate}
                     </p>
                   )}
                 </div>
@@ -162,27 +227,27 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
               <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2 text-xs text-slate-700">
                 {selectedDoc.year && (
                   <div className="flex justify-between py-1 border-b border-slate-200/70">
-                    <span className="font-semibold text-slate-500">Publication Year:</span>
+                    <span className="font-semibold text-slate-500">{c.modalPubYear}</span>
                     <span className="font-bold text-slate-900">{selectedDoc.year}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-1 border-b border-slate-200/70">
-                  <span className="font-semibold text-slate-500">File Type:</span>
+                  <span className="font-semibold text-slate-500">{c.modalFileType}</span>
                   <span className="font-bold text-slate-900">{selectedDoc.fileType}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/70">
-                  <span className="font-semibold text-slate-500">File Size:</span>
+                  <span className="font-semibold text-slate-500">{c.modalFileSize}</span>
                   <span className="font-bold text-slate-900">{selectedDoc.fileSize}</span>
                 </div>
                 {selectedDoc.language && (
                   <div className="flex justify-between py-1 border-b border-slate-200/70">
-                    <span className="font-semibold text-slate-500">Language:</span>
+                    <span className="font-semibold text-slate-500">{c.modalLang}</span>
                     <span className="font-bold text-slate-900">{selectedDoc.language}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-1">
-                  <span className="font-semibold text-slate-500">Official Source:</span>
-                  <span className="font-bold text-[#256B29]">Ministry of Fisheries</span>
+                  <span className="font-semibold text-slate-500">{c.modalSource}</span>
+                  <span className="font-bold text-[#256B29]">{c.modalSourceVal}</span>
                 </div>
               </div>
 
@@ -190,7 +255,7 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
               {(selectedDoc.fileUrlEn || selectedDoc.fileUrlSi || selectedDoc.fileUrlTa) && (
                 <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 p-3.5">
                   <span className="block text-xs font-extrabold text-emerald-950 mb-2">
-                    📄 Available Language File Versions:
+                    {c.modalVersions}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {selectedDoc.fileUrlEn && (
@@ -233,7 +298,7 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                   onClick={() => setSelectedDoc(null)}
                   className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
                 >
-                  Close
+                  {c.closeBtn}
                 </button>
                 <a
                   href={selectedDoc.fileUrl}
@@ -242,7 +307,7 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                   className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                 >
                   <ExternalLink className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                  <span>Open file</span>
+                  <span>{c.openFileBtn}</span>
                 </a>
                 <a
                   href={selectedDoc.downloadUrl || selectedDoc.fileUrl}
@@ -250,7 +315,7 @@ export function FeaturedDownloads({ featuredDocuments }: FeaturedDownloadsProps)
                   className="inline-flex items-center gap-1.5 rounded-xl bg-[#388E3C] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#256B29]"
                 >
                   <Download className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span>Download</span>
+                  <span>{c.downloadBtn}</span>
                 </a>
               </div>
             </div>

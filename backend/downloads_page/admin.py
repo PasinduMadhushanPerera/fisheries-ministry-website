@@ -64,6 +64,7 @@ class DownloadCategoryAdmin(admin.ModelAdmin):
     list_display = [
         "order",
         "title_en",
+        "title_si",
         "category_id",
         "icon_type",
         "attached_doc_count",
@@ -90,14 +91,12 @@ class DownloadCategoryAdmin(admin.ModelAdmin):
             ),
         }),
         ("🇱🇰 Sinhala Details (සිංහල)", {
-            "classes": ("collapse",),
             "fields": (
                 "title_si",
                 "description_si",
             ),
         }),
         ("🇱🇰 Tamil Details (தமிழ்)", {
-            "classes": ("collapse",),
             "fields": (
                 "title_ta",
                 "description_ta",
@@ -129,6 +128,7 @@ class DownloadDocumentItemAdmin(admin.ModelAdmin):
     list_display = [
         "order",
         "title_en",
+        "title_si",
         "category_badge",
         "format_badge",
         "uploaded_files_badge",
@@ -140,7 +140,7 @@ class DownloadDocumentItemAdmin(admin.ModelAdmin):
     ]
     list_display_links = ["title_en"]
     list_filter = ["category", "file_type", "language", "year", "is_featured", "is_active"]
-    search_fields = ["title_en", "title_si", "title_ta", "description_en", "item_id"]
+    search_fields = ["title_en", "title_si", "title_ta", "description_en", "description_si", "description_ta", "item_id"]
     ordering = ["category__order", "order", "id"]
 
     fieldsets = (
@@ -158,7 +158,6 @@ class DownloadDocumentItemAdmin(admin.ModelAdmin):
             ),
         }),
         ("🇱🇰 Sinhala Details & File Upload (සිංහල)", {
-            "classes": ("collapse",),
             "fields": (
                 "title_si",
                 "description_si",
@@ -166,7 +165,6 @@ class DownloadDocumentItemAdmin(admin.ModelAdmin):
             ),
         }),
         ("🇱🇰 Tamil Details & File Upload (தமிழ்)", {
-            "classes": ("collapse",),
             "fields": (
                 "title_ta",
                 "description_ta",

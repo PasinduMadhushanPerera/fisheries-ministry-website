@@ -15,7 +15,13 @@ import Link from "next/link"
 
 import { Container } from "@/components/ui/container"
 import { BackToTop } from "./back-to-top"
-import { ApiFooterSetting, incrementVisitorCount, fetchVisitorCount } from "@/lib/api/header-footer"
+import {
+  ApiFooterSetting,
+  incrementVisitorCount,
+  fetchVisitorCount,
+  fetchHeaderFooterData,
+} from "@/lib/api/header-footer"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 
 function FacebookIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -57,34 +63,151 @@ function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
   )
 }
 
-const defaultQuickLinks = [
-  { label: "Downloads Centre", href: "/downloads" },
-  { label: "About the Ministry", href: "/about/overview" },
-  { label: "Fisheries Institutions", href: "/institutions" },
-]
+const localizedDefaults = {
+  en: {
+    governmentBadge: "Government of Sri Lanka",
+    ministryName: "Ministry of Fisheries, Aquatic and Ocean Resources",
+    aboutText:
+      "Providing public information, official announcements, downloadable forms, and institutional access for Sri Lanka's fisheries, aquaculture, and ocean resources sector.",
+    govPortalLabel: "Visit Sri Lanka Gov.lk",
+    quickLinksTitle: "Quick Links",
+    infoLinksTitle: "Information & Portals",
+    contactTitle: "Contact & Support",
+    awardsTitle: "Recognitions & Awards",
+    hqAddress: "New Secretariat, Maligawatta, Colombo 10, Sri Lanka",
+    developedByText: "Design & Developed by IT UNIT",
+    lastUpdatedPrefix: "Last updated:",
+    websiteViewsPrefix: "Website Views:",
+    quickLinks: [
+      { label: "Downloads Centre", href: "/downloads" },
+      { label: "About the Ministry", href: "/about/overview" },
+      { label: "Fisheries Institutions", href: "/institutions" },
+    ],
+    mediaLinks: [
+      { label: "News & Media Centre", href: "/media-centre" },
+      { label: "Public Notices", href: "/media-centre/notices" },
+      { label: "Events & Programmes", href: "/media-centre/events" },
+      { label: "Fisheries Statistics", href: "/statistics" },
+      { label: "Right to Information (RTI)", href: "/rti" },
+    ],
+    supportLinks: [
+      { label: "Contact HQ & Directory", href: "/contact" },
+      { label: "Frequently Asked Questions", href: "/contact#contact-faq" },
+      { label: "Accessibility Statement", href: "/accessibility" },
+    ],
+    legalLinks: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Use", href: "/terms-of-use" },
+      { label: "Accessibility Statement", href: "/accessibility" },
+    ],
+  },
+  si: {
+    governmentBadge: "ශ්‍රී ලංකා රජය",
+    ministryName: "ධීවර, ජලජ සහ සාගර සම්පත් අමාත්‍යාංශය",
+    aboutText:
+      "ශ්‍රී ලංකාවේ ධීවර, ජලජීවී වගා සහ සාගර සම්පත් ක්ෂේත්‍රය සඳහා පොදු තොරතුරු, නිල නිවේදන, බාගත හැකි ආකෘති පත්‍ර සහ ආයතනික ප්‍රවේශය සැපයීම.",
+    govPortalLabel: "ශ්‍රී ලංකා Gov.lk වෙත පිවිසෙන්න",
+    quickLinksTitle: "ක්ෂණික සබැඳි",
+    infoLinksTitle: "තොරතුරු සහ ද්වාර",
+    contactTitle: "සම්බන්ධීකරණය සහ සහාය",
+    awardsTitle: "ඇගයීම් සහ සම්මාන",
+    hqAddress: "නව ලේකම් කාර්යාලය, මාළිගාවත්ත, කොළඹ 10, ශ්‍රී ලංකාව",
+    developedByText: "තොරතුරු තාක්ෂණ ඒකකය (IT UNIT) මඟින් නිර්මාණය සහ සංවර්ධනය කරන ලදී",
+    lastUpdatedPrefix: "අවසන් වරට යාවත්කාලීන කළේ:",
+    websiteViewsPrefix: "වෙබ් අඩවි පිවිසුම්:",
+    quickLinks: [
+      { label: "බාගත කිරීම් මධ්‍යස්ථානය", href: "/downloads" },
+      { label: "අමාත්‍යාංශය පිළිබඳව", href: "/about/overview" },
+      { label: "ධීවර ආයතන", href: "/institutions" },
+    ],
+    mediaLinks: [
+      { label: "පුවත් සහ මාධ්‍ය මධ්‍යස්ථානය", href: "/media-centre" },
+      { label: "පොදු නිවේදන", href: "/media-centre/notices" },
+      { label: "වැඩසටහන් සහ විශේෂ සිදුවීම්", href: "/media-centre/events" },
+      { label: "ධීවර සංඛ්‍යාලේඛන", href: "/statistics" },
+      { label: "තොරතුරු දැනගැනීමේ අයිතිය (RTI)", href: "/rti" },
+    ],
+    supportLinks: [
+      { label: "ප්‍රධාන කාර්යාලය සහ නාමාවලිය", href: "/contact" },
+      { label: "නිතර අසන ප්‍රශ්න (FAQ)", href: "/contact#contact-faq" },
+      { label: "ප්‍රවේශ්‍යතා ප්‍රකාශය", href: "/accessibility" },
+    ],
+    legalLinks: [
+      { label: "පෞද්ගලිකත්ව ප්‍රතිපත්තිය", href: "/privacy" },
+      { label: "භාවිත නියමයන්", href: "/terms-of-use" },
+      { label: "ප්‍රවේශ්‍යතා ප්‍රකාශය", href: "/accessibility" },
+    ],
+  },
+  ta: {
+    governmentBadge: "இலங்கை அரசாங்கம்",
+    ministryName: "கடற்றொழில், நீரியல் மற்றும் பெருங்கடல் வளங்கள் அமைச்சு",
+    aboutText:
+      "இலங்கையின் கடற்றொழில், நீரியல் வளர்ப்பு மற்றும் பெருங்கடல் வளங்கள் துறைக்கான பொதுத் தகவல்கள், உத்தியோகபூர்வ அறிவிப்புகள், பதிவிறக்கம் செய்யக்கூடிய படிவங்கள் மற்றும் நிறுவன அணுகலை வழங்குதல்.",
+    govPortalLabel: "இலங்கை Gov.lk போர்ட்டலுக்குச் செல்க",
+    quickLinksTitle: "விரைவு இணைப்புகள்",
+    infoLinksTitle: "தகவல்கள் & போர்ட்டல்கள்",
+    contactTitle: "தொடர்பு & ஆதரவு",
+    awardsTitle: "அங்கீகாரங்கள் & விருதுகள்",
+    hqAddress: "புதிய செயலகம், மாளிகாவத்தை, கொழும்பு 10, இலங்கை",
+    developedByText: "தகவல் தொழில்நுட்பப் பிரிவினால் (IT UNIT) வடிவமைக்கப்பட்டு உருவாக்கப்பட்டது",
+    lastUpdatedPrefix: "கடைசியாக புதுப்பிக்கப்பட்டது:",
+    websiteViewsPrefix: "தளப் பார்வைகள்:",
+    quickLinks: [
+      { label: "பதிவிறக்க மையம்", href: "/downloads" },
+      { label: "அமைச்சு பற்றி", href: "/about/overview" },
+      { label: "மீன்பிடி நிறுவனங்கள்", href: "/institutions" },
+    ],
+    mediaLinks: [
+      { label: "செய்திகள் & ஊடக மையம்", href: "/media-centre" },
+      { label: "பொது அறிவிப்புகள்", href: "/media-centre/notices" },
+      { label: "நிகழ்வுகள் & திட்டங்கள்", href: "/media-centre/events" },
+      { label: "மீன்பிடி புள்ளிவிவரங்கள்", href: "/statistics" },
+      { label: "தகவல் அறியும் உரிமை (RTI)", href: "/rti" },
+    ],
+    supportLinks: [
+      { label: "தலைமை அலுவலக தொடர்பு & அடைவு", href: "/contact" },
+      { label: "அடிக்கடி கேட்கப்படும் கேள்விகள்", href: "/contact#contact-faq" },
+      { label: "அணுகல்தன்மை அறிக்கை", href: "/accessibility" },
+    ],
+    legalLinks: [
+      { label: "தனியுரிமைக் கொள்கை", href: "/privacy" },
+      { label: "பயன்பாட்டு விதிமுறைகள்", href: "/terms-of-use" },
+      { label: "அணுகல்தன்மை அறிக்கை", href: "/accessibility" },
+    ],
+  },
+}
 
-const defaultMediaLinks = [
-  { label: "News & Media Centre", href: "/media-centre" },
-  { label: "Public Notices", href: "/media-centre/notices" },
-  { label: "Events & Programmes", href: "/media-centre/events" },
-  { label: "Fisheries Statistics", href: "/statistics" },
-  { label: "Right to Information (RTI)", href: "/rti" },
-]
-
-const defaultSupportLinks = [
-  { label: "Contact HQ & Directory", href: "/contact" },
-  { label: "Frequently Asked Questions", href: "/contact#contact-faq" },
-  { label: "Accessibility Statement", href: "/accessibility" },
-]
-
-const defaultLegalLinks = [
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms of Use", href: "/terms-of-use" },
-  { label: "Accessibility Statement", href: "/accessibility" },
-]
-
-export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: ApiFooterSetting; initialViews?: number }) {
+export function SiteFooter({
+  initialFooter,
+  initialViews,
+}: {
+  initialFooter?: ApiFooterSetting
+  initialViews?: number
+}) {
+  const { language } = useLanguage()
+  const [footerData, setFooterData] = useState<ApiFooterSetting | null>(initialFooter || null)
   const [viewsCount, setViewsCount] = useState<number | null>(initialViews ?? null)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadFooter() {
+      try {
+        const data = await fetchHeaderFooterData(language)
+        if (isMounted && data?.footer) {
+          setFooterData(data.footer)
+        }
+      } catch (err) {
+        console.error("Error loading localized footer data:", err)
+      }
+    }
+
+    loadFooter()
+
+    return () => {
+      isMounted = false
+    }
+  }, [language])
 
   useEffect(() => {
     let isMounted = true
@@ -118,57 +241,76 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
     }
   }, [initialViews])
 
-  const governmentBadge = initialFooter?.government_badge || "Government of Sri Lanka"
-  const ministryName = initialFooter?.ministry_name || "Ministry of Fisheries, Aquatic and Ocean Resources"
-  const aboutText =
-    initialFooter?.about_text ||
-    "Providing public information, official announcements, downloadable forms, and institutional access for Sri Lanka's fisheries, aquaculture, and ocean resources sector."
-  const govPortalLabel = initialFooter?.gov_portal_label || "Visit Sri Lanka Gov.lk"
-  const govPortalUrl = initialFooter?.gov_portal_url || "https://www.gov.lk/"
-  const hqAddress = initialFooter?.hq_address || "New Secretariat, Maligawatta, Colombo 10, Sri Lanka"
-  const telephone = initialFooter?.telephone || "+94 112 327 060"
-  const email = initialFooter?.email || "info@fisheries.gov.lk"
-  const copyrightYear = initialFooter?.copyright_year || new Date().getFullYear().toString()
+  const currentLang = language === "si" || language === "ta" ? language : "en"
+  const d = localizedDefaults[currentLang]
+
+  const activeFooter = footerData || initialFooter
+
+  const governmentBadge = activeFooter?.government_badge || d.governmentBadge
+  const ministryName = activeFooter?.ministry_name || d.ministryName
+  const aboutText = activeFooter?.about_text || d.aboutText
+  const govPortalLabel = activeFooter?.gov_portal_label || d.govPortalLabel
+  const govPortalUrl = activeFooter?.gov_portal_url || "https://www.gov.lk/"
+  const quickLinksTitle = activeFooter?.quick_links_title || d.quickLinksTitle
+  const infoLinksTitle = activeFooter?.info_links_title || d.infoLinksTitle
+  const contactTitle = activeFooter?.contact_title || d.contactTitle
+  const awardsTitle = activeFooter?.awards_title || d.awardsTitle
+  const hqAddress = activeFooter?.hq_address || d.hqAddress
+  const telephone = activeFooter?.telephone || "+94 112 327 060"
+  const email = activeFooter?.email || "info@fisheries.gov.lk"
+  const copyrightYear = activeFooter?.copyright_year || new Date().getFullYear().toString()
   const copyrightText =
-    initialFooter?.copyright_text ||
-    "Ministry of Fisheries, Aquatic and Ocean Resources. Official Government Website."
+    activeFooter?.copyright_text ||
+    `${ministryName}. Official Government Website.`
   const developedByText =
-    initialFooter?.developed_by_text !== undefined
-      ? initialFooter.developed_by_text
-      : "Design & Developed by IT UNIT"
-  const lastUpdatedText = initialFooter?.last_updated_text || "25 August 2026"
+    activeFooter?.developed_by_text !== undefined
+      ? activeFooter.developed_by_text
+      : d.developedByText
+  const lastUpdatedText =
+    activeFooter?.last_updated_text ||
+    (currentLang === "si" ? "2026 අගෝස්තු 25" : currentLang === "ta" ? "25 ஆகஸ்ட் 2026" : "25 August 2026")
+  const lastUpdatedPrefix = activeFooter?.last_updated_prefix || d.lastUpdatedPrefix
+  const websiteViewsPrefix = activeFooter?.website_views_prefix || d.websiteViewsPrefix
 
-  const enableSocialMedia = initialFooter?.enable_social_media ?? true
+  const enableSocialMedia = activeFooter?.enable_social_media ?? true
 
-  const facebookUrl = initialFooter ? (initialFooter.facebook_url?.trim() || "") : "https://web.facebook.com/fisheries.gov.lk/"
-  const youtubeUrl = initialFooter ? (initialFooter.youtube_url?.trim() || "") : "https://www.youtube.com/@Ministry_of_Fisheries_SL"
-  const linkedinUrl = initialFooter ? (initialFooter.linkedin_url?.trim() || "") : "https://www.linkedin.com/company/ministry-of-fisheries-and-ocean-resources/"
-  const twitterUrl = initialFooter ? (initialFooter.twitter_url?.trim() || "") : ""
-  const instagramUrl = initialFooter ? (initialFooter.instagram_url?.trim() || "") : ""
+  const facebookUrl = activeFooter
+    ? activeFooter.facebook_url?.trim() || ""
+    : "https://web.facebook.com/fisheries.gov.lk/"
+  const youtubeUrl = activeFooter
+    ? activeFooter.youtube_url?.trim() || ""
+    : "https://www.youtube.com/@Ministry_of_Fisheries_SL"
+  const linkedinUrl = activeFooter
+    ? activeFooter.linkedin_url?.trim() || ""
+    : "https://www.linkedin.com/company/ministry-of-fisheries-and-ocean-resources/"
+  const twitterUrl = activeFooter ? activeFooter.twitter_url?.trim() || "" : ""
+  const instagramUrl = activeFooter ? activeFooter.instagram_url?.trim() || "" : ""
 
-  const hasAnySocial = enableSocialMedia && Boolean(facebookUrl || youtubeUrl || linkedinUrl || twitterUrl || instagramUrl)
+  const hasAnySocial =
+    enableSocialMedia &&
+    Boolean(facebookUrl || youtubeUrl || linkedinUrl || twitterUrl || instagramUrl)
 
   const phoneTel = `tel:${telephone.replace(/[^0-9+]/g, "")}`
 
   const quickLinks =
-    initialFooter?.quick_links && initialFooter.quick_links.length > 0
-      ? initialFooter.quick_links.map((l) => ({ label: l.label, href: l.url }))
-      : defaultQuickLinks
+    activeFooter?.quick_links && activeFooter.quick_links.length > 0
+      ? activeFooter.quick_links.map((l) => ({ label: l.label, href: l.url }))
+      : d.quickLinks
 
   const infoLinks =
-    initialFooter?.info_links && initialFooter.info_links.length > 0
-      ? initialFooter.info_links.map((l) => ({ label: l.label, href: l.url }))
-      : defaultMediaLinks
+    activeFooter?.info_links && activeFooter.info_links.length > 0
+      ? activeFooter.info_links.map((l) => ({ label: l.label, href: l.url }))
+      : d.mediaLinks
 
   const supportLinks =
-    initialFooter?.support_links && initialFooter.support_links.length > 0
-      ? initialFooter.support_links.map((l) => ({ label: l.label, href: l.url }))
-      : defaultSupportLinks
+    activeFooter?.support_links && activeFooter.support_links.length > 0
+      ? activeFooter.support_links.map((l) => ({ label: l.label, href: l.url }))
+      : d.supportLinks
 
   const legalLinks =
-    initialFooter?.legal_links && initialFooter.legal_links.length > 0
-      ? initialFooter.legal_links.map((l) => ({ label: l.label, href: l.url }))
-      : defaultLegalLinks
+    activeFooter?.legal_links && activeFooter.legal_links.length > 0
+      ? activeFooter.legal_links.map((l) => ({ label: l.label, href: l.url }))
+      : d.legalLinks
 
   return (
     <>
@@ -183,7 +325,10 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
               </span>
 
               {/* Topic 1: Ministry Title */}
-              <h2 className="text-base font-extrabold leading-snug !text-yellow-300 border-b border-emerald-500/30 pb-1.5 flex items-center gap-2" style={{ color: "#fde047" }}>
+              <h2
+                className="text-base font-extrabold leading-snug !text-yellow-300 border-b border-emerald-500/30 pb-1.5 flex items-center gap-2"
+                style={{ color: "#fde047" }}
+              >
                 <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
                 <span>{ministryName}</span>
               </h2>
@@ -205,13 +350,16 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
               </div>
 
               {/* Award Badges & Accolades */}
-              {initialFooter?.awards && initialFooter.awards.length > 0 && (
+              {activeFooter?.awards && activeFooter.awards.length > 0 && (
                 <div className="pt-3 border-t border-white/10 mt-3">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider block mb-2" style={{ color: "#fde047" }}>
-                    Recognitions & Awards
+                  <span
+                    className="text-[11px] font-extrabold uppercase tracking-wider block mb-2"
+                    style={{ color: "#fde047" }}
+                  >
+                    {awardsTitle}
                   </span>
                   <div className="flex flex-wrap items-center gap-3">
-                    {initialFooter.awards.map((award) => {
+                    {activeFooter.awards.map((award) => {
                       const imageElement = (
                         <img
                           src={award.image_url}
@@ -243,41 +391,62 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
             </div>
 
             {/* Column 2: Quick Links & Downloads */}
-            <FooterColumn title="Quick Links" links={quickLinks} />
+            <FooterColumn title={quickLinksTitle} links={quickLinks} />
 
             {/* Column 3: Media & Statistics */}
-            <FooterColumn title="Information & Portals" links={infoLinks} />
+            <FooterColumn title={infoLinksTitle} links={infoLinks} />
 
             {/* Column 4: Contact & HQ Info */}
             <div className="space-y-3">
               {/* Topic 4: Contact & Support */}
-              <h2 className="text-xs font-extrabold uppercase tracking-wider !text-yellow-300 border-b border-emerald-500/30 pb-1.5 flex items-center gap-2" style={{ color: "#fde047" }}>
+              <h2
+                className="text-xs font-extrabold uppercase tracking-wider !text-yellow-300 border-b border-emerald-500/30 pb-1.5 flex items-center gap-2"
+                style={{ color: "#fde047" }}
+              >
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
-                <span>Contact & Support</span>
+                <span>{contactTitle}</span>
               </h2>
 
               <div className="space-y-2 text-xs text-slate-300">
                 <div className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300" aria-hidden="true" />
+                  <MapPin
+                    className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-300"
+                    aria-hidden="true"
+                  />
                   <span className="leading-relaxed">{hqAddress}</span>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Phone className="h-3.5 w-3.5 shrink-0 text-emerald-300" aria-hidden="true" />
-                  <a href={phoneTel} className="hover:text-emerald-300 transition-colors font-medium">
+                  <Phone
+                    className="h-3.5 w-3.5 shrink-0 text-emerald-300"
+                    aria-hidden="true"
+                  />
+                  <a
+                    href={phoneTel}
+                    className="hover:text-emerald-300 transition-colors font-medium"
+                  >
                     {telephone}
                   </a>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5 shrink-0 text-emerald-300" aria-hidden="true" />
-                  <a href={`mailto:${email}`} className="hover:text-emerald-300 transition-colors font-medium">
+                  <Mail
+                    className="h-3.5 w-3.5 shrink-0 text-emerald-300"
+                    aria-hidden="true"
+                  />
+                  <a
+                    href={`mailto:${email}`}
+                    className="hover:text-emerald-300 transition-colors font-medium"
+                  >
                     {email}
                   </a>
                 </div>
               </div>
 
-              <nav aria-label="Footer support links" className="border-t border-white/10 pt-2">
+              <nav
+                aria-label="Footer support links"
+                className="border-t border-white/10 pt-2"
+              >
                 <ul className="space-y-1.5">
                   {supportLinks.map((link) => (
                     <li key={link.label + link.href}>
@@ -300,11 +469,19 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
         <div className="border-t border-white/10 bg-black/15 py-3">
           <Container className="flex flex-col items-center justify-center gap-3 lg:flex-row lg:items-center lg:justify-between text-center lg:text-left">
             {/* Left: Policy & Governance Links */}
-            <nav aria-label="Legal links" className="w-full lg:w-auto flex justify-center lg:justify-start">
+            <nav
+              aria-label="Legal links"
+              className="w-full lg:w-auto flex justify-center lg:justify-start"
+            >
               <ul className="flex flex-wrap items-center justify-center lg:justify-start gap-x-3 gap-y-1.5 text-[11px] font-medium text-slate-300">
                 {legalLinks.map((link, idx) => (
-                  <li key={link.label + link.href} className="flex items-center gap-x-3">
-                    {idx > 0 && <span className="text-white/20 select-none">•</span>}
+                  <li
+                    key={link.label + link.href}
+                    className="flex items-center gap-x-3"
+                  >
+                    {idx > 0 && (
+                      <span className="text-white/20 select-none">•</span>
+                    )}
                     <Link
                       href={link.href}
                       className="transition-colors hover:text-emerald-300 hover:underline underline-offset-2"
@@ -320,16 +497,34 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
             <div className="flex flex-wrap items-center justify-center lg:justify-end gap-3 sm:gap-4 text-[11px] w-full lg:w-auto">
               {/* Last Updated */}
               <div className="inline-flex items-center gap-1.5 text-slate-300 font-medium">
-                <Clock className="h-3 w-3 text-emerald-400 shrink-0" aria-hidden="true" />
-                <span>Last updated: <span className="text-slate-100 font-semibold">{lastUpdatedText}</span></span>
+                <Clock
+                  className="h-3 w-3 text-emerald-400 shrink-0"
+                  aria-hidden="true"
+                />
+                <span>
+                  {lastUpdatedPrefix}{" "}
+                  <span className="text-slate-100 font-semibold">
+                    {lastUpdatedText}
+                  </span>
+                </span>
               </div>
 
-              <span className="hidden sm:inline text-white/20 select-none">•</span>
+              <span className="hidden sm:inline text-white/20 select-none">
+                •
+              </span>
 
               {/* Live Website Views Badge */}
               <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 text-[11px] font-semibold text-emerald-300 shadow-xs">
-                <Eye className="h-3.5 w-3.5 text-emerald-400 shrink-0" aria-hidden="true" />
-                <span>Website Views: <strong className="text-white font-extrabold">{viewsCount !== null ? viewsCount.toLocaleString() : "..."}</strong></span>
+                <Eye
+                  className="h-3.5 w-3.5 text-emerald-400 shrink-0"
+                  aria-hidden="true"
+                />
+                <span>
+                  {websiteViewsPrefix}{" "}
+                  <strong className="text-white font-extrabold">
+                    {viewsCount !== null ? viewsCount.toLocaleString() : "..."}
+                  </strong>
+                </span>
               </div>
 
               {/* Social Media Channels */}
@@ -410,7 +605,10 @@ export function SiteFooter({ initialFooter, initialViews }: { initialFooter?: Ap
           <Container className="flex flex-col items-center justify-center gap-2 sm:flex-row sm:items-center sm:justify-between text-slate-300 text-center sm:text-left">
             {/* Copyright Statement */}
             <div className="flex items-center justify-center sm:justify-start gap-2 text-center sm:text-left w-full sm:w-auto">
-              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" aria-hidden="true" />
+              <ShieldCheck
+                className="h-4 w-4 text-emerald-400 shrink-0"
+                aria-hidden="true"
+              />
               <span className="font-normal text-slate-300">
                 © {copyrightYear} {copyrightText}
               </span>
@@ -444,7 +642,10 @@ function FooterColumn({ title, links }: FooterColumnProps) {
   return (
     <nav aria-label={`${title} footer links`} className="space-y-3">
       {/* Topics 2 & 3: Quick Links & Information & Portals */}
-      <h2 className="text-xs font-extrabold uppercase tracking-wider !text-yellow-300 border-b border-emerald-500/30 pb-1.5 flex items-center gap-2" style={{ color: "#fde047" }}>
+      <h2
+        className="text-xs font-extrabold uppercase tracking-wider !text-yellow-300 border-b border-emerald-500/30 pb-1.5 flex items-center gap-2"
+        style={{ color: "#fde047" }}
+      >
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
         <span>{title}</span>
       </h2>

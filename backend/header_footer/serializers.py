@@ -2,6 +2,24 @@ from rest_framework import serializers
 from .models import HeaderSetting, FooterSetting, FooterLink, FooterAward, SiteMaintenanceSetting
 
 
+def resolve_lang(obj, field_base: str, context: dict = None) -> str:
+    if not obj:
+        return ""
+    context = context or {}
+    lang = context.get("lang", "en")
+    if lang in ["si", "ta"]:
+        val = getattr(obj, f"{field_base}_{lang}", None)
+        if val and str(val).strip():
+            return str(val).strip()
+    val_en = getattr(obj, f"{field_base}_en", None)
+    if val_en and str(val_en).strip():
+        return str(val_en).strip()
+    val_base = getattr(obj, field_base, None)
+    if val_base and str(val_base).strip():
+        return str(val_base).strip()
+    return ""
+
+
 class HeaderSettingSerializer(serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()
 
@@ -33,9 +51,14 @@ class HeaderSettingSerializer(serializers.ModelSerializer):
 
 
 class FooterLinkSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+
     class Meta:
         model = FooterLink
         fields = ["id", "column", "label", "url", "is_external", "order"]
+
+    def get_label(self, obj):
+        return resolve_lang(obj, "label", self.context)
 
 
 class FooterAwardSerializer(serializers.ModelSerializer):
@@ -53,6 +76,20 @@ class FooterAwardSerializer(serializers.ModelSerializer):
 
 
 class FooterSettingSerializer(serializers.ModelSerializer):
+    government_badge = serializers.SerializerMethodField()
+    ministry_name = serializers.SerializerMethodField()
+    about_text = serializers.SerializerMethodField()
+    gov_portal_label = serializers.SerializerMethodField()
+    quick_links_title = serializers.SerializerMethodField()
+    info_links_title = serializers.SerializerMethodField()
+    contact_title = serializers.SerializerMethodField()
+    awards_title = serializers.SerializerMethodField()
+    hq_address = serializers.SerializerMethodField()
+    copyright_text = serializers.SerializerMethodField()
+    developed_by_text = serializers.SerializerMethodField()
+    last_updated_text = serializers.SerializerMethodField()
+    last_updated_prefix = serializers.SerializerMethodField()
+    website_views_prefix = serializers.SerializerMethodField()
     quick_links = serializers.SerializerMethodField()
     info_links = serializers.SerializerMethodField()
     support_links = serializers.SerializerMethodField()
@@ -67,6 +104,10 @@ class FooterSettingSerializer(serializers.ModelSerializer):
             "about_text",
             "gov_portal_label",
             "gov_portal_url",
+            "quick_links_title",
+            "info_links_title",
+            "contact_title",
+            "awards_title",
             "hq_address",
             "telephone",
             "email",
@@ -74,6 +115,8 @@ class FooterSettingSerializer(serializers.ModelSerializer):
             "copyright_year",
             "developed_by_text",
             "last_updated_text",
+            "last_updated_prefix",
+            "website_views_prefix",
             "enable_social_media",
             "facebook_url",
             "youtube_url",
@@ -87,36 +130,40 @@ class FooterSettingSerializer(serializers.ModelSerializer):
             "awards",
         ]
 
+    def get_government_badge(self, obj): return resolve_lang(obj, "government_badge", self.context)
+    def get_ministry_name(self, obj): return resolve_lang(obj, "ministry_name", self.context)
+    def get_about_text(self, obj): return resolve_lang(obj, "about_text", self.context)
+    def get_gov_portal_label(self, obj): return resolve_lang(obj, "gov_portal_label", self.context)
+    def get_quick_links_title(self, obj): return resolve_lang(obj, "quick_links_title", self.context)
+    def get_info_links_title(self, obj): return resolve_lang(obj, "info_links_title", self.context)
+    def get_contact_title(self, obj): return resolve_lang(obj, "contact_title", self.context)
+    def get_awards_title(self, obj): return resolve_lang(obj, "awards_title", self.context)
+    def get_hq_address(self, obj): return resolve_lang(obj, "hq_address", self.context)
+    def get_copyright_text(self, obj): return resolve_lang(obj, "copyright_text", self.context)
+    def get_developed_by_text(self, obj): return resolve_lang(obj, "developed_by_text", self.context)
+    def get_last_updated_text(self, obj): return resolve_lang(obj, "last_updated_text", self.context)
+    def get_last_updated_prefix(self, obj): return resolve_lang(obj, "last_updated_prefix", self.context)
+    def get_website_views_prefix(self, obj): return resolve_lang(obj, "website_views_prefix", self.context)
+
     def get_quick_links(self, obj):
         links = FooterLink.objects.filter(column="quick", is_active=True).order_by("order", "id")
-        return FooterLinkSerializer(links, many=True).data
+        return FooterLinkSerializer(links, many=True, context=self.context).data
 
     def get_info_links(self, obj):
         links = FooterLink.objects.filter(column="info", is_active=True).order_by("order", "id")
-        return FooterLinkSerializer(links, many=True).data
+        return FooterLinkSerializer(links, many=True, context=self.context).data
 
     def get_support_links(self, obj):
         links = FooterLink.objects.filter(column="support", is_active=True).order_by("order", "id")
-        return FooterLinkSerializer(links, many=True).data
+        return FooterLinkSerializer(links, many=True, context=self.context).data
 
     def get_legal_links(self, obj):
         links = FooterLink.objects.filter(column="legal", is_active=True).order_by("order", "id")
-        return FooterLinkSerializer(links, many=True).data
+        return FooterLinkSerializer(links, many=True, context=self.context).data
 
     def get_awards(self, obj):
         awards = FooterAward.objects.filter(is_active=True).order_by("order", "id")
         return FooterAwardSerializer(awards, many=True, context=self.context).data
-
-
-def resolve_lang(obj, field_base: str, context: dict) -> str:
-    if not obj:
-        return ""
-    lang = context.get("lang", "en")
-    if lang in ["si", "ta"]:
-        val = getattr(obj, f"{field_base}_{lang}", None)
-        if val and str(val).strip():
-            return str(val).strip()
-    return getattr(obj, f"{field_base}_en", "")
 
 
 class SiteMaintenanceSettingSerializer(serializers.ModelSerializer):
@@ -138,4 +185,3 @@ class SiteMaintenanceSettingSerializer(serializers.ModelSerializer):
     def get_title(self, obj): return resolve_lang(obj, "title", self.context)
     def get_message(self, obj): return resolve_lang(obj, "message", self.context)
     def get_estimated_restoration(self, obj): return resolve_lang(obj, "estimated_restoration", self.context)
-
