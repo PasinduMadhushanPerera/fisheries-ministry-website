@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from .models import MonthlyFishProductionHeader, MonthlyProductionReport
+from .models import (
+    MonthlyFishProductionHeader,
+    MonthlyProductionYearCategory,
+    MonthlyProductionReport,
+)
 
 
 def resolve_lang(obj, field_base: str, context: dict) -> str:
@@ -30,6 +34,36 @@ class MonthlyFishProductionHeaderSerializer(serializers.ModelSerializer):
     def get_title(self, obj): return resolve_lang(obj, "title", self.context)
     def get_description(self, obj): return resolve_lang(obj, "description", self.context)
     def get_featured_badge(self, obj): return resolve_lang(obj, "featured_badge", self.context)
+
+
+class MonthlyProductionYearCategorySerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    badgeSingular = serializers.SerializerMethodField()
+    badgePlural = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MonthlyProductionYearCategory
+        fields = [
+            "id",
+            "year",
+            "title",
+            "description",
+            "badgeSingular",
+            "badgePlural",
+        ]
+
+    def get_title(self, obj):
+        return resolve_lang(obj, "title", self.context)
+
+    def get_description(self, obj):
+        return resolve_lang(obj, "description", self.context)
+
+    def get_badgeSingular(self, obj):
+        return resolve_lang(obj, "badge_singular", self.context)
+
+    def get_badgePlural(self, obj):
+        return resolve_lang(obj, "badge_plural", self.context)
 
 
 class MonthlyProductionReportSerializer(serializers.ModelSerializer):

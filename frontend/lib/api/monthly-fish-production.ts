@@ -19,10 +19,20 @@ export interface ApiMonthlyProductionReport {
   featured?: boolean
 }
 
+export interface ApiMonthlyProductionYearCategory {
+  id: number
+  year: number
+  title: string
+  description: string
+  badgeSingular: string
+  badgePlural: string
+}
+
 export interface ApiMonthlyFishProductionData {
   language: string
   header: ApiMonthlyProductionHeader
   available_years: number[]
+  categories?: ApiMonthlyProductionYearCategory[]
   reports: ApiMonthlyProductionReport[]
 }
 

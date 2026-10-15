@@ -16,10 +16,23 @@ export interface ApiWeeklyPriceReport {
   pdfUrl: string
 }
 
+export interface ApiWeeklyPriceCategory {
+  id: number
+  groupKey: string
+  year: number
+  month: string
+  monthNumber: number
+  title: string
+  description: string
+  badgeSingular: string
+  badgePlural: string
+}
+
 export interface ApiWeeklyFishPricesData {
   language: string
   header: ApiWeeklyPricesHeader
   available_years: number[]
+  categories?: ApiWeeklyPriceCategory[]
   reports: ApiWeeklyPriceReport[]
 }
 

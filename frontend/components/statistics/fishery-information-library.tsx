@@ -32,6 +32,7 @@ import {
   informationCategories as fallbackCategories,
   fisheryInformationItems as fallbackItems,
 } from "@/data/fishery-information"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 import type {
   ApiFisheryCategoryMeta,
   ApiFisheryInformationHeader,
@@ -51,6 +52,10 @@ export function FisheryInformationLibrary({
   categories,
   items,
 }: FisheryInformationLibraryProps) {
+  const { language } = useLanguage()
+  const isSi = language === "si"
+  const isTa = language === "ta"
+
   const allCategories: ApiFisheryCategoryMeta[] = useMemo(() => {
     return categories !== undefined && categories !== null
       ? categories
@@ -214,7 +219,7 @@ export function FisheryInformationLibrary({
             {/* Search Input */}
             <div className="relative flex-1 max-w-md">
               <label htmlFor="search-fishery-info" className="sr-only">
-                Search fishery information and maps
+                {isSi ? "ධීවර තොරතුරු සහ සිතියම් සොයන්න" : isTa ? "மீன்பிடித் தகவல் மற்றும் வரைபடங்களைத் தேடுங்கள்" : "Search fishery information and maps"}
               </label>
               <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                 <Search className="h-4 w-4" aria-hidden="true" />
@@ -224,7 +229,7 @@ export function FisheryInformationLibrary({
                 id="search-fishery-info"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search landing maps, species, census..."
+                placeholder={isSi ? "සිතියම්, මත්ස්‍ය විශේෂ, සංගණන දත්ත සොයන්න..." : isTa ? "வரைபடங்கள், மீன் இனங்கள், கணக்கெடுப்பு தரவுகளைத் தேடுங்கள்..." : "Search landing maps, species, census..."}
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-colors"
               />
               {searchQuery && (
@@ -232,7 +237,7 @@ export function FisheryInformationLibrary({
                   type="button"
                   onClick={() => setSearchQuery("")}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 cursor-pointer"
-                  aria-label="Clear search query"
+                  aria-label={isSi ? "සෙවුම ඉවත් කරන්න" : isTa ? "தேடலை மீட்டமை" : "Clear search query"}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -243,17 +248,17 @@ export function FisheryInformationLibrary({
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
-                  Sort:
+                  {isSi ? "පිළිවෙල:" : isTa ? "வரிசைப்படுத்து:" : "Sort:"}
                 </span>
                 <select
                   value={sortOrder}
                   onChange={(e) => setSortOrder(e.target.value as SortOption)}
                   className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none cursor-pointer"
-                  aria-label="Sort information items"
+                  aria-label={isSi ? "තොරතුරු පෙළගස්වන්න" : isTa ? "தகவல்களை வரிசைப்படுத்துங்கள்" : "Sort information items"}
                 >
-                  <option value="Title A–Z">Title A–Z</option>
-                  <option value="Newest first">Newest first</option>
-                  <option value="Oldest first">Oldest first</option>
+                  <option value="Title A–Z">{isSi ? "නම (A-Z)" : isTa ? "தலைப்பு (A-Z)" : "Title A–Z"}</option>
+                  <option value="Newest first">{isSi ? "නවතම පළමුව" : isTa ? "புதியவை முதலில்" : "Newest first"}</option>
+                  <option value="Oldest first">{isSi ? "පැරණිතම පළමුව" : isTa ? "பழையவை முதலில்" : "Oldest first"}</option>
                 </select>
               </div>
 
@@ -264,7 +269,7 @@ export function FisheryInformationLibrary({
                   className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer ml-auto sm:ml-0"
                 >
                   <X className="h-3.5 w-3.5" />
-                  <span>Reset filters</span>
+                  <span>{isSi ? "පෙරහන් යළි සකසන්න" : isTa ? "வடிகட்டிகளை மீட்டமை" : "Reset filters"}</span>
                 </button>
               )}
             </div>
@@ -274,11 +279,23 @@ export function FisheryInformationLibrary({
         {/* Results Counter */}
         <div className="mb-6 flex items-center justify-between text-xs text-slate-600 font-semibold">
           <span>
-            Showing <strong className="text-slate-900">{filteredItems.length}</strong> official resources &amp; datasets across <strong className="text-slate-900">{visibleCategories.length}</strong> categories
+            {isSi ? (
+              <>
+                ප්‍රවර්ග <strong className="text-slate-900">{visibleCategories.length}</strong> ක් යටතේ නිල සම්පත් සහ දත්ත කට්ටල <strong className="text-slate-900">{filteredItems.length}</strong> ක් පෙන්වයි
+              </>
+            ) : isTa ? (
+              <>
+                <strong className="text-slate-900">{visibleCategories.length}</strong> பிரிவுகளின் கீழ் <strong className="text-slate-900">{filteredItems.length}</strong> உத்தியோகபூர்வ வளங்கள் மற்றும் தரவுத்தொகுப்புகள் காட்டப்படுகின்றன
+              </>
+            ) : (
+              <>
+                Showing <strong className="text-slate-900">{filteredItems.length}</strong> official resources &amp; datasets across <strong className="text-slate-900">{visibleCategories.length}</strong> categories
+              </>
+            )}
           </span>
           {isFiltered && (
             <span className="bg-emerald-50 text-[#256B29] px-2.5 py-0.5 rounded-full border border-emerald-200">
-              Filtered results
+              {isSi ? "පෙරූ ප්‍රතිඵල" : isTa ? "வடிகட்டப்பட்ட முடிவுகள்" : "Filtered results"}
             </span>
           )}
         </div>
@@ -292,6 +309,18 @@ export function FisheryInformationLibrary({
               )
 
               const isOpen = openCategory === category.id || isFiltered
+
+              let displayBadge = `${categoryItems.length} ${categoryItems.length === 1 ? "file" : "files"}`
+              if (isSi) {
+                const label = categoryItems.length === 1 ? (category.badgeSingular || "ගොනුව") : (category.badgePlural || "ගොනු")
+                displayBadge = `${categoryItems.length} ${label}`
+              } else if (isTa) {
+                const label = categoryItems.length === 1 ? (category.badgeSingular || "கோப்பு") : (category.badgePlural || "கோப்புகள்")
+                displayBadge = `${categoryItems.length} ${label}`
+              } else if (category.badgeSingular || category.badgePlural) {
+                const label = categoryItems.length === 1 ? (category.badgeSingular || "file") : (category.badgePlural || "files")
+                displayBadge = `${categoryItems.length} ${label}`
+              }
 
               return (
                 <div
@@ -343,7 +372,7 @@ export function FisheryInformationLibrary({
                             : "bg-slate-100 text-slate-700 border-slate-300"
                         }`}
                       >
-                        {categoryItems.length} {categoryItems.length === 1 ? "file" : "files"}
+                        {displayBadge}
                       </span>
                       <div
                         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border transition-all duration-300 ${
@@ -402,8 +431,10 @@ export function FisheryInformationLibrary({
 
                                   {/* Meta */}
                                   <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-                                    <span>Size: {item.fileSize}</span>
-                                    {item.publishedDate && <span>Date: {item.publishedDate}</span>}
+                                    <span>{isSi ? "ප්‍රමාණය: " : isTa ? "அளவு: " : "Size: "}{item.fileSize}</span>
+                                    {item.publishedDate && (
+                                      <span>{isSi ? "දිනය: " : isTa ? "திகதி: " : "Date: "}{item.publishedDate}</span>
+                                    )}
                                   </div>
                                 </div>
 
@@ -422,12 +453,12 @@ export function FisheryInformationLibrary({
                                       className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition"
                                     >
                                       <Eye className="h-3.5 w-3.5 text-[#256B29]" />
-                                      <span>Preview</span>
+                                      <span>{isSi ? "පෙරදසුන" : isTa ? "முன்னோட்டம்" : "Preview"}</span>
                                     </a>
                                   ) : (
                                     <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-400 cursor-not-allowed">
                                       <Eye className="h-3.5 w-3.5" />
-                                      <span>Preview</span>
+                                      <span>{isSi ? "පෙරදසුන" : isTa ? "முன்னோட்டம்" : "Preview"}</span>
                                     </span>
                                   )}
 
@@ -436,9 +467,10 @@ export function FisheryInformationLibrary({
                                       href={item.downloadUrl && item.downloadUrl !== "#" ? item.downloadUrl : item.fileUrl}
                                       download
                                       className="inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-lg bg-[#256B29] text-xs font-bold text-white !text-white hover:bg-[#1b4d1d] hover:text-white hover:!text-white transition shadow-2xs"
+                                      title={isSi ? "බාගත කරන්න" : isTa ? "பதிவிறக்குக" : "Download"}
                                     >
                                       <Download className="h-3.5 w-3.5 text-white !text-white" />
-                                      <span className="text-white !text-white">Download</span>
+                                      <span className="text-white !text-white">{isSi ? "බාගත කරන්න" : isTa ? "பதிவிறக்குக" : "Download"}</span>
                                     </a>
                                   ) : (
                                     <button
@@ -447,7 +479,7 @@ export function FisheryInformationLibrary({
                                       className="inline-flex items-center justify-center gap-1.5 py-2 px-3.5 rounded-lg bg-slate-100 text-xs font-bold text-slate-400 cursor-not-allowed"
                                     >
                                       <Download className="h-3.5 w-3.5" />
-                                      <span>Download</span>
+                                      <span>{isSi ? "බාගත කරන්න" : isTa ? "பதிவிறக்குக" : "Download"}</span>
                                     </button>
                                   )}
                                 </div>
@@ -459,10 +491,18 @@ export function FisheryInformationLibrary({
                         <div className="p-8 text-center bg-white rounded-xl border border-dashed border-slate-200">
                           <FolderOpen className="h-8 w-8 text-slate-400 mx-auto mb-2" />
                           <p className="text-sm font-bold text-slate-800">
-                            No resources or datasets attached to this category yet
+                            {isSi
+                              ? "මෙම ප්‍රවර්ගය සඳහා තවමත් ගොනු හෝ දත්ත ඇතුළත් කර නොමැත"
+                              : isTa
+                              ? "இந்த வகையின் கீழ் இன்னும் கோப்புகள் எதுவும் இணைக்கப்படவில்லை"
+                              : "No resources or datasets attached to this category yet"}
                           </p>
                           <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                            Maps, reports, and datasets published under this category in the Admin Panel will appear here automatically.
+                            {isSi
+                              ? "පරිපාලන පැනලය (Admin Panel) මඟින් මෙම ප්‍රවර්ගය යටතේ පළ කරනු ලබන සිතියම් සහ දත්ත කට්ටල ස්වයංක්‍රීයව මෙහි දිස්වනු ඇත."
+                              : isTa
+                              ? "நிர்வாக குழு மூலம் இந்த வகையின் கீழ் வெளியிடப்படும் வரைபடங்கள் மற்றும் தரவுத்தொகுப்புகள் தானாகவே இங்கே தோன்றும்."
+                              : "Maps, reports, and datasets published under this category in the Admin Panel will appear here automatically."}
                           </p>
                         </div>
                       )}
@@ -478,9 +518,19 @@ export function FisheryInformationLibrary({
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 mb-4">
               <FolderOpen className="h-7 w-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">No Resources Found</h3>
+            <h3 className="text-lg font-bold text-slate-900">
+              {isSi
+                ? "සම්පත් කිසිවක් හමු නොවීය"
+                : isTa
+                ? "வளங்கள் எதுவும் காணப்படவில்லை"
+                : "No Resources Found"}
+            </h3>
             <p className="mt-1 text-sm text-slate-500 max-w-sm mx-auto">
-              We couldn&apos;t find any maps or datasets matching your search criteria.
+              {isSi
+                ? "ඔබගේ සෙවුම් නිර්ණායකවලට ගැලපෙන සිතියම් හෝ දත්ත කට්ටල කිසිවක් සොයා ගැනීමට නොහැකි විය."
+                : isTa
+                ? "உங்கள் தேடல் அளவுகோல்களுடன் பொருந்தக்கூடிய வரைபடங்கள் அல்லது தரவுத்தொகுப்புகள் எதுவும் காணப்படவில்லை."
+                : "We couldn't find any maps or datasets matching your search criteria."}
             </p>
             <button
               type="button"
@@ -488,7 +538,7 @@ export function FisheryInformationLibrary({
               className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#256B29] px-4 py-2 text-xs font-bold text-white hover:bg-[#1b4d1d] transition-colors cursor-pointer"
             >
               <X className="h-4 w-4" />
-              <span>Clear filters & search</span>
+              <span>{isSi ? "පෙරහන් සහ සෙවීම ඉවත් කරන්න" : isTa ? "வடிகட்டிகள் & தேடலை மீட்டமை" : "Clear filters & search"}</span>
             </button>
           </div>
         )}

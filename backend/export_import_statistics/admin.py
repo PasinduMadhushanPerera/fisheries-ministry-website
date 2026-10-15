@@ -4,6 +4,7 @@ from django.utils.html import format_html
 from .models import (
     ExportImportHeader,
     ExportImportSummaryMetric,
+    ExportImportYearCategory,
     ExportImportReport,
 )
 
@@ -133,6 +134,81 @@ class ExportImportSummaryMetricAdmin(admin.ModelAdmin):
             fg, bg, obj.metric_id
         )
     metric_preview.short_description = "Key"
+
+
+
+@admin.register(ExportImportYearCategory)
+class ExportImportYearCategoryAdmin(admin.ModelAdmin):
+    list_display = [
+        "year_badge",
+        "title_en",
+        "title_si",
+        "title_ta",
+        "reports_count_badge",
+        "is_active",
+        "order",
+    ]
+    list_filter = ["year", "is_active"]
+    list_editable = ["is_active", "order"]
+    search_fields = [
+        "title_en",
+        "title_si",
+        "title_ta",
+        "description_en",
+        "description_si",
+        "description_ta",
+        "year",
+    ]
+    ordering = ["-year", "order"]
+
+    fieldsets = (
+        ("🗓️ Timeline Year Group (වසර)", {
+            "fields": (
+                "year",
+                ("is_active", "order"),
+            ),
+            "description": "Specify the trade report year for this annual accordion group.",
+        }),
+        ("🇬🇧 English Details", {
+            "fields": (
+                "title_en",
+                "description_en",
+                ("badge_singular_en", "badge_plural_en"),
+            ),
+            "description": "Custom title and subtitle shown on the annual accordion row in English.",
+        }),
+        ("🇱🇰 Sinhala Details (සිංහල)", {
+            "fields": (
+                "title_si",
+                "description_si",
+                ("badge_singular_si", "badge_plural_si"),
+            ),
+            "description": "සිංහල භාෂාව තෝරාගත් විට මෙම වාර්ෂික ප්‍රවර්ගයේ පෙන්වන මාතෘකාව, උපසිරැසි විස්තරය සහ ලේබලය.",
+        }),
+        ("🇱🇰 Tamil Details (தமிழ்)", {
+            "fields": (
+                "title_ta",
+                "description_ta",
+                ("badge_singular_ta", "badge_plural_ta"),
+            ),
+            "description": "தமிழ் மொழி தேர்ந்தெடுக்கப்பட்ட போது காட்டப்படும் தலைப்பு, விளக்கம் மற்றும் அறிக்கை லேபிள்.",
+        }),
+    )
+
+    def year_badge(self, obj):
+        return format_html(
+            '<strong style="font-size: 13px; color: #1e3a8a;">📅 Year {}</strong>',
+            obj.year,
+        )
+    year_badge.short_description = "Year"
+
+    def reports_count_badge(self, obj):
+        count = ExportImportReport.objects.filter(year=obj.year, is_active=True).count()
+        return format_html(
+            '<span style="background: #ecfdf5; color: #047857; padding: 2px 8px; border-radius: 9999px; font-weight: bold; border: 1px solid #a7f3d0;">{} Reports</span>',
+            count,
+        )
+    reports_count_badge.short_description = "Total Reports"
 
 
 @admin.register(ExportImportReport)

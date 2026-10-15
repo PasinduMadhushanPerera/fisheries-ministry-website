@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import (
     ExportImportHeader,
     ExportImportSummaryMetric,
+    ExportImportYearCategory,
     ExportImportReport,
 )
 
@@ -34,6 +35,65 @@ class ExportImportHeaderSerializer(serializers.ModelSerializer):
     def get_title(self, obj): return resolve_lang(obj, "title", self.context)
     def get_description(self, obj): return resolve_lang(obj, "description", self.context)
     def get_summary_heading(self, obj): return resolve_lang(obj, "summary_heading", self.context)
+
+
+class ExportImportYearCategorySerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    badgeSingular = serializers.SerializerMethodField()
+    badgePlural = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ExportImportYearCategory
+        fields = [
+            "id",
+            "year",
+            "title",
+            "description",
+            "badgeSingular",
+            "badgePlural",
+            "order",
+        ]
+
+    def get_title(self, obj):
+        val = resolve_lang(obj, "title", self.context)
+        if not val or not val.strip():
+            lang = self.context.get("lang", "en")
+            if lang == "si":
+                return f"{obj.year} මත්ස්‍ය අපනයන සහ ආනයන වෙළඳ වාර්තා"
+            elif lang == "ta":
+                return f"{obj.year} மீன் ஏற்றுமதி மற்றும் இறக்குமதி வர்த்தக அறிக்கைகள்"
+            return f"{obj.year} Export & Import Trade Reports"
+        return val
+
+    def get_description(self, obj):
+        val = resolve_lang(obj, "description", self.context)
+        if not val or not val.strip():
+            lang = self.context.get("lang", "en")
+            if lang == "si":
+                return f"{obj.year} වසර සඳහා සකස් කරන ලද නිල මාසික මත්ස්‍ය අපනයන සහ ආනයන රේගු වෙළඳ දත්ත වාර්තා"
+            elif lang == "ta":
+                return f"{obj.year} ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ மாதாந்த மீன் ஏற்றுமதி மற்றும் இறக்குமதி சுங்க வர்த்தக தரவுத்தொகுப்புகள்"
+            return f"Official monthly fish export and import customs trade datasets compiled for {obj.year}"
+        return val
+
+    def get_badgeSingular(self, obj):
+        val = resolve_lang(obj, "badge_singular", self.context)
+        if not val or not val.strip():
+            lang = self.context.get("lang", "en")
+            if lang == "si": return "වාර්තාව"
+            if lang == "ta": return "அறிக்கை"
+            return "Report"
+        return val
+
+    def get_badgePlural(self, obj):
+        val = resolve_lang(obj, "badge_plural", self.context)
+        if not val or not val.strip():
+            lang = self.context.get("lang", "en")
+            if lang == "si": return "මාසික වාර්තා"
+            if lang == "ta": return "மாதாந்த அறிக்கைகள்"
+            return "Monthly Reports"
+        return val
 
 
 class ExportImportSummaryMetricSerializer(serializers.ModelSerializer):

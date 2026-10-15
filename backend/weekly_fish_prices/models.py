@@ -32,6 +32,36 @@ MONTH_MAP = {
     "December": 12,
 }
 
+SINHALA_MONTH_MAP = {
+    "January": "ජනවාරි",
+    "February": "පෙබරවාරි",
+    "March": "මාර්තු",
+    "April": "අප්‍රේල්",
+    "May": "මැයි",
+    "June": "ජූනි",
+    "July": "ජූලි",
+    "August": "අගෝස්තු",
+    "September": "සැප්තැම්බර්",
+    "October": "ඔක්තෝබර්",
+    "November": "නොවැම්බර්",
+    "December": "දෙසැම්බර්",
+}
+
+TAMIL_MONTH_MAP = {
+    "January": "ஜனவரி",
+    "February": "பெப்ரவரி",
+    "March": "மார்ச்",
+    "April": "ஏப்ரல்",
+    "May": "மே",
+    "June": "ஜூன்",
+    "July": "ஜூலை",
+    "August": "ஆகஸ்ட்",
+    "September": "செப்டம்பர்",
+    "October": "அக்டோபர்",
+    "November": "நவம்பர்",
+    "December": "டிசம்பர்",
+}
+
 
 # ==========================================================
 # 01. Weekly Fish Prices Page Header & Badges
@@ -103,7 +133,163 @@ class WeeklyFishPricesHeader(TimeStampedModel):
 
 
 # ==========================================================
-# 02. Weekly Price Report PDF Bulletins
+# 02. Monthly Categories / Group Headers
+# ==========================================================
+class WeeklyPriceMonthCategory(TimeStampedModel):
+    """
+    Manages custom multilingual titles, descriptions, and badge labels for each
+    monthly report accordion group (e.g. September 2026, August 2026).
+    """
+    year = models.PositiveIntegerField(
+        default=2026,
+        help_text="Reporting Year (e.g. 2026, 2025)",
+    )
+    month = models.CharField(
+        max_length=30,
+        choices=MONTH_CHOICES,
+        default="September",
+        help_text="Reporting Month",
+    )
+    month_number = models.PositiveSmallIntegerField(
+        default=9,
+        help_text="Month integer (1 for Jan, 9 for Sep, 12 for Dec). Automatically synced.",
+    )
+
+    # 🇬🇧 English Details
+    title_en = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (English)",
+        help_text="Group header title (e.g. 'September 2026'). Auto-filled if left blank.",
+    )
+    description_en = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (English)",
+        help_text="Group subtitle (e.g. 'Weekly bulletins published during September 2026'). Auto-filled if left blank.",
+    )
+    badge_singular_en = models.CharField(
+        max_length=50,
+        default="Report",
+        blank=True,
+        verbose_name="Singular Badge (English)",
+        help_text="e.g. 'Report' for 1 item",
+    )
+    badge_plural_en = models.CharField(
+        max_length=50,
+        default="Reports",
+        blank=True,
+        verbose_name="Plural Badge (English)",
+        help_text="e.g. 'Reports' for multiple items",
+    )
+
+    # 🇱🇰 Sinhala Details (සිංහල)
+    title_si = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (සිංහල)",
+        help_text="සිංහල මාතෘකාව (උදා: '2026 සැප්තැම්බර්')",
+    )
+    description_si = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (සිංහල)",
+        help_text="සිංහල විස්තරය (උදා: '2026 සැප්තැම්බර් මාසය තුළ පළ කරන ලද සතිපතා මිල වාර්තා')",
+    )
+    badge_singular_si = models.CharField(
+        max_length=50,
+        default="වාර්තාව",
+        blank=True,
+        verbose_name="Singular Badge (සිංහල)",
+        help_text="උදා: 'වාර්තාව'",
+    )
+    badge_plural_si = models.CharField(
+        max_length=50,
+        default="වාර්තා",
+        blank=True,
+        verbose_name="Plural Badge (සිංහල)",
+        help_text="උදා: 'වාර්තා'",
+    )
+
+    # 🇱🇰 Tamil Details (தமிழ்)
+    title_ta = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (தமிழ்)",
+        help_text="தமிழ் தலைப்பு (எ.கா: 'செப்டம்பர் 2026')",
+    )
+    description_ta = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (தமிழ்)",
+        help_text="தமிழ் விளக்கம் (எ.கா: 'செப்டம்பர் 2026 இல் வெளியிடப்பட்ட வாராந்த விலை அறிக்கைகள்')",
+    )
+    badge_singular_ta = models.CharField(
+        max_length=50,
+        default="அறிக்கை",
+        blank=True,
+        verbose_name="Singular Badge (தமிழ்)",
+        help_text="எ.கா: 'அறிக்கை'",
+    )
+    badge_plural_ta = models.CharField(
+        max_length=50,
+        default="அறிக்கைகள்",
+        blank=True,
+        verbose_name="Plural Badge (தமிழ்)",
+        help_text="எ.கா: 'அறிக்கைகள்'",
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Display this monthly category section on live website",
+    )
+    order = models.PositiveIntegerField(
+        default=1,
+        help_text="Sort order",
+    )
+
+    class Meta:
+        ordering = ["-year", "-month_number", "order"]
+        unique_together = ("year", "month")
+        verbose_name = "02. Monthly Category / Group Header (මාසික ප්‍රවර්ග)"
+        verbose_name_plural = "02. Monthly Categories / Group Headers (මාසික ප්‍රවර්ග)"
+
+    def save(self, *args, **kwargs):
+        if self.month in MONTH_MAP:
+            self.month_number = MONTH_MAP[self.month]
+
+        si_month = SINHALA_MONTH_MAP.get(self.month, self.month)
+        ta_month = TAMIL_MONTH_MAP.get(self.month, self.month)
+
+        if not self.title_en:
+            self.title_en = f"{self.month} {self.year}"
+        if not self.description_en:
+            self.description_en = f"Weekly bulletins published during {self.month} {self.year}"
+
+        if not self.title_si:
+            self.title_si = f"{self.year} {si_month}"
+        if not self.description_si:
+            self.description_si = f"{self.year} {si_month} මාසය තුළ පළ කරන ලද සතිපතා මිල වාර්තා"
+
+        if not self.title_ta:
+            self.title_ta = f"{ta_month} {self.year}"
+        if not self.description_ta:
+            self.description_ta = f"{ta_month} {self.year} இல் வெளியிடப்பட்ட வாராந்த விலை அறிக்கைகள்"
+
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.year} {self.month} ({self.title_si or self.title_en})"
+
+
+# ==========================================================
+# 03. Weekly Price Report PDF Bulletins
 # ==========================================================
 class WeeklyPriceReport(TimeStampedModel):
     report_id = models.CharField(
@@ -195,8 +381,8 @@ class WeeklyPriceReport(TimeStampedModel):
 
     class Meta:
         ordering = ["-year", "-month_number", "-week", "order"]
-        verbose_name = "02. Weekly Price Report"
-        verbose_name_plural = "02. Weekly Price Reports"
+        verbose_name = "03. Weekly Price Report"
+        verbose_name_plural = "03. Weekly Price Reports"
 
     def save(self, *args, **kwargs):
         # Auto-sync month_number from month name
@@ -229,6 +415,15 @@ class WeeklyPriceReport(TimeStampedModel):
                 pass
 
         super().save(*args, **kwargs)
+
+        # Ensure corresponding Monthly Category exists
+        try:
+            WeeklyPriceMonthCategory.objects.get_or_create(
+                year=self.year,
+                month=self.month,
+            )
+        except Exception:
+            pass
 
     def __str__(self) -> str:
         return f"{self.year} {self.month} Week {self.week} - {self.title_en}"

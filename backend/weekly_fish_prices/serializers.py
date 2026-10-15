@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from .models import WeeklyFishPricesHeader, WeeklyPriceReport
+from .models import (
+    WeeklyFishPricesHeader,
+    WeeklyPriceMonthCategory,
+    WeeklyPriceReport,
+)
 
 
 def resolve_lang(obj, field_base: str, context: dict) -> str:
@@ -27,6 +31,44 @@ class WeeklyFishPricesHeaderSerializer(serializers.ModelSerializer):
     def get_badge_text(self, obj): return resolve_lang(obj, "badge_text", self.context)
     def get_title(self, obj): return resolve_lang(obj, "title", self.context)
     def get_description(self, obj): return resolve_lang(obj, "description", self.context)
+
+
+class WeeklyPriceMonthCategorySerializer(serializers.ModelSerializer):
+    groupKey = serializers.SerializerMethodField()
+    monthNumber = serializers.IntegerField(source="month_number")
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    badgeSingular = serializers.SerializerMethodField()
+    badgePlural = serializers.SerializerMethodField()
+
+    class Meta:
+        model = WeeklyPriceMonthCategory
+        fields = [
+            "id",
+            "groupKey",
+            "year",
+            "month",
+            "monthNumber",
+            "title",
+            "description",
+            "badgeSingular",
+            "badgePlural",
+        ]
+
+    def get_groupKey(self, obj):
+        return f"{obj.month}-{obj.year}"
+
+    def get_title(self, obj):
+        return resolve_lang(obj, "title", self.context)
+
+    def get_description(self, obj):
+        return resolve_lang(obj, "description", self.context)
+
+    def get_badgeSingular(self, obj):
+        return resolve_lang(obj, "badge_singular", self.context)
+
+    def get_badgePlural(self, obj):
+        return resolve_lang(obj, "badge_plural", self.context)
 
 
 class WeeklyPriceReportSerializer(serializers.ModelSerializer):

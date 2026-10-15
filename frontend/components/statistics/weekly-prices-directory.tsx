@@ -18,24 +18,72 @@ import {
 
 import { Container } from "@/components/ui/container"
 import { weeklyPriceReports as fallbackReports } from "@/data/weekly-fish-prices"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 import type {
+  ApiWeeklyPriceCategory,
   ApiWeeklyPriceReport,
   ApiWeeklyPricesHeader,
 } from "@/lib/api/weekly-fish-prices"
 
 type SortOption = "Newest first" | "Oldest first"
 
+const SINHALA_MONTHS: Record<string, string> = {
+  January: "ජනවාරි",
+  February: "පෙබරවාරි",
+  March: "මාර්තු",
+  April: "අප්‍රේල්",
+  May: "මැයි",
+  June: "ජූනි",
+  July: "ජූලි",
+  August: "අගෝස්තු",
+  September: "සැප්තැම්බර්",
+  October: "ඔක්තෝබර්",
+  November: "නොවැම්බර්",
+  December: "දෙසැම්බර්",
+}
+
+const TAMIL_MONTHS: Record<string, string> = {
+  January: "ஜனவரி",
+  February: "பெப்ரவரி",
+  March: "மார்ச்",
+  April: "ஏப்ரல்",
+  May: "மே",
+  June: "ஜூன்",
+  July: "ஜூலை",
+  August: "ஆகஸ்ட்",
+  September: "செப்டம்பர்",
+  October: "அக்டோபர்",
+  November: "நவம்பர்",
+  December: "டிசம்பர்",
+}
+
 interface WeeklyPricesDirectoryProps {
   header?: ApiWeeklyPricesHeader
   reports?: ApiWeeklyPriceReport[]
   availableYears?: number[]
+  categories?: ApiWeeklyPriceCategory[]
 }
 
 export function WeeklyPricesDirectory({
   header,
   reports,
   availableYears,
+  categories,
 }: WeeklyPricesDirectoryProps) {
+  const { language } = useLanguage()
+  const isSi = language === "si"
+  const isTa = language === "ta"
+
+  const categoryMap = useMemo(() => {
+    const map = new Map<string, ApiWeeklyPriceCategory>()
+    if (categories && categories.length > 0) {
+      categories.forEach((cat) => {
+        map.set(`${cat.month}-${cat.year}`, cat)
+      })
+    }
+    return map
+  }, [categories])
+
   const allReports: ApiWeeklyPriceReport[] =
     reports !== undefined && reports !== null
       ? reports
@@ -160,7 +208,7 @@ export function WeeklyPricesDirectory({
             {/* Search Input */}
             <div className="relative flex-1 max-w-md">
               <label htmlFor="search-reports" className="sr-only">
-                Search weekly reports
+                {isSi ? "සතිපතා වාර්තා සොයන්න" : isTa ? "வாராந்த அறிக்கைகளைத் தேடுக" : "Search weekly reports"}
               </label>
               <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                 <Search className="h-4 w-4" aria-hidden="true" />
@@ -170,7 +218,7 @@ export function WeeklyPricesDirectory({
                 id="search-reports"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by week, month or date..."
+                placeholder={isSi ? "සතිය, මාසය හෝ දිනය අනුව සොයන්න..." : isTa ? "வாரம், மாதம் அல்லது திகதி மூலம் தேடுக..." : "Search by week, month or date..."}
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-colors"
               />
               {searchQuery && (
@@ -190,7 +238,7 @@ export function WeeklyPricesDirectory({
               {/* Year Select */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
-                  Year:
+                  {isSi ? "වසර:" : isTa ? "வருடம்:" : "Year:"}
                 </span>
                 <select
                   value={selectedYear}
@@ -198,7 +246,7 @@ export function WeeklyPricesDirectory({
                   className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none cursor-pointer"
                   aria-label="Select report year"
                 >
-                  <option value="All years">All years</option>
+                  <option value="All years">{isSi ? "සියලුම වසර" : isTa ? "அனைத்து வருடங்களும்" : "All years"}</option>
                   {yearsList.map((yr) => (
                     <option key={yr} value={yr}>
                       {yr}
@@ -210,7 +258,7 @@ export function WeeklyPricesDirectory({
               {/* Sort Order Select */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
-                  Sort:
+                  {isSi ? "පිළිවෙල:" : isTa ? "வரிசைப்படுத்துக:" : "Sort:"}
                 </span>
                 <select
                   value={sortOrder}
@@ -218,8 +266,8 @@ export function WeeklyPricesDirectory({
                   className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none cursor-pointer"
                   aria-label="Sort reports"
                 >
-                  <option value="Newest first">Newest first</option>
-                  <option value="Oldest first">Oldest first</option>
+                  <option value="Newest first">{isSi ? "නවතම වාර්තා පළමුව" : isTa ? "புதியவை முதலில்" : "Newest first"}</option>
+                  <option value="Oldest first">{isSi ? "පැරණි වාර්තා පළමුව" : isTa ? "பழையவை முதலில்" : "Oldest first"}</option>
                 </select>
               </div>
 
@@ -230,7 +278,7 @@ export function WeeklyPricesDirectory({
                   className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer ml-auto sm:ml-0"
                 >
                   <X className="h-3.5 w-3.5" />
-                  <span>Reset filters</span>
+                  <span>{isSi ? "පෙරහන් ඉවත් කරන්න" : isTa ? "வடிகட்டிகளை மீட்டமைக்குக" : "Reset filters"}</span>
                 </button>
               )}
             </div>
@@ -240,12 +288,17 @@ export function WeeklyPricesDirectory({
         {/* Results Counter */}
         <div className="mb-6 flex items-center justify-between text-xs text-slate-600 font-semibold">
           <span>
-            Showing <strong className="text-slate-900">{filteredReports.length}</strong> weekly reports
-            {selectedYear !== "All years" ? ` for ${selectedYear}` : ""}
+            {isSi ? (
+              <>සතිපතා වාර්තා <strong className="text-slate-900">{filteredReports.length}</strong> ක් පෙන්වයි{selectedYear !== "All years" ? ` (${selectedYear} වසර සඳහා)` : ""}</>
+            ) : isTa ? (
+              <><strong className="text-slate-900">{filteredReports.length}</strong> வாராந்த அறிக்கைகள் காட்டப்படுகின்றன{selectedYear !== "All years" ? ` (${selectedYear} வருடத்திற்கான)` : ""}</>
+            ) : (
+              <>Showing <strong className="text-slate-900">{filteredReports.length}</strong> weekly reports{selectedYear !== "All years" ? ` for ${selectedYear}` : ""}</>
+            )}
           </span>
           {isFiltered && (
             <span className="bg-emerald-50 text-[#256B29] px-2.5 py-0.5 rounded-full border border-emerald-200">
-              Filtered results
+              {isSi ? "පෙරූ ප්‍රතිඵල" : isTa ? "வடிகட்டப்பட்ட முடிவுகள்" : "Filtered results"}
             </span>
           )}
         </div>
@@ -256,6 +309,37 @@ export function WeeklyPricesDirectory({
             {groupedByMonth.map(({ monthName, year, reports: monthReports }) => {
               const groupKey = `${monthName}-${year}`
               const isOpen = Boolean(openMonths[groupKey])
+              const cat = categoryMap.get(groupKey)
+
+              let displayTitle = `${monthName} ${year}`
+              if (cat?.title) {
+                displayTitle = cat.title
+              } else if (isSi) {
+                displayTitle = `${year} ${SINHALA_MONTHS[monthName] || monthName}`
+              } else if (isTa) {
+                displayTitle = `${TAMIL_MONTHS[monthName] || monthName} ${year}`
+              }
+
+              let displayDesc = `Weekly bulletins published during ${monthName} ${year}`
+              if (cat?.description) {
+                displayDesc = cat.description
+              } else if (isSi) {
+                displayDesc = `${year} ${SINHALA_MONTHS[monthName] || monthName} මාසය තුළ පළ කරන ලද සතිපතා මිල වාර්තා`
+              } else if (isTa) {
+                displayDesc = `${TAMIL_MONTHS[monthName] || monthName} ${year} இல் வெளியிடப்பட்ட வாராந்த விலை அறிக்கைகள்`
+              }
+
+              let displayBadge = `${monthReports.length} ${monthReports.length === 1 ? "Report" : "Reports"}`
+              if (isSi) {
+                const label = monthReports.length === 1 ? (cat?.badgeSingular || "වාර්තාව") : (cat?.badgePlural || "වාර්තා")
+                displayBadge = `${monthReports.length} ${label}`
+              } else if (isTa) {
+                const label = monthReports.length === 1 ? (cat?.badgeSingular || "அறிக்கை") : (cat?.badgePlural || "அறிக்கைகள்")
+                displayBadge = `${monthReports.length} ${label}`
+              } else if (cat) {
+                const label = monthReports.length === 1 ? (cat.badgeSingular || "Report") : (cat.badgePlural || "Reports")
+                displayBadge = `${monthReports.length} ${label}`
+              }
 
               return (
                 <div
@@ -291,7 +375,7 @@ export function WeeklyPricesDirectory({
                           }`}
                         >
                           <span>
-                            {monthName} {year}
+                            {displayTitle}
                           </span>
                           <span
                             className={`text-xs font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
@@ -300,11 +384,11 @@ export function WeeklyPricesDirectory({
                                 : "bg-slate-100 text-slate-700 border-slate-300"
                             }`}
                           >
-                            {monthReports.length} {monthReports.length === 1 ? "Report" : "Reports"}
+                            {displayBadge}
                           </span>
                         </h2>
                         <p className="text-xs text-slate-600 font-medium mt-0.5 truncate">
-                          Weekly bulletins published during {monthName} {year}
+                          {displayDesc}
                         </p>
                       </div>
                     </div>
@@ -333,7 +417,7 @@ export function WeeklyPricesDirectory({
                               {/* Week Badge & File Size */}
                               <div className="flex items-center justify-between gap-2 mb-3">
                                 <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-extrabold bg-emerald-100 text-[#256B29] border border-emerald-200">
-                                  Week {report.week}
+                                  {isSi ? `සතිය ${report.week}` : isTa ? `வாரம் ${report.week}` : `Week ${report.week}`}
                                 </span>
                                 <span className="text-[11px] font-semibold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
                                   {report.fileSize || "PDF"}
@@ -363,14 +447,14 @@ export function WeeklyPricesDirectory({
                                     className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-2xs"
                                   >
                                     <Eye className="h-3.5 w-3.5 text-[#256B29]" />
-                                    <span>Preview</span>
+                                    <span>{isSi ? "පෙරදසුන" : isTa ? "முன்னோட்டம்" : "Preview"}</span>
                                   </a>
 
                                   <a
                                     href={report.pdfUrl}
                                     download
                                     className="inline-flex items-center justify-center p-2 rounded-lg bg-[#256B29] text-white hover:bg-[#1b4d1d] transition-colors shadow-2xs"
-                                    title="Download PDF"
+                                    title={isSi ? "PDF බාගත කරන්න" : isTa ? "PDF பதிவிறக்குக" : "Download PDF"}
                                     aria-label={`Download ${report.title} Week ${report.week}`}
                                   >
                                     <Download className="h-3.5 w-3.5" />
@@ -378,7 +462,7 @@ export function WeeklyPricesDirectory({
                                 </>
                               ) : (
                                 <span className="text-xs text-slate-400 italic py-1">
-                                  PDF uploading soon
+                                  {isSi ? "PDF ලේඛනය ළඟදීම" : isTa ? "PDF விரைவில் பதிவேற்றப்படும்" : "PDF uploading soon"}
                                 </span>
                               )}
                             </div>
@@ -397,9 +481,11 @@ export function WeeklyPricesDirectory({
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 mb-4">
               <FileText className="h-7 w-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">No Weekly Price Reports Found</h3>
+            <h3 className="text-lg font-bold text-slate-900">
+              {isSi ? "සතිපතා මිල වාර්තා හමු නොවීය" : isTa ? "வாராந்த விலை அறிக்கைகள் எதுவும் கிடைக்கவில்லை" : "No Weekly Price Reports Found"}
+            </h3>
             <p className="mt-1 text-sm text-slate-500 max-w-sm mx-auto">
-              We couldn&apos;t find any weekly reports matching your current search or year filters.
+              {isSi ? "ඔබ සොයන නිර්ණායකවලට ගැලපෙන සතිපතා වාර්තා කිසිවක් හමු නොවීය." : isTa ? "உங்கள் தேடலுடன் பொருந்தக்கூடிய அறிக்கைகள் எதுவும் காணப்படவில்லை." : "We couldn't find any weekly reports matching your current search or year filters."}
             </p>
             <button
               type="button"
@@ -407,7 +493,7 @@ export function WeeklyPricesDirectory({
               className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#256B29] px-4 py-2 text-xs font-bold text-white hover:bg-[#1b4d1d] transition-colors"
             >
               <X className="h-4 w-4" />
-              <span>Clear filters & search</span>
+              <span>{isSi ? "සොයුම සහ පෙරහන් ඉවත් කරන්න" : isTa ? "தேடல் மற்றும் வடிகட்டிகளை அழிக்கவும்" : "Clear filters & search"}</span>
             </button>
           </div>
         )}

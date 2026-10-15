@@ -101,8 +101,146 @@ class AnnualStatisticsHeader(TimeStampedModel):
         return f"Annual Statistics Header: {self.title_en}"
 
 
+
 # ==========================================================
-# 02. Annual Statistics Report Documents & Datasets
+# 02. Annual Categories / Year Accordion Headers
+# ==========================================================
+class AnnualStatisticsYearCategory(TimeStampedModel):
+    """
+    Manages custom multilingual titles, descriptions, and badge labels for each
+    annual fisheries statistics report accordion group (e.g. 2024, 2023).
+    """
+    year = models.PositiveIntegerField(
+        unique=True,
+        default=2024,
+        help_text="Reporting Year (e.g. 2024, 2023)",
+    )
+
+    # 🇬🇧 English Details
+    title_en = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (English)",
+        help_text="Group header title (e.g. '2024 Annual Statistics Reports & Datasets'). Auto-filled if left blank.",
+    )
+    description_en = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (English)",
+        help_text="Group subtitle (e.g. 'Official annual statistical bulletins and sector publications compiled for 2024'). Auto-filled if left blank.",
+    )
+    badge_singular_en = models.CharField(
+        max_length=50,
+        default="Report",
+        blank=True,
+        verbose_name="Singular Badge (English)",
+        help_text="e.g. 'Report' for 1 item",
+    )
+    badge_plural_en = models.CharField(
+        max_length=50,
+        default="Annual Reports",
+        blank=True,
+        verbose_name="Plural Badge (English)",
+        help_text="e.g. 'Annual Reports' for multiple items",
+    )
+
+    # 🇱🇰 Sinhala Details (සිංහල)
+    title_si = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (සිංහල)",
+        help_text="සිංහල මාතෘකාව (උදා: '2024 වාර්ෂික සංඛ්‍යාලේඛන වාර්තා සහ දත්ත කට්ටල')",
+    )
+    description_si = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (සිංහල)",
+        help_text="සිංහල විස්තරය (උදා: '2024 වසර සඳහා සකස් කරන ලද නිල වාර්ෂික සංඛ්‍යාලේඛන ප්‍රකාශන සහ ක්ෂේත්‍ර වාර්තා')",
+    )
+    badge_singular_si = models.CharField(
+        max_length=50,
+        default="වාර්තාව",
+        blank=True,
+        verbose_name="Singular Badge (සිංහල)",
+        help_text="උදා: 'වාර්තාව'",
+    )
+    badge_plural_si = models.CharField(
+        max_length=50,
+        default="වාර්ෂික වාර්තා",
+        blank=True,
+        verbose_name="Plural Badge (සිංහල)",
+        help_text="උදා: 'වාර්ෂික වාර්තා'",
+    )
+
+    # 🇱🇰 Tamil Details (தமிழ்)
+    title_ta = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (தமிழ்)",
+        help_text="தமிழ் தலைப்பு (எ.கா: '2024 வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் தரவுத் தொகுப்புகள்')",
+    )
+    description_ta = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (தமிழ்)",
+        help_text="தமிழ் விளக்கம் (எ.கா: '2024 ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் துறைசார் வெளியீடுகள்')",
+    )
+    badge_singular_ta = models.CharField(
+        max_length=50,
+        default="அறிக்கை",
+        blank=True,
+        verbose_name="Singular Badge (தமிழ்)",
+        help_text="எ.கா: 'அறிக்கை'",
+    )
+    badge_plural_ta = models.CharField(
+        max_length=50,
+        default="வருடாந்த அறிக்கைகள்",
+        blank=True,
+        verbose_name="Plural Badge (தமிழ்)",
+        help_text="எ.கா: 'வருடாந்த அறிக்கைகள்'",
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Display this year category section on live website",
+    )
+    order = models.PositiveIntegerField(
+        default=1,
+        help_text="Sort order",
+    )
+
+    class Meta:
+        ordering = ["-year", "order"]
+        verbose_name = "02. Annual Category / Year Header (වාර්ෂික ප්‍රවර්ග)"
+        verbose_name_plural = "02. Annual Categories / Year Headers (වාර්ෂික ප්‍රවර්ග)"
+
+    def save(self, *args, **kwargs):
+        if not self.title_en:
+            self.title_en = f"{self.year} Annual Statistics Reports & Datasets"
+        if not self.description_en:
+            self.description_en = f"Official annual statistical bulletins and sector publications compiled for {self.year}"
+        if not self.title_si:
+            self.title_si = f"{self.year} වාර්ෂික සංඛ්‍යාලේඛන වාර්තා සහ දත්ත කට්ටල"
+        if not self.description_si:
+            self.description_si = f"{self.year} වසර සඳහා සකස් කරන ලද නිල වාර්ෂික සංඛ්‍යාලේඛන ප්‍රකාශන සහ ක්ෂේත්‍ර වාර්තා"
+        if not self.title_ta:
+            self.title_ta = f"{self.year} வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் தரவுத் தொகுப்புகள்"
+        if not self.description_ta:
+            self.description_ta = f"{self.year} ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் துறைசார் வெளியீடுகள்"
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.year} - {self.title_en}"
+
+
+# ==========================================================
+# 03. Annual Statistics Report Documents & Datasets
 # ==========================================================
 class AnnualStatisticsReport(TimeStampedModel):
     report_id = models.CharField(
@@ -212,8 +350,8 @@ class AnnualStatisticsReport(TimeStampedModel):
 
     class Meta:
         ordering = ["-is_featured", "-year", "order", "id"]
-        verbose_name = "02. Annual Statistics Report"
-        verbose_name_plural = "02. Annual Statistics Reports"
+        verbose_name = "03. Annual Statistics Report"
+        verbose_name_plural = "03. Annual Statistics Reports"
 
     def save(self, *args, **kwargs):
         # Auto-generate report_id if empty
@@ -238,6 +376,29 @@ class AnnualStatisticsReport(TimeStampedModel):
                     self.file_size = f"{round(size_bytes / 1024)} KB"
                 else:
                     self.file_size = f"{round(size_bytes / (1024 * 1024), 1)} MB"
+            except Exception:
+                pass
+
+        # Auto-ensure AnnualStatisticsYearCategory exists for this report's year
+        if self.year:
+            try:
+                AnnualStatisticsYearCategory.objects.get_or_create(
+                    year=self.year,
+                    defaults={
+                        "title_en": f"{self.year} Annual Statistics Reports & Datasets",
+                        "title_si": f"{self.year} වාර්ෂික සංඛ්‍යාලේඛන වාර්තා සහ දත්ත කට්ටල",
+                        "title_ta": f"{self.year} வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் தரவுத் தொகுப்புகள்",
+                        "description_en": f"Official annual statistical bulletins and sector publications compiled for {self.year}",
+                        "description_si": f"{self.year} වසර සඳහා සකස් කරන ලද නිල වාර්ෂික සංඛ්‍යාලේඛන ප්‍රකාශන සහ ක්ෂේත්‍ර වාර්තා",
+                        "description_ta": f"{self.year} ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் துறைசார் வெளியீடுகள்",
+                        "badge_singular_en": "Report",
+                        "badge_plural_en": "Annual Reports",
+                        "badge_singular_si": "වාර්තාව",
+                        "badge_plural_si": "වාර්ෂික වාර්තා",
+                        "badge_singular_ta": "அறிக்கை",
+                        "badge_plural_ta": "வருடாந்த அறிக்கைகள்",
+                    }
+                )
             except Exception:
                 pass
 

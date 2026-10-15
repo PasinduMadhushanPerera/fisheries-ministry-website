@@ -4,11 +4,13 @@ from rest_framework.views import APIView
 from .models import (
     ExportImportHeader,
     ExportImportSummaryMetric,
+    ExportImportYearCategory,
     ExportImportReport,
 )
 from .serializers import (
     ExportImportHeaderSerializer,
     ExportImportSummaryMetricSerializer,
+    ExportImportYearCategorySerializer,
     ExportImportReportSerializer,
 )
 
@@ -16,7 +18,7 @@ from .serializers import (
 class ExportImportStatisticsDataView(APIView):
     """
     API endpoint returning all customizable sections of Statistics : Export and Import in the requested language (?lang=en/si/ta).
-    Returns header information, trade summary KPI metrics, available years, and active monthly trade reports.
+    Returns header information, trade summary KPI metrics, available years, category year groups, and active monthly trade reports.
     """
     permission_classes = [permissions.AllowAny]
 
@@ -32,6 +34,9 @@ class ExportImportStatisticsDataView(APIView):
 
         metrics_query = ExportImportSummaryMetric.objects.filter(is_active=True).order_by("order", "id")
         metrics_data = ExportImportSummaryMetricSerializer(metrics_query, many=True, context=context).data
+
+        categories_query = ExportImportYearCategory.objects.filter(is_active=True).order_by("-year", "order")
+        categories_data = ExportImportYearCategorySerializer(categories_query, many=True, context=context).data
 
         reports_query = ExportImportReport.objects.filter(is_active=True).order_by("-year", "-month_number", "order")
         reports_data = ExportImportReportSerializer(reports_query, many=True, context=context).data
@@ -49,5 +54,6 @@ class ExportImportStatisticsDataView(APIView):
             "header": header_data,
             "summary_metrics": metrics_data,
             "available_years": years,
+            "categories": categories_data,
             "reports": reports_data,
         })

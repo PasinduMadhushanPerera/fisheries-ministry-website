@@ -45,6 +45,7 @@ export function AnnualReportsContent({ initialData }: AnnualReportsContentProps)
       header={data?.header}
       reports={data?.reports}
       availableYears={data?.available_years}
+      categories={data?.categories}
     />
   )
 }

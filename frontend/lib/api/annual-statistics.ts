@@ -29,10 +29,21 @@ export interface ApiAnnualStatisticsDocument {
   featured?: boolean
 }
 
+export interface ApiAnnualStatisticsYearCategory {
+  id: number
+  year: number
+  title: string
+  description: string
+  badgeSingular: string
+  badgePlural: string
+  order: number
+}
+
 export interface ApiAnnualStatisticsData {
   language: string
   header: ApiAnnualStatisticsHeader
   available_years: number[]
+  categories?: ApiAnnualStatisticsYearCategory[]
   reports: ApiAnnualStatisticsDocument[]
 }
 

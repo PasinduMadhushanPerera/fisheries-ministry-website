@@ -116,18 +116,21 @@ class FisheryInformationCategoryAdmin(admin.ModelAdmin):
             "fields": (
                 "title_en",
                 "description_en",
+                ("badge_singular_en", "badge_plural_en"),
             ),
         }),
         ("🇱🇰 Sinhala Content (සිංහල)", {
             "fields": (
                 "title_si",
                 "description_si",
+                ("badge_singular_si", "badge_plural_si"),
             ),
         }),
         ("🇱🇰 Tamil Content (தமிழ்)", {
             "fields": (
                 "title_ta",
                 "description_ta",
+                ("badge_singular_ta", "badge_plural_ta"),
             ),
         }),
     )

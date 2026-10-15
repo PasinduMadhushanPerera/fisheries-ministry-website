@@ -264,7 +264,144 @@ class ExportImportSummaryMetric(TimeStampedModel):
 
 
 # ==========================================================
-# 03. Export / Import Monthly Reports & Spreadsheets
+# 03. Annual Categories / Year Accordion Headers
+# ==========================================================
+class ExportImportYearCategory(TimeStampedModel):
+    """
+    Manages custom multilingual titles, descriptions, and badge labels for each
+    annual trade report accordion group (e.g. 2026, 2025).
+    """
+    year = models.PositiveIntegerField(
+        unique=True,
+        default=2026,
+        help_text="Reporting Year (e.g. 2026, 2025)",
+    )
+
+    # 🇬🇧 English Details
+    title_en = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (English)",
+        help_text="Group header title (e.g. '2026 Export & Import Trade Reports'). Auto-filled if left blank.",
+    )
+    description_en = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (English)",
+        help_text="Group subtitle (e.g. 'Official monthly fish export and import customs trade datasets compiled for 2026'). Auto-filled if left blank.",
+    )
+    badge_singular_en = models.CharField(
+        max_length=50,
+        default="Report",
+        blank=True,
+        verbose_name="Singular Badge (English)",
+        help_text="e.g. 'Report' for 1 item",
+    )
+    badge_plural_en = models.CharField(
+        max_length=50,
+        default="Monthly Reports",
+        blank=True,
+        verbose_name="Plural Badge (English)",
+        help_text="e.g. 'Monthly Reports' for multiple items",
+    )
+
+    # 🇱🇰 Sinhala Details (සිංහල)
+    title_si = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (සිංහල)",
+        help_text="සිංහල මාතෘකාව (උදා: '2026 මත්ස්‍ය අපනයන සහ ආනයන වෙළඳ වාර්තා')",
+    )
+    description_si = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (සිංහල)",
+        help_text="සිංහල විස්තරය (උදා: '2026 වසර සඳහා සකස් කරන ලද නිල මාසික මත්ස්‍ය අපනයන සහ ආනයන රේගු වෙළඳ දත්ත වාර්තා')",
+    )
+    badge_singular_si = models.CharField(
+        max_length=50,
+        default="වාර්තාව",
+        blank=True,
+        verbose_name="Singular Badge (සිංහල)",
+        help_text="උදා: 'වාර්තාව'",
+    )
+    badge_plural_si = models.CharField(
+        max_length=50,
+        default="මාසික වාර්තා",
+        blank=True,
+        verbose_name="Plural Badge (සිංහල)",
+        help_text="උදා: 'මාසික වාර්තා'",
+    )
+
+    # 🇱🇰 Tamil Details (தமிழ்)
+    title_ta = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (தமிழ்)",
+        help_text="தமிழ் தலைப்பு (எ.கா: '2026 மீன் ஏற்றுமதி மற்றும் இறக்குமதி வர்த்தக அறிக்கைகள்')",
+    )
+    description_ta = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (தமிழ்)",
+        help_text="தமிழ் விளக்கம் (எ.கா: '2026 ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ மாதாந்த மீன் ஏற்றுமதி மற்றும் இறக்குமதி சுங்க வர்த்தக தரவுத்தொகுப்புகள்')",
+    )
+    badge_singular_ta = models.CharField(
+        max_length=50,
+        default="அறிக்கை",
+        blank=True,
+        verbose_name="Singular Badge (தமிழ்)",
+        help_text="எ.கா: 'அறிக்கை'",
+    )
+    badge_plural_ta = models.CharField(
+        max_length=50,
+        default="மாதாந்த அறிக்கைகள்",
+        blank=True,
+        verbose_name="Plural Badge (தமிழ்)",
+        help_text="எ.கா: 'மாதாந்த அறிக்கைகள்'",
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Display this year category section on live website",
+    )
+    order = models.PositiveIntegerField(
+        default=1,
+        help_text="Sort order",
+    )
+
+    class Meta:
+        ordering = ["-year", "order"]
+        verbose_name = "03. Annual Category / Year Header (වාර්ෂික ප්‍රවර්ග)"
+        verbose_name_plural = "03. Annual Categories / Year Headers (වාර්ෂික ප්‍රවර්ග)"
+
+    def save(self, *args, **kwargs):
+        if not self.title_en:
+            self.title_en = f"{self.year} Export & Import Trade Reports"
+        if not self.description_en:
+            self.description_en = f"Official monthly fish export and import customs trade datasets compiled for {self.year}"
+        if not self.title_si:
+            self.title_si = f"{self.year} මත්ස්‍ය අපනයන සහ ආනයන වෙළඳ වාර්තා"
+        if not self.description_si:
+            self.description_si = f"{self.year} වසර සඳහා සකස් කරන ලද නිල මාසික මත්ස්‍ය අපනයන සහ ආනයන රේගු වෙළඳ දත්ත වාර්තා"
+        if not self.title_ta:
+            self.title_ta = f"{self.year} மீன் ஏற்றுமதி மற்றும் இறக்குமதி வர்த்தக அறிக்கைகள்"
+        if not self.description_ta:
+            self.description_ta = f"{self.year} ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ மாதாந்த மீன் ஏற்றுமதி மற்றும் இறக்குமதி சுங்க வர்த்தக தரவுத்தொகுப்புகள்"
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.year} - {self.title_en}"
+
+
+# ==========================================================
+# 04. Export / Import Monthly Reports & Spreadsheets
 # ==========================================================
 class ExportImportReport(TimeStampedModel):
     report_id = models.CharField(
@@ -373,8 +510,8 @@ class ExportImportReport(TimeStampedModel):
 
     class Meta:
         ordering = ["-year", "-month_number", "order"]
-        verbose_name = "03. Export / Import Monthly Report"
-        verbose_name_plural = "03. Export / Import Monthly Reports"
+        verbose_name = "04. Export / Import Monthly Report"
+        verbose_name_plural = "04. Export / Import Monthly Reports"
 
     def save(self, *args, **kwargs):
         # Auto-sync month_number from month name
@@ -403,6 +540,29 @@ class ExportImportReport(TimeStampedModel):
                     self.file_size = f"{round(size_bytes / 1024)} KB"
                 else:
                     self.file_size = f"{round(size_bytes / (1024 * 1024), 1)} MB"
+            except Exception:
+                pass
+
+        # Auto-ensure ExportImportYearCategory exists for this report's year
+        if self.year:
+            try:
+                ExportImportYearCategory.objects.get_or_create(
+                    year=self.year,
+                    defaults={
+                        "title_en": f"{self.year} Export & Import Trade Reports",
+                        "title_si": f"{self.year} මත්ස්‍ය අපනයන සහ ආනයන වෙළඳ වාර්තා",
+                        "title_ta": f"{self.year} மீன் ஏற்றுமதி மற்றும் இறக்குமதி வர்த்தக அறிக்கைகள்",
+                        "description_en": f"Official monthly fish export and import customs trade datasets compiled for {self.year}",
+                        "description_si": f"{self.year} වසර සඳහා සකස් කරන ලද නිල මාසික මත්ස්‍ය අපනයන සහ ආනයන රේගු වෙළඳ දත්ත වාර්තා",
+                        "description_ta": f"{self.year} ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ மாதாந்த மீன் ஏற்றுமதி மற்றும் இறக்குமதி சுங்க வர்த்தக தரவுத்தொகுப்புகள்",
+                        "badge_singular_en": "Report",
+                        "badge_plural_en": "Monthly Reports",
+                        "badge_singular_si": "වාර්තාව",
+                        "badge_plural_si": "මාසික වාර්තා",
+                        "badge_singular_ta": "அறிக்கை",
+                        "badge_plural_ta": "மாதாந்த அறிக்கைகள்",
+                    }
+                )
             except Exception:
                 pass
 

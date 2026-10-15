@@ -127,7 +127,147 @@ class MonthlyFishProductionHeader(TimeStampedModel):
 
 
 # ==========================================================
-# 02. Monthly Production Report Data Spreadsheets
+# 02. Annual Categories / Year Accordion Headers
+# ==========================================================
+class MonthlyProductionYearCategory(TimeStampedModel):
+    """
+    Manages custom multilingual titles, descriptions, and badge labels for each
+    annual fish production report accordion group (e.g. 2026, 2025).
+    """
+    year = models.PositiveIntegerField(
+        unique=True,
+        default=2026,
+        help_text="Reporting Year (e.g. 2026, 2025)",
+    )
+
+    # 🇬🇧 English Details
+    title_en = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (English)",
+        help_text="Group header title (e.g. '2026 Fish Production Reports'). Auto-filled if left blank.",
+    )
+    description_en = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (English)",
+        help_text="Group subtitle (e.g. 'Official monthly sectoral production datasets compiled for 2026'). Auto-filled if left blank.",
+    )
+    badge_singular_en = models.CharField(
+        max_length=50,
+        default="Report",
+        blank=True,
+        verbose_name="Singular Badge (English)",
+        help_text="e.g. 'Report' for 1 item",
+    )
+    badge_plural_en = models.CharField(
+        max_length=50,
+        default="Monthly Reports",
+        blank=True,
+        verbose_name="Plural Badge (English)",
+        help_text="e.g. 'Monthly Reports' for multiple items",
+    )
+
+    # 🇱🇰 Sinhala Details (සිංහල)
+    title_si = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (සිංහල)",
+        help_text="සිංහල මාතෘකාව (උදා: '2026 මත්ස්‍ය නිෂ්පාදන වාර්තා')",
+    )
+    description_si = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (සිංහල)",
+        help_text="සිංහල විස්තරය (උදා: '2026 වසර සඳහා සකස් කරන ලද නිල මාසික ක්ෂේත්‍ර නිෂ්පාදන දත්ත වාර්තා')",
+    )
+    badge_singular_si = models.CharField(
+        max_length=50,
+        default="වාර්තාව",
+        blank=True,
+        verbose_name="Singular Badge (සිංහල)",
+        help_text="උදා: 'වාර්තාව'",
+    )
+    badge_plural_si = models.CharField(
+        max_length=50,
+        default="මාසික වාර්තා",
+        blank=True,
+        verbose_name="Plural Badge (සිංහල)",
+        help_text="උදා: 'මාසික වාර්තා'",
+    )
+
+    # 🇱🇰 Tamil Details (தமிழ்)
+    title_ta = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Title (தமிழ்)",
+        help_text="தமிழ் தலைப்பு (எ.கா: '2026 மீன் உற்பத்தி அறிக்கைகள்')",
+    )
+    description_ta = models.CharField(
+        max_length=255,
+        default="",
+        blank=True,
+        verbose_name="Category Description (தமிழ்)",
+        help_text="தமிழ் விளக்கம் (எ.கா: '2026 ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ மாதாந்த துறைசார் உற்பத்தி தரவுத்தொகுப்புகள்')",
+    )
+    badge_singular_ta = models.CharField(
+        max_length=50,
+        default="அறிக்கை",
+        blank=True,
+        verbose_name="Singular Badge (தமிழ்)",
+        help_text="எ.கா: 'அறிக்கை'",
+    )
+    badge_plural_ta = models.CharField(
+        max_length=50,
+        default="மாதாந்த அறிக்கைகள்",
+        blank=True,
+        verbose_name="Plural Badge (தமிழ்)",
+        help_text="எ.கா: 'மாதாந்த அறிக்கைகள்'",
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Display this year category section on live website",
+    )
+    order = models.PositiveIntegerField(
+        default=1,
+        help_text="Sort order",
+    )
+
+    class Meta:
+        ordering = ["-year", "order"]
+        verbose_name = "02. Annual Category / Year Header (වාර්ෂික ප්‍රවර්ග)"
+        verbose_name_plural = "02. Annual Categories / Year Headers (වාර්ෂික ප්‍රවර්ග)"
+
+    def save(self, *args, **kwargs):
+        if not self.title_en:
+            self.title_en = f"{self.year} Fish Production Reports"
+        if not self.description_en:
+            self.description_en = f"Official monthly sectoral production datasets compiled for {self.year}"
+
+        if not self.title_si:
+            self.title_si = f"{self.year} මත්ස්‍ය නිෂ්පාදන වාර්තා"
+        if not self.description_si:
+            self.description_si = f"{self.year} වසර සඳහා සකස් කරන ලද නිල මාසික ක්ෂේත්‍ර නිෂ්පාදන දත්ත වාර්තා"
+
+        if not self.title_ta:
+            self.title_ta = f"{self.year} மீன் உற்பத்தி அறிக்கைகள்"
+        if not self.description_ta:
+            self.description_ta = f"{self.year} ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ மாதாந்த துறைசார் உற்பத்தி தரவுத்தொகுப்புகள்"
+
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.year} ({self.title_si or self.title_en})"
+
+
+# ==========================================================
+# 03. Monthly Production Report Data Spreadsheets
 # ==========================================================
 class MonthlyProductionReport(TimeStampedModel):
     report_id = models.CharField(
@@ -241,8 +381,8 @@ class MonthlyProductionReport(TimeStampedModel):
 
     class Meta:
         ordering = ["-is_featured", "-year", "-month_number", "order"]
-        verbose_name = "02. Monthly Production Report"
-        verbose_name_plural = "02. Monthly Production Reports"
+        verbose_name = "03. Monthly Production Report"
+        verbose_name_plural = "03. Monthly Production Reports"
 
     def save(self, *args, **kwargs):
         # Auto-sync month_number from month name
@@ -275,6 +415,12 @@ class MonthlyProductionReport(TimeStampedModel):
                 pass
 
         super().save(*args, **kwargs)
+
+        # Ensure corresponding Year Category exists
+        try:
+            MonthlyProductionYearCategory.objects.get_or_create(year=self.year)
+        except Exception:
+            pass
 
     def __str__(self) -> str:
         return f"{self.year} {self.month} - {self.title_en}"

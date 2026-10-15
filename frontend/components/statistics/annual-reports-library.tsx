@@ -28,9 +28,11 @@ import { Container } from "@/components/ui/container"
 import {
   annualStatisticsReports as fallbackReports,
 } from "@/data/annual-statistics-reports"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 import type {
   ApiAnnualStatisticsDocument,
   ApiAnnualStatisticsHeader,
+  ApiAnnualStatisticsYearCategory,
 } from "@/lib/api/annual-statistics"
 
 type SortOption = "Newest first" | "Oldest first" | "Title A–Z"
@@ -39,13 +41,29 @@ interface AnnualReportsLibraryProps {
   header?: ApiAnnualStatisticsHeader
   reports?: ApiAnnualStatisticsDocument[]
   availableYears?: number[]
+  categories?: ApiAnnualStatisticsYearCategory[]
 }
 
 export function AnnualReportsLibrary({
   header,
   reports,
   availableYears,
+  categories,
 }: AnnualReportsLibraryProps) {
+  const { language } = useLanguage()
+  const isSi = language === "si"
+  const isTa = language === "ta"
+
+  const categoryMap = useMemo(() => {
+    const map = new Map<number, ApiAnnualStatisticsYearCategory>()
+    if (categories && categories.length > 0) {
+      categories.forEach((cat) => {
+        map.set(cat.year, cat)
+      })
+    }
+    return map
+  }, [categories])
+
   const allReports: ApiAnnualStatisticsDocument[] =
     reports !== undefined && reports !== null
       ? reports
@@ -185,12 +203,22 @@ export function AnnualReportsLibrary({
     }
   }
 
-  const badgeText = header?.badge_text || "Official Statistical Archive"
-  const pageTitle = header?.title || "Annual Statistics Reports & Datasets"
+  const badgeText =
+    header?.badge_text ||
+    (isSi ? "නිල සංඛ්‍යාලේඛන ලේඛනාගාරය" : isTa ? "உத்தியோகபூர்வ புள்ளிவிவரக் காப்பகம்" : "Official Statistical Archive")
+  const pageTitle =
+    header?.title ||
+    (isSi ? "වාර්ෂික සංඛ්‍යාලේඛන වාර්තා සහ දත්ත කට්ටල" : isTa ? "வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் தரவுத் தொகுப்புகள்" : "Annual Statistics Reports & Datasets")
   const pageDesc =
     header?.description ||
-    "Browse and download official annual fisheries statistical bulletins, comprehensive sector performance metrics, supporting spreadsheets, raw datasets, and executive presentations published by the Ministry."
-  const featuredBadge = header?.featured_badge || "Featured Annual Report"
+    (isSi
+      ? "ධීවර අමාත්‍යාංශය විසින් ප්‍රකාශයට පත් කරන ලද නිල වාර්ෂික ධීවර සංඛ්‍යාලේඛන ප්‍රකාශන, ක්ෂේත්‍ර කාර්යසාධන වාර්තා සහ දත්ත කට්ටල මෙතැනින් බාගත කරගන්න."
+      : isTa
+      ? "கடற்றொழில் அமைச்சினால் வெளியிடப்பட்ட உத்தியோகபூர்வ வருடாந்த மீன்பிடி புள்ளிவிவர அறிக்கைகள் மற்றும் தரவுத்தொகுப்புகளைப் பதிவிறக்குங்கள்."
+      : "Browse and download official annual fisheries statistical bulletins, comprehensive sector performance metrics, supporting spreadsheets, raw datasets, and executive presentations published by the Ministry.")
+  const featuredBadge =
+    header?.featured_badge ||
+    (isSi ? "විශේෂ වාර්ෂික වාර්තාව" : isTa ? "முக்கிய வருடாந்த அறிக்கை" : "Featured Annual Report")
 
   return (
     <section
@@ -235,10 +263,15 @@ export function AnnualReportsLibrary({
                 <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-medium !text-white-500">
                   <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-lg border border-white/10">
                     <FileText className="h-3.5 w-3.5 text-emerald-300" />
-                    <span>{featuredDocument.fileType} Document ({featuredDocument.fileSize})</span>
+                    <span>
+                      {featuredDocument.fileType} {isSi ? "ලේඛනය" : isTa ? "ஆவணம்" : "Document"} ({featuredDocument.fileSize})
+                    </span>
                   </span>
                   <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-lg border border-white/10">
-                    <span>Languages: {featuredDocument.language || "English / Sinhala / Tamil"}</span>
+                    <span>
+                      {isSi ? "භාෂා: " : isTa ? "மொழிகள்: " : "Languages: "}
+                      {featuredDocument.language || (isSi ? "ඉංග්‍රීසි / සිංහල / දෙමළ" : isTa ? "ஆங்கிலம் / சிங்களம் / தமிழ்" : "English / Sinhala / Tamil")}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -258,7 +291,7 @@ export function AnnualReportsLibrary({
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-5 py-3 text-xs font-bold text-white hover:bg-white/20 transition"
                     >
                       <Eye className="h-4 w-4" />
-                      <span>Preview Report</span>
+                      <span>{isSi ? "වාර්තාව පෙරදසුන" : isTa ? "அறிக்கை முன்னோட்டம்" : "Preview Report"}</span>
                     </a>
                     {featuredDocument.downloadUrl && featuredDocument.downloadUrl !== "#" ? (
                       <a
@@ -267,14 +300,14 @@ export function AnnualReportsLibrary({
                         className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-6 py-3 text-xs font-extrabold text-white hover:bg-[#2e7d32] transition shadow-md"
                       >
                         <Download className="h-4 w-4" />
-                        <span>Download Report</span>
+                        <span>{isSi ? "වාර්තාව බාගත කරන්න" : isTa ? "அறிக்கையைப் பதிවிறக்குக" : "Download Report"}</span>
                       </a>
                     ) : null}
                   </>
                 ) : (
                   <span className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/10 border border-white/20 px-5 py-3 text-xs font-bold text-slate-300 opacity-60 cursor-not-allowed">
                     <Eye className="h-4 w-4" />
-                    <span>Preview Unavailable</span>
+                    <span>{isSi ? "පෙරදසුන නොමැත" : isTa ? "முன்னோட்டம் கிடைக்கவில்லை" : "Preview Unavailable"}</span>
                   </span>
                 )}
               </div>
@@ -288,7 +321,7 @@ export function AnnualReportsLibrary({
             {/* Search Box */}
             <div className="relative flex-1 max-w-md">
               <label htmlFor="search-documents" className="sr-only">
-                Search annual reports and datasets
+                {isSi ? "වාර්ෂික වාර්තා සහ දත්ත කට්ටල සොයන්න" : isTa ? "வருடாந்த அறிக்கைகள் மற்றும் தரவுத்தொகுப்புகளைத் தேடுக" : "Search annual reports and datasets"}
               </label>
               <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                 <Search className="h-4 w-4" aria-hidden="true" />
@@ -298,7 +331,13 @@ export function AnnualReportsLibrary({
                 id="search-documents"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by keywords, title, or year..."
+                placeholder={
+                  isSi
+                    ? "මාතෘකාව හෝ වසර අනුව සොයන්න..."
+                    : isTa
+                    ? "தலைப்பு அல்லது ஆண்டு வாரியாகத் தேடுக..."
+                    : "Search by keywords, title, or year..."
+                }
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-500 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-colors"
               />
               {searchQuery && (
@@ -318,7 +357,7 @@ export function AnnualReportsLibrary({
               {/* Year Select */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
-                  Year:
+                  {isSi ? "වසර:" : isTa ? "ஆண்டு:" : "Year:"}
                 </span>
                 <select
                   value={selectedYear}
@@ -326,7 +365,9 @@ export function AnnualReportsLibrary({
                   className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none cursor-pointer"
                   aria-label="Select report year"
                 >
-                  <option value="All years">All years</option>
+                  <option value="All years">
+                    {isSi ? "සියලු වසර" : isTa ? "அனைத்து ஆண்டுகள்" : "All years"}
+                  </option>
                   {yearsList.map((yr) => (
                     <option key={yr} value={yr}>
                       {yr}
@@ -338,7 +379,7 @@ export function AnnualReportsLibrary({
               {/* Sort Order Select */}
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
-                  Sort:
+                  {isSi ? "පිළිවෙල:" : isTa ? "வரிசைப்படுத்து:" : "Sort:"}
                 </span>
                 <select
                   value={sortOrder}
@@ -346,9 +387,15 @@ export function AnnualReportsLibrary({
                   className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#388E3C] focus:ring-2 focus:ring-emerald-500/20 focus:outline-none cursor-pointer"
                   aria-label="Sort reports"
                 >
-                  <option value="Newest first">Newest first</option>
-                  <option value="Oldest first">Oldest first</option>
-                  <option value="Title A–Z">Title A–Z</option>
+                  <option value="Newest first">
+                    {isSi ? "නවතම පළමුව" : isTa ? "புதியவை முதலில்" : "Newest first"}
+                  </option>
+                  <option value="Oldest first">
+                    {isSi ? "පැරණිතම පළමුව" : isTa ? "பழையவை முதலில்" : "Oldest first"}
+                  </option>
+                  <option value="Title A–Z">
+                    {isSi ? "මාතෘකාව (A–Z)" : isTa ? "தலைப்பு (A–Z)" : "Title A–Z"}
+                  </option>
                 </select>
               </div>
 
@@ -359,7 +406,7 @@ export function AnnualReportsLibrary({
                   className="text-xs font-bold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors cursor-pointer ml-auto sm:ml-0"
                 >
                   <X className="h-3.5 w-3.5" />
-                  <span>Reset filters</span>
+                  <span>{isSi ? "පෙරහන් යළි සකසන්න" : isTa ? "வடிகட்டிகளை மீட்டமை" : "Reset filters"}</span>
                 </button>
               )}
             </div>
@@ -369,12 +416,26 @@ export function AnnualReportsLibrary({
         {/* 3. Results Header & Grid */}
         <div className="mb-6 flex items-center justify-between text-xs text-slate-600 font-semibold">
           <span>
-            Showing <strong className="text-slate-900">{filteredDocuments.length}</strong> official documents
-            {selectedYear !== "All years" ? ` for ${selectedYear}` : ""}
+            {isSi ? (
+              <>
+                නිල ලේඛන <strong className="text-slate-900">{filteredDocuments.length}</strong> ක් පෙන්වයි
+                {selectedYear !== "All years" ? ` (${selectedYear} සඳහා)` : ""}
+              </>
+            ) : isTa ? (
+              <>
+                உத்தியோகபூர்வ ஆவணங்கள் <strong className="text-slate-900">{filteredDocuments.length}</strong> காட்டப்படுகின்றன
+                {selectedYear !== "All years" ? ` (${selectedYear} இற்கு)` : ""}
+              </>
+            ) : (
+              <>
+                Showing <strong className="text-slate-900">{filteredDocuments.length}</strong> official documents
+                {selectedYear !== "All years" ? ` for ${selectedYear}` : ""}
+              </>
+            )}
           </span>
           {isFiltered && (
             <span className="bg-emerald-50 text-[#256B29] px-2.5 py-0.5 rounded-full border border-emerald-200">
-              Filtered results
+              {isSi ? "පෙරූ ප්‍රතිඵල" : isTa ? "வடிகட்டப்பட்ட முடிவுகள்" : "Filtered results"}
             </span>
           )}
         </div>
@@ -384,6 +445,37 @@ export function AnnualReportsLibrary({
           <div className="space-y-6">
             {groupedByYear.map(({ year, reports: yearReports }) => {
               const isOpen = Boolean(openYears[year])
+              const cat = categoryMap.get(year)
+
+              let displayTitle = `${year} Annual Statistics Reports & Datasets`
+              if (cat?.title) {
+                displayTitle = cat.title
+              } else if (isSi) {
+                displayTitle = `${year} වාර්ෂික සංඛ්‍යාලේඛන වාර්තා සහ දත්ත කට්ටල`
+              } else if (isTa) {
+                displayTitle = `${year} வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் தரவுத் தொகுப்புகள்`
+              }
+
+              let displayDesc = `Official annual statistical bulletins and sector publications compiled for ${year}`
+              if (cat?.description) {
+                displayDesc = cat.description
+              } else if (isSi) {
+                displayDesc = `${year} වසර සඳහා සකස් කරන ලද නිල වාර්ෂික සංඛ්‍යාලේඛන ප්‍රකාශන සහ ක්ෂේත්‍ර වාර්තා`
+              } else if (isTa) {
+                displayDesc = `${year} ஆம் ஆண்டிற்காக தொகுக்கப்பட்ட உத்தியோகபூர்வ வருடாந்த புள்ளிவிவர அறிக்கைகள் மற்றும் துறைசார் வெளியீடுகள்`
+              }
+
+              let displayBadge = `${yearReports.length} ${yearReports.length === 1 ? "Report" : "Annual Reports"}`
+              if (isSi) {
+                const label = yearReports.length === 1 ? (cat?.badgeSingular || "වාර්තාව") : (cat?.badgePlural || "වාර්ෂික වාර්තා")
+                displayBadge = `${yearReports.length} ${label}`
+              } else if (isTa) {
+                const label = yearReports.length === 1 ? (cat?.badgeSingular || "அறிக்கை") : (cat?.badgePlural || "வருடாந்த அறிக்கைகள்")
+                displayBadge = `${yearReports.length} ${label}`
+              } else if (cat) {
+                const label = yearReports.length === 1 ? (cat.badgeSingular || "Report") : (cat.badgePlural || "Annual Reports")
+                displayBadge = `${yearReports.length} ${label}`
+              }
 
               return (
                 <div
@@ -418,7 +510,7 @@ export function AnnualReportsLibrary({
                             isOpen ? "text-[#256B29]" : "text-slate-950"
                           }`}
                         >
-                          <span>{year} Annual Statistics Reports & Datasets</span>
+                          <span>{displayTitle}</span>
                           <span
                             className={`text-xs font-bold px-2.5 py-0.5 rounded-full border transition-colors ${
                               isOpen
@@ -426,11 +518,11 @@ export function AnnualReportsLibrary({
                                 : "bg-slate-100 text-slate-700 border-slate-300"
                             }`}
                           >
-                            {yearReports.length} {yearReports.length === 1 ? "Report" : "Annual Reports"}
+                            {displayBadge}
                           </span>
                         </h2>
                         <p className="text-xs text-slate-600 font-medium mt-0.5 truncate">
-                          Official annual statistical bulletins and sector publications compiled for {year}
+                          {displayDesc}
                         </p>
                       </div>
                     </div>
@@ -489,7 +581,7 @@ export function AnnualReportsLibrary({
                                 {/* Publication Date */}
                                 <div className="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500 font-medium">
                                   <CalendarDays className="h-3.5 w-3.5 text-[#256B29]" />
-                                  <span>Published: {doc.publishedDate}</span>
+                                  <span>{isSi ? "පළ කළ දිනය: " : isTa ? "வெளியிடப்பட்டது: " : "Published: "}{doc.publishedDate}</span>
                                 </div>
                               </div>
 
@@ -508,12 +600,12 @@ export function AnnualReportsLibrary({
                                     className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-white border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors shadow-2xs"
                                   >
                                     <Eye className="h-3.5 w-3.5 text-[#256B29]" />
-                                    <span>Preview</span>
+                                    <span>{isSi ? "පෙරදසුන" : isTa ? "முன்னோட்டம்" : "Preview"}</span>
                                   </a>
                                 ) : (
                                   <span className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-slate-100 border border-slate-200 text-xs font-bold text-slate-400 cursor-not-allowed">
                                     <Eye className="h-3.5 w-3.5" />
-                                    <span>Preview</span>
+                                    <span>{isSi ? "පෙරදසුන" : isTa ? "முன்னோட்டம்" : "Preview"}</span>
                                   </span>
                                 )}
 
@@ -522,7 +614,7 @@ export function AnnualReportsLibrary({
                                     href={doc.downloadUrl}
                                     download
                                     className="inline-flex items-center justify-center p-2 rounded-lg bg-[#256B29] text-white hover:bg-[#1b4d1d] transition-colors shadow-2xs"
-                                    title="Download file"
+                                    title={isSi ? "ගොනුව බාගත කරන්න" : isTa ? "கோப்பைப் பதிவிறக்குக" : "Download file"}
                                     aria-label={`Download ${doc.title}`}
                                   >
                                     <Download className="h-3.5 w-3.5" />
@@ -532,7 +624,7 @@ export function AnnualReportsLibrary({
                                     type="button"
                                     disabled
                                     className="inline-flex items-center justify-center p-2 rounded-lg bg-slate-100 text-slate-400 cursor-not-allowed"
-                                    title="Download unavailable"
+                                    title={isSi ? "බාගත කිරීම නොමැත" : isTa ? "பதிவிறக்கம் கிடைக்கவில்லை" : "Download unavailable"}
                                   >
                                     <Download className="h-3.5 w-3.5" />
                                   </button>
@@ -554,9 +646,19 @@ export function AnnualReportsLibrary({
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400 mb-4">
               <FolderSearch className="h-7 w-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">No Statistical Documents Found</h3>
+            <h3 className="text-lg font-bold text-slate-900">
+              {isSi
+                ? "සංඛ්‍යාලේඛන ලේඛන කිසිවක් හමු නොවීය"
+                : isTa
+                ? "புள்ளிவிவர ஆவணங்கள் எதுவும் காணப்படவில்லை"
+                : "No Statistical Documents Found"}
+            </h3>
             <p className="mt-1 text-sm text-slate-500 max-w-sm mx-auto">
-              We couldn&apos;t find any statistical reports or datasets matching your search and filter criteria.
+              {isSi
+                ? "ඔබේ සෙවුම් පෙරහන් සඳහා ගැලපෙන වාර්තා හෝ දත්ත කට්ටල කිසිවක් හමු නොවීය."
+                : isTa
+                ? "உங்கள் தேடல் வடிகட்டிகளுடன் பொருந்தக்கூடிய அறிக்கைகள் அல்லது தரவுத்தொகுப்புகள் எதுவும் காணப்படவில்லை."
+                : "We couldn't find any statistical reports or datasets matching your search and filter criteria."}
             </p>
             <button
               type="button"
@@ -564,7 +666,13 @@ export function AnnualReportsLibrary({
               className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#256B29] px-4 py-2 text-xs font-bold text-white hover:bg-[#1b4d1d] transition-colors"
             >
               <X className="h-4 w-4" />
-              <span>Clear all filters & search</span>
+              <span>
+                {isSi
+                  ? "පෙරහන් සහ සෙවීම ඉවත් කරන්න"
+                  : isTa
+                  ? "வடிகட்டிகள் & தேடலை மீட்டமை"
+                  : "Clear all filters & search"}
+              </span>
             </button>
           </div>
         )}

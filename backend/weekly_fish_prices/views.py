@@ -1,9 +1,14 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import WeeklyFishPricesHeader, WeeklyPriceReport
+from .models import (
+    WeeklyFishPricesHeader,
+    WeeklyPriceMonthCategory,
+    WeeklyPriceReport,
+)
 from .serializers import (
     WeeklyFishPricesHeaderSerializer,
+    WeeklyPriceMonthCategorySerializer,
     WeeklyPriceReportSerializer,
 )
 
@@ -25,6 +30,9 @@ class WeeklyFishPricesDataView(APIView):
         header, _ = WeeklyFishPricesHeader.objects.get_or_create(id=1)
         header_data = WeeklyFishPricesHeaderSerializer(header, context=context).data
 
+        categories_query = WeeklyPriceMonthCategory.objects.filter(is_active=True).order_by("-year", "-month_number", "order")
+        categories_data = WeeklyPriceMonthCategorySerializer(categories_query, many=True, context=context).data
+
         reports_query = WeeklyPriceReport.objects.filter(is_active=True).order_by("-year", "-month_number", "-week", "order")
         reports_data = WeeklyPriceReportSerializer(reports_query, many=True, context=context).data
 
@@ -40,5 +48,6 @@ class WeeklyFishPricesDataView(APIView):
             "language": lang,
             "header": header_data,
             "available_years": years,
+            "categories": categories_data,
             "reports": reports_data,
         })

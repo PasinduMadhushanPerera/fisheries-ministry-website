@@ -1,9 +1,14 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import MonthlyFishProductionHeader, MonthlyProductionReport
+from .models import (
+    MonthlyFishProductionHeader,
+    MonthlyProductionYearCategory,
+    MonthlyProductionReport,
+)
 from .serializers import (
     MonthlyFishProductionHeaderSerializer,
+    MonthlyProductionYearCategorySerializer,
     MonthlyProductionReportSerializer,
 )
 
@@ -25,6 +30,9 @@ class MonthlyFishProductionDataView(APIView):
         header, _ = MonthlyFishProductionHeader.objects.get_or_create(id=1)
         header_data = MonthlyFishProductionHeaderSerializer(header, context=context).data
 
+        categories_query = MonthlyProductionYearCategory.objects.filter(is_active=True).order_by("-year", "order")
+        categories_data = MonthlyProductionYearCategorySerializer(categories_query, many=True, context=context).data
+
         reports_query = MonthlyProductionReport.objects.filter(is_active=True).order_by("-is_featured", "-year", "-month_number", "order")
         reports_data = MonthlyProductionReportSerializer(reports_query, many=True, context=context).data
 
@@ -40,5 +48,6 @@ class MonthlyFishProductionDataView(APIView):
             "language": lang,
             "header": header_data,
             "available_years": years,
+            "categories": categories_data,
             "reports": reports_data,
         })

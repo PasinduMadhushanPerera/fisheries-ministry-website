@@ -9,6 +9,9 @@ export interface ApiFisheryCategoryMeta {
   title: string
   description: string
   icon_type?: string
+  badgeSingular?: string
+  badgePlural?: string
+  order?: number
 }
 
 export interface ApiFisheryInformationItem {

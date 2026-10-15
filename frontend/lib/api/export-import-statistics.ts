@@ -43,11 +43,22 @@ export interface ApiExportImportReport {
   publishedDate: string
 }
 
+export interface ApiExportImportYearCategory {
+  id: number | string
+  year: number
+  title: string
+  description: string
+  badgeSingular: string
+  badgePlural: string
+  order?: number
+}
+
 export interface ApiExportImportData {
   language: string
   header: ApiExportImportHeader
   summary_metrics: ApiTradeMetric[]
   available_years: number[]
+  categories?: ApiExportImportYearCategory[]
   reports: ApiExportImportReport[]
 }
 

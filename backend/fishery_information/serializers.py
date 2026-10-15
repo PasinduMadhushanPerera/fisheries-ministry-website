@@ -37,6 +37,8 @@ class FisheryInformationCategorySerializer(serializers.ModelSerializer):
     id = serializers.CharField(source="category_id")
     title = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
+    badgeSingular = serializers.SerializerMethodField()
+    badgePlural = serializers.SerializerMethodField()
 
     class Meta:
         model = FisheryInformationCategory
@@ -45,10 +47,31 @@ class FisheryInformationCategorySerializer(serializers.ModelSerializer):
             "title",
             "description",
             "icon_type",
+            "badgeSingular",
+            "badgePlural",
+            "order",
         ]
 
     def get_title(self, obj): return resolve_lang(obj, "title", self.context)
     def get_description(self, obj): return resolve_lang(obj, "description", self.context)
+
+    def get_badgeSingular(self, obj):
+        val = resolve_lang(obj, "badge_singular", self.context)
+        if not val or not val.strip():
+            lang = self.context.get("lang", "en")
+            if lang == "si": return "ගොනුව"
+            if lang == "ta": return "கோப்பு"
+            return "file"
+        return val
+
+    def get_badgePlural(self, obj):
+        val = resolve_lang(obj, "badge_plural", self.context)
+        if not val or not val.strip():
+            lang = self.context.get("lang", "en")
+            if lang == "si": return "ගොනු"
+            if lang == "ta": return "கோப்புகள்"
+            return "files"
+        return val
 
 
 class FisheryInformationItemSerializer(serializers.ModelSerializer):

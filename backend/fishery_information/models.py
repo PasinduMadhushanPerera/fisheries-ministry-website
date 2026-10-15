@@ -143,6 +143,50 @@ class FisheryInformationCategory(TimeStampedModel):
         verbose_name="Description (தமிழ்)",
     )
 
+    # 🏷️ Badges / Counters (e.g. '1 file', '11 files' or '1 සිතියම', 'සිතියම් 11')
+    badge_singular_en = models.CharField(
+        max_length=50,
+        blank=True,
+        default="file",
+        verbose_name="Badge Singular (English)",
+        help_text="Singular counter label (e.g. 'file', 'map', 'catalog', 'dataset')",
+    )
+    badge_plural_en = models.CharField(
+        max_length=50,
+        blank=True,
+        default="files",
+        verbose_name="Badge Plural (English)",
+        help_text="Plural counter label (e.g. 'files', 'maps', 'catalogs', 'datasets')",
+    )
+    badge_singular_si = models.CharField(
+        max_length=50,
+        blank=True,
+        default="ගොනුව",
+        verbose_name="Badge Singular (සිංහල)",
+        help_text="ඒකවචන ලේබලය (උදා: 'ගොනුව', 'සිතියම', 'නාමාවලිය', 'කාඩ්පත', 'වාර්තාව')",
+    )
+    badge_plural_si = models.CharField(
+        max_length=50,
+        blank=True,
+        default="ගොනු",
+        verbose_name="Badge Plural (සිංහල)",
+        help_text="බහුවචන ලේබලය (උදා: 'ගොනු', 'සිතියම්', 'නාමාවලි', 'කාඩ්පත්', 'වාර්තා')",
+    )
+    badge_singular_ta = models.CharField(
+        max_length=50,
+        blank=True,
+        default="கோப்பு",
+        verbose_name="Badge Singular (தமிழ்)",
+        help_text="ஒருமை லேபிள்கள் (எ.கா. 'கோப்பு', 'வரைபடம்', 'அட்டை')",
+    )
+    badge_plural_ta = models.CharField(
+        max_length=50,
+        blank=True,
+        default="கோப்புகள்",
+        verbose_name="Badge Plural (தமிழ்)",
+        help_text="பன்மை லேபிள்கள் (எ.கா. 'கோப்புகள்', 'வரைபடங்கள்', 'அட்டைகள்')",
+    )
+
     icon_type = models.CharField(
         max_length=30,
         choices=CATEGORY_ICON_CHOICES,
