@@ -267,7 +267,7 @@ export function ContactForm({ departments, settings }: ContactFormProps) {
                     {/* Email Address */}
                     <div>
                       <label htmlFor="email" className="block text-xs font-bold text-slate-700 mb-1">
-                        {tLabels.emailAddress} <span className="text-red-500">*</span>
+                        {tLabels.email} <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="email"

@@ -134,11 +134,13 @@ class ContactOfficerAdmin(admin.ModelAdmin):
         "designation_en",
         "department",
         "telephone",
+        "mobile",
+        "fax",
         "email",
         "order",
     )
     list_filter = ("department",)
-    search_fields = ("name_en", "designation_en", "telephone", "email")
+    search_fields = ("name_en", "designation_en", "telephone", "mobile", "email")
     list_editable = ("order",)
     fieldsets = (
         (
