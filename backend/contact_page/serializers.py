@@ -39,6 +39,7 @@ class ContactOfficerSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
     notes = serializers.SerializerMethodField()
+    extra_data = serializers.SerializerMethodField()
 
     class Meta:
         model = ContactOfficer
@@ -68,11 +69,52 @@ class ContactOfficerSerializer(serializers.ModelSerializer):
     def get_notes(self, obj):
         return resolve_lang(obj, "notes", self.context)
 
+    def get_extra_data(self, obj):
+        lang = self.context.get("lang", "en") if self.context else "en"
+        data = dict(obj.extra_data) if isinstance(obj.extra_data, dict) else {}
+
+        # Merge dynamic custom columns 1..5
+        dept = obj.department
+        if dept:
+            for i in range(1, 6):
+                c_en = getattr(dept, f"custom_col_{i}_name_en", "").strip()
+                c_si = getattr(dept, f"custom_col_{i}_name_si", "").strip() or c_en
+                c_ta = getattr(dept, f"custom_col_{i}_name_ta", "").strip() or c_en
+
+                v_en = getattr(obj, f"custom_col_{i}_val_en", "").strip()
+                v_si = getattr(obj, f"custom_col_{i}_val_si", "").strip() or v_en
+                v_ta = getattr(obj, f"custom_col_{i}_val_ta", "").strip() or v_en
+
+                if c_en:
+                    # Select localized value
+                    if lang == "si":
+                        val = v_si or v_en
+                    elif lang == "ta":
+                        val = v_ta or v_en
+                    else:
+                        val = v_en
+
+                    if val:
+                        # Key by localized column name
+                        if lang == "si" and c_si:
+                            data[c_si] = val
+                        elif lang == "ta" and c_ta:
+                            data[c_ta] = val
+                        else:
+                            data[c_en] = val
+
+                        # Also key by English name as fallback
+                        data[c_en] = val
+                        data[f"custom_{i}"] = val
+
+        return data
+
 
 class ContactDepartmentSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
+    custom_columns = serializers.SerializerMethodField()
     officers = serializers.SerializerMethodField()
     officers_count = serializers.SerializerMethodField()
 
@@ -97,6 +139,10 @@ class ContactDepartmentSerializer(serializers.ModelSerializer):
 
     def get_location(self, obj):
         return resolve_lang(obj, "location", self.context)
+
+    def get_custom_columns(self, obj):
+        lang = self.context.get("lang", "en") if self.context else "en"
+        return obj.get_columns_for_lang(lang)
 
     def get_officers(self, obj):
         active_officers = obj.officers.all()

@@ -32,25 +32,38 @@ class ContactOfficerInline(admin.StackedInline):
             },
         ),
         (
-            "Multilingual Names & Extra Notes (Optional)",
+            "Custom Column Values (අභිරුචි තීරු දත්ත / தனிப்பயன் நெடுவரிசை மதிப்புகள்)",
+            {
+                "fields": (
+                    ("custom_col_1_val_en", "custom_col_1_val_si", "custom_col_1_val_ta"),
+                    ("custom_col_2_val_en", "custom_col_2_val_si", "custom_col_2_val_ta"),
+                    ("custom_col_3_val_en", "custom_col_3_val_si", "custom_col_3_val_ta"),
+                    ("custom_col_4_val_en", "custom_col_4_val_si", "custom_col_4_val_ta"),
+                    ("custom_col_5_val_en", "custom_col_5_val_si", "custom_col_5_val_ta"),
+                ),
+                "description": (
+                    "Enter officer values for the Custom Columns defined in the Department above. "
+                    "For numeric or short data (e.g. extension '402'), filling English is sufficient. "
+                    "For text descriptions, you can also fill Sinhala and Tamil fields."
+                ),
+            },
+        ),
+        (
+            "Multilingual Officer Details (සිංහල & தமிழ்)",
             {
                 "classes": ("collapse",),
                 "fields": (
                     ("designation_si", "name_si", "location_si"),
                     ("designation_ta", "name_ta", "location_ta"),
-                    "notes_en",
+                    ("notes_en", "notes_si", "notes_ta"),
                 ),
             },
         ),
         (
-            "Newly Added Custom Column Values (e.g. Notes1, Notes2, Extension)",
+            "Advanced Extra Data (JSON)",
             {
+                "classes": ("collapse",),
                 "fields": ("extra_data",),
-                "description": (
-                    "If you added new custom columns under 'Custom Table Columns' above (e.g. Notes1, Notes2, Extension), "
-                    "enter their data as a JSON dictionary here. "
-                    'Example: {"Notes1": "Priority Desk", "Notes2": "Shift A", "Extension": "402"}'
-                ),
             },
         ),
     )
@@ -105,17 +118,38 @@ class ContactDepartmentAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Table Customization & Settings",
+            "New Custom Table Columns (අභිරුචි තීරු ශීර්ෂයන් / தனிப்பயன் நெடுவரிசைகள்)",
             {
                 "fields": (
-                    "custom_columns",
+                    ("custom_col_1_name_en", "custom_col_1_name_si", "custom_col_1_name_ta"),
+                    ("custom_col_2_name_en", "custom_col_2_name_si", "custom_col_2_name_ta"),
+                    ("custom_col_3_name_en", "custom_col_3_name_si", "custom_col_3_name_ta"),
+                    ("custom_col_4_name_en", "custom_col_4_name_si", "custom_col_4_name_ta"),
+                    ("custom_col_5_name_en", "custom_col_5_name_si", "custom_col_5_name_ta"),
+                ),
+                "description": (
+                    "Add new columns to this department table with their English, Sinhala, and Tamil headers. "
+                    "Example: Column 1 = Extension (දිගුව / நீட்டிப்பு), Column 2 = Cadre Unit (කාඩර් ඒකකය / பதவி பிரிவு)."
+                ),
+            },
+        ),
+        (
+            "Display Order & Status",
+            {
+                "fields": (
                     "order",
                     "is_active",
                 ),
+            },
+        ),
+        (
+            "Advanced Base Columns List (Optional)",
+            {
+                "classes": ("collapse",),
+                "fields": ("custom_columns",),
                 "description": (
-                    "Define custom column names for this department contact table as a JSON array, "
-                    "e.g. ['Designation', 'Officer Name', 'Telephone', 'Mobile', 'Fax', 'Email', 'Location']. "
-                    "You can add or remove columns here to customize the table structure."
+                    "Raw JSON list of base columns: ['Designation', 'Officer Name', 'Telephone', 'Mobile', 'Fax', 'Email']. "
+                    "Any custom columns added above are automatically appended to this list with their translations."
                 ),
             },
         ),
@@ -166,13 +200,19 @@ class ContactOfficerAdmin(admin.ModelAdmin):
             },
         ),
         (
-            "Newly Added Custom Column Values (e.g. Notes1, Notes2, Extension)",
+            "Custom Column Values (අභිරුචි තීරු දත්ත / தனிப்பயன் நெடுவரிசை மதிப்புகள்)",
             {
-                "fields": ("extra_data",),
+                "fields": (
+                    ("custom_col_1_val_en", "custom_col_1_val_si", "custom_col_1_val_ta"),
+                    ("custom_col_2_val_en", "custom_col_2_val_si", "custom_col_2_val_ta"),
+                    ("custom_col_3_val_en", "custom_col_3_val_si", "custom_col_3_val_ta"),
+                    ("custom_col_4_val_en", "custom_col_4_val_si", "custom_col_4_val_ta"),
+                    ("custom_col_5_val_en", "custom_col_5_val_si", "custom_col_5_val_ta"),
+                ),
                 "description": (
-                    "If you added new custom columns under 'Custom Table Columns' in Department & Division Categories "
-                    "(e.g. Notes1, Notes2, Extension), enter their data as a JSON dictionary here. "
-                    'Example: {"Notes1": "Priority Desk", "Notes2": "Shift A", "Extension": "402"}'
+                    "Enter officer values for the Custom Columns defined in the Department. "
+                    "For numeric or short data (e.g. extension '402'), filling English is sufficient. "
+                    "For text descriptions, you can also fill Sinhala and Tamil fields."
                 ),
             },
         ),
@@ -185,6 +225,13 @@ class ContactOfficerAdmin(admin.ModelAdmin):
                     ("designation_ta", "name_ta", "location_ta"),
                     ("notes_si", "notes_ta"),
                 ),
+            },
+        ),
+        (
+            "Advanced Extra Data (JSON)",
+            {
+                "classes": ("collapse",),
+                "fields": ("extra_data",),
             },
         ),
     )

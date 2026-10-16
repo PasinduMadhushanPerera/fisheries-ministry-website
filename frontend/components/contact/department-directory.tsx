@@ -67,7 +67,7 @@ export function DepartmentDirectory({
   ]
 
   const COLUMN_TRANSLATIONS: Record<string, { en: string; si: string; ta: string }> = {
-    "designation": { en: "Designation", si: "තනතුර", ta: "පதவி" },
+    "designation": { en: "Designation", si: "තනතුර", ta: "பதவி" },
     "officer name": { en: "Officer Name", si: "නිලධාරියාගේ නම", ta: "அதிகாரியின் பெயர்" },
     "name": { en: "Name", si: "නම", ta: "பெயர்" },
     "telephone": { en: "Telephone", si: "ස්ථාවර දුරකථන", ta: "தொலைபேசி" },
@@ -123,19 +123,36 @@ export function DepartmentDirectory({
       return "officer_name"
     }
 
-    // 3. Combined Telephone / Mobile (only if BOTH are explicitly present in the header)
-    if (
-      (norm.includes("telephone") && norm.includes("mobile")) ||
-      (norm.includes("phone") && norm.includes("mobile")) ||
-      (norm.includes("දුරකථන") && norm.includes("ජංගම")) ||
-      (norm.includes("தொலைபேசி") && norm.includes("கைபேசி")) ||
+    // 3. Combined Telephone & Mobile (ONLY if there is a separator like '/', '&', 'සහ', 'and' or an explicit dual title)
+    const isDualWithSeparator =
+      (norm.includes("/") ||
+        norm.includes("&") ||
+        norm.includes(" සහ ") ||
+        norm.includes(" and ") ||
+        norm.includes(" හෝ ")) &&
+      (norm.includes("tel") ||
+        norm.includes("phone") ||
+        norm.includes("ස්ථාවර") ||
+        norm.includes("දුරකථන") ||
+        norm.includes("தொலைபேசி")) &&
+      (norm.includes("mob") ||
+        norm.includes("cell") ||
+        norm.includes("ජංගම") ||
+        norm.includes("கைபேசி"))
+
+    const isExplicitCombined =
       norm === "telephone / mobile" ||
       norm === "telephone/mobile" ||
       norm === "phone / mobile" ||
       norm === "phone/mobile" ||
       norm === "tel / mob" ||
-      norm === "tel/mob"
-    ) {
+      norm === "tel/mob" ||
+      norm === "දුරකථන / ජංගම" ||
+      norm === "ස්ථාවර / ජංගම" ||
+      norm === "ස්ථාවර / ජංගම දුරකථන" ||
+      norm === "தொலைபேசி / கைபேசி"
+
+    if (isDualWithSeparator || isExplicitCombined) {
       return "combined_phone"
     }
 
@@ -657,6 +674,11 @@ export function DepartmentDirectory({
                                   extraData[colName] ||
                                   extraData[colName.trim()] ||
                                   extraData[normCol] ||
+                                  (typeof extraData === "object"
+                                    ? Object.entries(extraData).find(
+                                        ([k]) => k.trim().toLowerCase() === normCol
+                                      )?.[1]
+                                    : null) ||
                                   null
 
                                 return (

@@ -165,6 +165,27 @@ class ContactDepartment(models.Model):
         verbose_name="Custom Table Columns"
     )
 
+    # Dynamic Multilingual Custom Columns (Up to 5 custom columns per department table)
+    custom_col_1_name_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 1 Header (English)")
+    custom_col_1_name_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 1 Header (සිංහල)")
+    custom_col_1_name_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 1 Header (தமிழ்)")
+
+    custom_col_2_name_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 2 Header (English)")
+    custom_col_2_name_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 2 Header (සිංහල)")
+    custom_col_2_name_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 2 Header (தமிழ்)")
+
+    custom_col_3_name_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 3 Header (English)")
+    custom_col_3_name_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 3 Header (සිංහල)")
+    custom_col_3_name_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 3 Header (தமிழ்)")
+
+    custom_col_4_name_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 4 Header (English)")
+    custom_col_4_name_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 4 Header (සිංහල)")
+    custom_col_4_name_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 4 Header (தமிழ்)")
+
+    custom_col_5_name_en = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 5 Header (English)")
+    custom_col_5_name_si = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 5 Header (සිංහල)")
+    custom_col_5_name_ta = models.CharField(max_length=255, blank=True, default="", verbose_name="Custom Column 5 Header (தமிழ்)")
+
     order = models.PositiveIntegerField(default=0, verbose_name="Display Order")
     is_active = models.BooleanField(default=True, verbose_name="Is Active")
 
@@ -179,11 +200,61 @@ class ContactDepartment(models.Model):
     def __str__(self):
         return self.name_en
 
+    def get_columns_for_lang(self, lang="en"):
+        """
+        Returns the resolved list of table column names for the given language.
+        Combines base custom_columns (or defaults) with any defined custom_col_1..5.
+        """
+        STANDARD_COL_MAP = {
+            "designation": {"en": "Designation", "si": "තනතුර", "ta": "பதவி"},
+            "officer name": {"en": "Officer Name", "si": "නිලධාරියාගේ නම", "ta": "அதிகாரியின் பெயர்"},
+            "name": {"en": "Name", "si": "නම", "ta": "பெயர்"},
+            "telephone": {"en": "Telephone", "si": "ස්ථාවර දුරකථන", "ta": "தொலைபேசி"},
+            "mobile": {"en": "Mobile", "si": "ජංගම දුරකථන", "ta": "கைபேசி"},
+            "telephone / mobile": {"en": "Telephone / Mobile", "si": "දුරකථන / ජංගම", "ta": "தொலைபேசி / கைபேசி"},
+            "fax": {"en": "Fax", "si": "ෆැක්ස්", "ta": "தொலைநகல்"},
+            "email": {"en": "Email", "si": "විද්‍යුත් තැපෑල", "ta": "மின்னஞ்சல்"},
+            "email address": {"en": "Email Address", "si": "විද්‍යුත් තැපැල් ලිපිනය", "ta": "மின்னஞ்சல் முகவரி"},
+            "room / location": {"en": "Room / Location", "si": "කාමරය / ස්ථානය", "ta": "அறை / இடம்"},
+            "location": {"en": "Location", "si": "ස්ථානය", "ta": "இடம்"},
+            "notes": {"en": "Notes", "si": "සටහන්", "ta": "குறிப்புகள்"},
+        }
+
+        # Base columns
+        base_cols = list(self.custom_columns) if (self.custom_columns and len(self.custom_columns) > 0) else [
+            "Designation", "Officer Name", "Telephone", "Mobile", "Fax", "Email"
+        ]
+
+        result = []
+        for col in base_cols:
+            col_norm = col.strip().lower()
+            if col_norm in STANDARD_COL_MAP and lang in ("si", "ta"):
+                result.append(STANDARD_COL_MAP[col_norm].get(lang, col))
+            else:
+                result.append(col)
+
+        # Append defined custom columns 1..5
+        for i in range(1, 6):
+            c_en = getattr(self, f"custom_col_{i}_name_en", "").strip()
+            c_si = getattr(self, f"custom_col_{i}_name_si", "").strip() or c_en
+            c_ta = getattr(self, f"custom_col_{i}_name_ta", "").strip() or c_en
+            if c_en:
+                if lang == "si":
+                    val = c_si
+                elif lang == "ta":
+                    val = c_ta
+                else:
+                    val = c_en
+                if val not in result:
+                    result.append(val)
+
+        return result
+
 
 class ContactOfficer(models.Model):
     """
     Individual officer row inside a Department contact table.
-    Supports structured fields and flexible custom JSON column values.
+    Supports structured fields, multilingual custom column values, and flexible JSON values.
     """
     department = models.ForeignKey(
         ContactDepartment,
@@ -213,6 +284,27 @@ class ContactOfficer(models.Model):
     notes_si = models.TextField(blank=True, default="", verbose_name="Notes / Remarks (සිංහල)")
     notes_ta = models.TextField(blank=True, default="", verbose_name="Notes / Remarks (தமிழ்)")
 
+    # Dynamic Multilingual Custom Column Values (Values for custom_col_1..5)
+    custom_col_1_val_en = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 1 Value (English)")
+    custom_col_1_val_si = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 1 Value (සිංහල)")
+    custom_col_1_val_ta = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 1 Value (தமிழ்)")
+
+    custom_col_2_val_en = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 2 Value (English)")
+    custom_col_2_val_si = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 2 Value (සිංහල)")
+    custom_col_2_val_ta = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 2 Value (தமிழ்)")
+
+    custom_col_3_val_en = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 3 Value (English)")
+    custom_col_3_val_si = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 3 Value (සිංහල)")
+    custom_col_3_val_ta = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 3 Value (தமிழ்)")
+
+    custom_col_4_val_en = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 4 Value (English)")
+    custom_col_4_val_si = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 4 Value (සිංහල)")
+    custom_col_4_val_ta = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 4 Value (தமிழ்)")
+
+    custom_col_5_val_en = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 5 Value (English)")
+    custom_col_5_val_si = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 5 Value (සිංහල)")
+    custom_col_5_val_ta = models.CharField(max_length=500, blank=True, default="", verbose_name="Custom Column 5 Value (தமிழ்)")
+
     # Flexible key-value pairs for additional admin-defined dynamic table columns
     extra_data = models.JSONField(
         default=dict,
@@ -233,6 +325,35 @@ class ContactOfficer(models.Model):
 
     def __str__(self):
         return f"{self.designation_en} - {self.name_en} ({self.department.name_en})"
+
+    def save(self, *args, **kwargs):
+        if not isinstance(self.extra_data, dict):
+            self.extra_data = {}
+
+        # Auto-sync custom column values into extra_data dictionary
+        if self.department_id:
+            try:
+                dept = self.department
+                for i in range(1, 6):
+                    c_en = getattr(dept, f"custom_col_{i}_name_en", "").strip()
+                    c_si = getattr(dept, f"custom_col_{i}_name_si", "").strip() or c_en
+                    c_ta = getattr(dept, f"custom_col_{i}_name_ta", "").strip() or c_en
+
+                    v_en = getattr(self, f"custom_col_{i}_val_en", "").strip()
+                    v_si = getattr(self, f"custom_col_{i}_val_si", "").strip()
+                    v_ta = getattr(self, f"custom_col_{i}_val_ta", "").strip()
+
+                    if c_en:
+                        if v_en:
+                            self.extra_data[c_en] = v_en
+                        if v_si and c_si:
+                            self.extra_data[c_si] = v_si
+                        if v_ta and c_ta:
+                            self.extra_data[c_ta] = v_ta
+            except Exception:
+                pass
+
+        super().save(*args, **kwargs)
 
 
 class ContactFaq(models.Model):
