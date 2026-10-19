@@ -98,8 +98,8 @@ def custom_admin_password_change_view(request):
         if new_password1 or new_password2:
             if new_password1 != new_password2:
                 errors.append("❌ New passwords do not match.")
-            elif len(new_password1) < 4:
-                errors.append("❌ New password must be at least 4 characters long.")
+            elif len(new_password1) < 6:
+                errors.append("❌ New password must be at least 6 characters long for security.")
 
         if not errors:
             username_changed = new_username != request.user.username
@@ -112,6 +112,27 @@ def custom_admin_password_change_view(request):
 
             # Maintain session login state
             update_session_auth_hash(request, request.user)
+
+            # Record in Audit History
+            try:
+                from django.contrib.admin.models import LogEntry, CHANGE
+                from django.contrib.contenttypes.models import ContentType
+                log_details = []
+                if username_changed:
+                    log_details.append(f"Username changed to '{new_username}'")
+                if password_changed:
+                    log_details.append("Password updated")
+                if log_details:
+                    LogEntry.objects.log_action(
+                        user_id=request.user.pk,
+                        content_type_id=ContentType.objects.get_for_model(request.user).pk,
+                        object_id=str(request.user.pk),
+                        object_repr=str(request.user.username),
+                        action_flag=CHANGE,
+                        change_message=f"Account settings updated: {', '.join(log_details)}",
+                    )
+            except Exception as log_err:
+                print("Failed to log account change:", log_err)
 
             if username_changed and password_changed:
                 messages.success(request, f"🎉 Account settings updated successfully! Your username is now '{new_username}' and your password has been changed.")

@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     "pages",
     "navigation",
     "core_content",
+    "audit_log",
 ]
 
 # Email Backend Configuration for Contact Form

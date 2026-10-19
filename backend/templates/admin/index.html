@@ -198,6 +198,14 @@
       <a href="http://localhost:3000/" target="_blank" rel="noopener noreferrer" class="cms-quick-action-btn cms-btn-primary">
         <span>🌐</span> Open Live Website
       </a>
+      <a href="/admin/audit_log/auditlogentry/" class="cms-quick-action-btn cms-btn-secondary" style="background: rgba(34, 197, 94, 0.25); border-color: rgba(134, 239, 172, 0.5);">
+        <span>📜</span> Activity History (ක්‍රියාකාරකම් ඉතිහාසය)
+      </a>
+      {% if request.user.is_superuser %}
+      <a href="{% url 'admin:auth_user_add' %}" class="cms-quick-action-btn cms-btn-secondary" style="background: rgba(59, 130, 246, 0.25); border-color: rgba(147, 197, 253, 0.5);">
+        <span>👤➕</span> Add User (පරිශීලකයෙකු එක් කරන්න)
+      </a>
+      {% endif %}
       <a href="{% url 'admin:news_newsarticleitem_add' %}" class="cms-quick-action-btn cms-btn-secondary">
         <span>➕</span> Publish News Article
       </a>
@@ -230,13 +238,15 @@
         <p>Fully Editable</p>
       </div>
     </div>
-    <div class="cms-stat-card">
-      <div class="cms-stat-icon purple">🛡️</div>
-      <div class="cms-stat-info">
-        <h4>Access Role</h4>
-        <p>Administrator</p>
+    <a href="/admin/audit_log/auditlogentry/" style="text-decoration: none; color: inherit;">
+      <div class="cms-stat-card" style="cursor: pointer;">
+        <div class="cms-stat-icon purple">📜</div>
+        <div class="cms-stat-info">
+          <h4>Audit Trail</h4>
+          <p>Activity History</p>
+        </div>
       </div>
-    </div>
+    </a>
   </div>
 
   <!-- 3. Active App Modules -->
@@ -246,7 +256,9 @@
         <table>
           <caption>
             <a href="{{ app.app_url }}" class="section" title="{% blocktranslate with name=app.name %}Models in the {{ name }} application{% endblocktranslate %}">
-              {% if app.app_label == 'header_footer' %}
+              {% if app.app_label == 'audit_log' %}
+                <span>📜</span>
+              {% elif app.app_label == 'header_footer' %}
                 <span>⚙️</span>
               {% elif app.app_label == 'home_page' %}
                 <span>🏠</span>

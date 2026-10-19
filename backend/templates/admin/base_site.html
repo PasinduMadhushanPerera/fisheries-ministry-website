@@ -2411,14 +2411,28 @@
     <span>🌐</span>
     <span>View Live Site</span>
   </a>
+  {% if user.is_superuser %}
+  <a href="{% url 'admin:auth_user_changelist' %}" class="header-action-btn" title="Manage Users & Add User (පරිශීලක කළමනාකරණය)">
+    <span>👥</span>
+    <span>Users</span>
+  </a>
+  <a href="{% url 'admin:auth_user_add' %}" class="header-action-btn" title="Add User (නව පරිශීලකයෙකු එක් කරන්න)">
+    <span>👤➕</span>
+    <span>Add User</span>
+  </a>
+  {% endif %}
   <a href="/admin/header_footer/sitemaintenancesetting/" id="header-maintenance-btn" class="header-maintenance-btn" title="Site Maintenance Settings & Security Control">
     <span id="maint-btn-icon">🚨</span>
     <span id="maint-btn-label">Maintenance Mode</span>
     <span id="maint-btn-status-badge" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 9999px; background: rgba(255,255,255,0.2); color: #ffffff; font-weight: 800; margin-left: 2px;">OFF</span>
   </a>
-  <a href="{% url 'admin:password_change' %}" class="header-action-btn" title="Change Password">
-    <span>🔑</span>
-    <span>Password</span>
+  <a href="/admin/audit_log/auditlogentry/" class="header-action-btn" title="View CMS Activity History & Audit Log (ක්‍රියාකාරකම් ඉතිහාසය)">
+    <span>📜</span>
+    <span>History</span>
+  </a>
+  <a href="{% url 'admin:password_change' %}" class="header-action-btn" title="Account Settings & Password (පරිශීලක නාමය සහ මුරපදය)">
+    <span>👤</span>
+    <span>Account / Password</span>
   </a>
   <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
     {% csrf_token %}

@@ -22,6 +22,7 @@ _original_get_app_list = admin.site.get_app_list
 def custom_get_app_list(request, app_label=None):
     app_list = _original_get_app_list(request, app_label=app_label)
     allowed_apps = {
+        "audit_log",
         "header_footer",
         "home_page",
         "about",
@@ -61,6 +62,8 @@ def custom_get_app_list(request, app_label=None):
     
     def app_order(a):
         label = a.get("app_label")
+        if label == "audit_log":
+            return -1
         if label == "header_footer":
             return 0
         if label == "home_page":
