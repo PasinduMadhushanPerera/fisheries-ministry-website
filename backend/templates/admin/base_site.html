@@ -193,26 +193,49 @@
     letter-spacing: 0.06em !important;
   }
 
-  /* User tools */
+  /* ==========================================================================
+     USER TOOLS & COMPACT TOP BAR BUTTON SYSTEM
+     ========================================================================== */
   #user-tools {
     display: flex !important;
     align-items: center !important;
-    gap: 8px !important;
-    font-size: 0.84rem !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+    font-size: 0.76rem !important;
     color: #ffffff !important;
+    margin-left: auto !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .header-btn-cluster {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  .header-divider {
+    display: inline-block !important;
+    width: 1px !important;
+    height: 18px !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    margin: 0 3px !important;
+    flex-shrink: 0 !important;
   }
 
   .user-greeting-badge {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.18) !important;
-    border-radius: 9999px !important;
-    padding: 4px 12px !important;
+    border-radius: 7px !important;
+    padding: 0 9px !important;
+    height: 31px !important;
+    box-sizing: border-box !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
-    font-size: 0.80rem !important;
+    font-size: 0.76rem !important;
     font-weight: 600 !important;
     color: #e2e8f0 !important;
+    white-space: nowrap !important;
   }
 
   .user-greeting-badge strong {
@@ -221,81 +244,112 @@
   }
 
   .user-role-tag {
-    background: #22c55e !important;
-    color: #06261c !important;
-    font-size: 0.65rem !important;
+    font-size: 0.62rem !important;
     font-weight: 900 !important;
-    padding: 1px 6px !important;
+    padding: 2px 6px !important;
     border-radius: 9999px !important;
     text-transform: uppercase !important;
     letter-spacing: 0.04em !important;
+    line-height: 1 !important;
   }
 
+  .user-role-tag.role-superuser {
+    background: #f59e0b !important;
+    color: #1e1b4b !important;
+    border: 1px solid #fde68a !important;
+  }
+
+  .user-role-tag.role-staff {
+    background: #22c55e !important;
+    color: #052e16 !important;
+    border: 1px solid #86efac !important;
+  }
+
+  /* Universal Top Header Buttons - Compact & Balanced */
+  .live-site-btn,
+  .header-users-btn,
+  .header-add-user-btn,
+  .header-maintenance-btn,
+  .header-history-btn,
+  .header-account-btn,
+  .header-action-btn,
+  .header-logout-btn {
+    height: 31px !important;
+    line-height: 1 !important;
+    box-sizing: border-box !important;
+    padding: 0 9px !important;
+    border-radius: 7px !important;
+    font-size: 0.76rem !important;
+    font-weight: 800 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    user-select: none !important;
+  }
+
+  /* 1. Live Site Button (Emerald Green) */
   .live-site-btn {
     background: #16a34a !important;
     color: #ffffff !important;
-    border: 1px solid #86efac !important;
-    padding: 6px 14px !important;
-    border-radius: var(--radius-sm) !important;
-    font-weight: 800 !important;
-    font-size: 0.80rem !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    text-decoration: none !important;
-    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.35) !important;
-    transition: all 0.2s ease !important;
+    border: 1px solid #4ade80 !important;
+    box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3) !important;
   }
 
   .live-site-btn:hover {
     background: #15803d !important;
+    border-color: #86efac !important;
     color: #ffffff !important;
     transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(22, 163, 74, 0.45) !important;
   }
 
-  .header-action-btn {
-    background: rgba(255, 255, 255, 0.12) !important;
+  /* 2. Users Button (Royal Blue - Superadmin only) */
+  .header-users-btn {
+    background: rgba(59, 130, 246, 0.16) !important;
+    color: #dbeafe !important;
+    border: 1px solid rgba(147, 197, 253, 0.45) !important;
+  }
+
+  .header-users-btn:hover {
+    background: #2563eb !important;
+    border-color: #60a5fa !important;
     color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.22) !important;
-    padding: 6px 12px !important;
-    border-radius: var(--radius-sm) !important;
-    font-weight: 750 !important;
-    font-size: 0.80rem !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    text-decoration: none !important;
-    transition: all 0.2s ease !important;
-  }
-
-  .header-action-btn:hover {
-    background: #ffffff !important;
-    color: #0f172a !important;
     transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
   }
 
+  /* 3. Add User Button (Sky Cyan - Superadmin only) */
+  .header-add-user-btn {
+    background: rgba(14, 165, 233, 0.18) !important;
+    color: #e0f2fe !important;
+    border: 1px solid rgba(125, 211, 252, 0.45) !important;
+  }
+
+  .header-add-user-btn:hover {
+    background: #0284c7 !important;
+    border-color: #38bdf8 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4) !important;
+  }
+
+  /* 4. Maintenance Mode Button (Amber Warning) */
   .header-maintenance-btn {
-    background: rgba(234, 179, 8, 0.18) !important;
-    color: #fef08a !important;
-    border: 1px solid rgba(250, 204, 21, 0.45) !important;
-    padding: 6px 12px !important;
-    border-radius: var(--radius-sm) !important;
-    font-weight: 800 !important;
-    font-size: 0.80rem !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    text-decoration: none !important;
-    transition: all 0.2s ease !important;
+    background: rgba(245, 158, 11, 0.16) !important;
+    color: #fef3c7 !important;
+    border: 1px solid rgba(252, 211, 77, 0.45) !important;
   }
 
   .header-maintenance-btn:hover {
-    background: #eab308 !important;
-    color: #0f172a !important;
-    border-color: #eab308 !important;
+    background: #d97706 !important;
+    border-color: #f59e0b !important;
+    color: #ffffff !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(234, 179, 8, 0.35) !important;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4) !important;
   }
 
   .header-maintenance-btn.maint-active {
@@ -310,6 +364,65 @@
     0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
     70% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
     100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+  }
+
+  /* 5. Activity History Button (Royal Violet) */
+  .header-history-btn {
+    background: rgba(168, 85, 247, 0.16) !important;
+    color: #f3e8ff !important;
+    border: 1px solid rgba(216, 180, 254, 0.45) !important;
+  }
+
+  .header-history-btn:hover {
+    background: #9333ea !important;
+    border-color: #c084fc !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4) !important;
+  }
+
+  /* 6. Account Settings & Password Button (Modern Glass / Slate) */
+  .header-account-btn,
+  .header-action-btn {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.24) !important;
+  }
+
+  .header-account-btn:hover,
+  .header-action-btn:hover {
+    background: #ffffff !important;
+    border-color: #ffffff !important;
+    color: #0f172a !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.25) !important;
+  }
+
+  /* 7. Logout Form & Button (Danger Crimson) */
+  #user-tools #logout-form {
+    display: inline-flex !important;
+    align-items: center !important;
+    height: 31px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .header-logout-btn {
+    background: rgba(239, 68, 68, 0.16) !important;
+    color: #fee2e2 !important;
+    border: 1px solid rgba(248, 113, 113, 0.45) !important;
+    cursor: pointer !important;
+  }
+
+  .header-logout-btn:hover {
+    background: #dc2626 !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4) !important;
   }
 
   /* Prominent Extra Large Toggle Container for Maintenance Mode Checkbox */
@@ -357,36 +470,7 @@
     line-height: 1.4 !important;
   }
 
-  #user-tools #logout-form {
-    display: inline-flex !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
 
-  .header-logout-btn {
-    background: rgba(239, 68, 68, 0.18) !important;
-    color: #fecaca !important;
-    border: 1px solid rgba(248, 113, 113, 0.45) !important;
-    padding: 6px 12px !important;
-    border-radius: var(--radius-sm) !important;
-    font-weight: 800 !important;
-    font-size: 0.80rem !important;
-    cursor: pointer !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    transition: all 0.2s ease !important;
-  }
-
-  .header-logout-btn:hover {
-    background: #dc2626 !important;
-    color: #ffffff !important;
-    border-color: #dc2626 !important;
-    transform: translateY(-1px) !important;
-  }
 
   /* Breadcrumbs */
   div.breadcrumbs {
@@ -1618,15 +1702,26 @@
     }
 
     .user-greeting-badge {
-      padding: 4px 8px !important;
+      height: 32px !important;
+      padding: 0 9px !important;
       font-size: 0.76rem !important;
     }
 
     .live-site-btn,
+    .header-users-btn,
+    .header-add-user-btn,
+    .header-maintenance-btn,
+    .header-history-btn,
+    .header-account-btn,
     .header-action-btn,
     .header-logout-btn {
-      padding: 5px 10px !important;
+      height: 32px !important;
+      padding: 0 9px !important;
       font-size: 0.76rem !important;
+    }
+
+    #user-tools #logout-form {
+      height: 32px !important;
     }
 
     nav#nav-sidebar,
@@ -1730,12 +1825,22 @@
     }
 
     .live-site-btn,
+    .header-users-btn,
+    .header-add-user-btn,
+    .header-maintenance-btn,
+    .header-history-btn,
+    .header-account-btn,
     .header-action-btn,
     .header-logout-btn {
-      padding: 4px 7px !important;
+      height: 30px !important;
+      padding: 0 8px !important;
       font-size: 0.72rem !important;
       border-radius: 6px !important;
       gap: 4px !important;
+    }
+
+    #user-tools #logout-form {
+      height: 30px !important;
     }
 
     /* Off-Canvas Mobile Drawer */
@@ -2402,45 +2507,66 @@
   <div class="user-greeting-badge">
     <span>👤</span>
     <strong>{% firstof user.get_short_name user.get_username %}</strong>
-    <span class="user-role-tag">Admin</span>
+    {% if user.is_superuser %}
+      <span class="user-role-tag role-superuser">👑 SUPER</span>
+    {% else %}
+      <span class="user-role-tag role-staff">👤 STAFF</span>
+    {% endif %}
   </div>
+  <span class="header-divider"></span>
 {% endblock %}
 
 {% block userlinks %}
-  <a href="http://localhost:3000/" target="_blank" rel="noopener noreferrer" class="live-site-btn" title="View Public Website">
+  <a href="http://localhost:3000/" target="_blank" rel="noopener noreferrer" class="live-site-btn" title="View Public Website (ප්‍රසිද්ධ වෙබ් අඩවිය)">
     <span>🌐</span>
-    <span>View Live Site</span>
+    <span>Live Site</span>
   </a>
+
   {% if user.is_superuser %}
-  <a href="{% url 'admin:auth_user_changelist' %}" class="header-action-btn" title="Manage Users & Add User (පරිශීලක කළමනාකරණය)">
-    <span>👥</span>
-    <span>Users</span>
-  </a>
-  <a href="{% url 'admin:auth_user_add' %}" class="header-action-btn" title="Add User (නව පරිශීලකයෙකු එක් කරන්න)">
-    <span>👤➕</span>
-    <span>Add User</span>
-  </a>
+  <span class="header-divider"></span>
+  <div class="header-btn-cluster">
+    <a href="{% url 'admin:auth_user_changelist' %}" class="header-users-btn" title="Manage Users (පරිශීලකයින් කළමනාකරණය)">
+      <span>👥</span>
+      <span>Users</span>
+    </a>
+    <a href="{% url 'admin:auth_user_add' %}" class="header-add-user-btn" title="Add New User (නව පරිශීලකයෙකු එක් කරන්න)">
+      <span>➕</span>
+      <span>Add</span>
+    </a>
+  </div>
   {% endif %}
-  <a href="/admin/header_footer/sitemaintenancesetting/" id="header-maintenance-btn" class="header-maintenance-btn" title="Site Maintenance Settings & Security Control">
-    <span id="maint-btn-icon">🚨</span>
-    <span id="maint-btn-label">Maintenance Mode</span>
-    <span id="maint-btn-status-badge" style="font-size: 0.65rem; padding: 2px 6px; border-radius: 9999px; background: rgba(255,255,255,0.2); color: #ffffff; font-weight: 800; margin-left: 2px;">OFF</span>
-  </a>
-  <a href="/admin/audit_log/auditlogentry/" class="header-action-btn" title="View CMS Activity History & Audit Log (ක්‍රියාකාරකම් ඉතිහාසය)">
-    <span>📜</span>
-    <span>History</span>
-  </a>
-  <a href="{% url 'admin:password_change' %}" class="header-action-btn" title="Account Settings & Password (පරිශීලක නාමය සහ මුරපදය)">
-    <span>👤</span>
-    <span>Account / Password</span>
-  </a>
-  <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
-    {% csrf_token %}
-    <button type="submit" class="header-logout-btn" title="Log out of CMS session">
-      <span>🚪</span>
-      <span>Log out</span>
-    </button>
-  </form>
+
+  <span class="header-divider"></span>
+
+  <div class="header-btn-cluster">
+    <a href="/admin/header_footer/sitemaintenancesetting/" id="header-maintenance-btn" class="header-maintenance-btn" title="Site Maintenance Settings & Security Control">
+      <span id="maint-btn-icon">🚨</span>
+      <span id="maint-btn-label">Maint</span>
+      <span id="maint-btn-status-badge" style="font-size: 0.62rem; padding: 1px 5px; border-radius: 9999px; background: rgba(255,255,255,0.2); color: #ffffff; font-weight: 800; margin-left: 2px;">OFF</span>
+    </a>
+
+    <a href="/admin/audit_log/auditlogentry/" class="header-history-btn" title="View CMS Activity History & Audit Log (ක්‍රියාකාරකම් ඉතිහාසය)">
+      <span>📜</span>
+      <span>History</span>
+    </a>
+  </div>
+
+  <span class="header-divider"></span>
+
+  <div class="header-btn-cluster">
+    <a href="{% url 'admin:password_change' %}" class="header-account-btn" title="Account Settings & Password (පරිශීලක නාමය සහ මුරපදය)">
+      <span>⚙️</span>
+      <span>Account</span>
+    </a>
+
+    <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="header-logout-btn" title="Log out of CMS session (පද්ධතියෙන් ඉවත් වන්න)">
+        <span>🚪</span>
+        <span>Logout</span>
+      </button>
+    </form>
+  </div>
 {% endblock %}
 
 {% block footer %}
@@ -2459,7 +2585,7 @@
           if (data && data.is_maintenance_mode) {
             btn.classList.add('maint-active');
             if (icon) icon.textContent = '🔴';
-            if (label) label.textContent = 'Maintenance ON';
+            if (label) label.textContent = 'Maint ON';
             if (badge) {
               badge.textContent = 'ACTIVE';
               badge.style.background = '#ffffff';
@@ -2468,7 +2594,7 @@
           } else {
             btn.classList.remove('maint-active');
             if (icon) icon.textContent = '🚨';
-            if (label) label.textContent = 'Maintenance Mode';
+            if (label) label.textContent = 'Maint';
             if (badge) {
               badge.textContent = 'OFF';
               badge.style.background = 'rgba(255,255,255,0.2)';
