@@ -266,9 +266,20 @@ export function SiteFooter({
     activeFooter?.developed_by_text !== undefined
       ? activeFooter.developed_by_text
       : d.developedByText
-  const lastUpdatedText =
-    activeFooter?.last_updated_text ||
-    (currentLang === "si" ? "2026 අගෝස්තු 25" : currentLang === "ta" ? "25 ஆகஸ்ட் 2026" : "25 August 2026")
+  const defaultUpdatedText = (() => {
+    const now = new Date()
+    const d = now.getDate()
+    const y = now.getFullYear()
+    const m = now.getMonth()
+    const monthsSi = ["ජනවාරි", "පෙබරවාරි", "මාර්තු", "අප්‍රේල්", "මැයි", "ජූනි", "ජූලි", "අගෝස්තු", "සැප්තැම්බර්", "ඔක්තෝබර්", "නොවැම්බර්", "දෙසැම්බර්"]
+    const monthsTa = ["ஜனவரி", "பிப்ரவரி", "மார்ச்", "ஏப்ரல்", "மே", "ஜூன்", "ஜூலை", "ஆகஸ்ட்", "செப்டம்பர்", "அக்டோபர்", "நவம்பர்", "டிசம்பர்"]
+    const monthsEn = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    if (currentLang === "si") return `${y} ${monthsSi[m]} ${d}`
+    if (currentLang === "ta") return `${d} ${monthsTa[m]} ${y}`
+    return `${d} ${monthsEn[m]} ${y}`
+  })()
+
+  const lastUpdatedText = activeFooter?.last_updated_text || defaultUpdatedText
   const lastUpdatedPrefix = activeFooter?.last_updated_prefix || d.lastUpdatedPrefix
   const websiteViewsPrefix = activeFooter?.website_views_prefix || d.websiteViewsPrefix
 

@@ -19,7 +19,7 @@ export function UtilityBar({ initialHeader }: { initialHeader?: ApiHeaderSetting
 
   const isTranslated = language === "si" || language === "ta"
 
-  const hotlinePhone = initialHeader?.hotline_phone || "+94 112 327 060"
+  const hotlinePhone = initialHeader?.hotline_phone || "+94 112 446 183"
   const email = initialHeader?.email || "info@fisheries.gov.lk"
   const helpLinkText = isTranslated ? t.utilityBar.getHelp : (initialHeader?.help_link_text || t.utilityBar.getHelp || "Get help & contact")
   const helpLinkUrl = initialHeader?.help_link_url || "/contact"

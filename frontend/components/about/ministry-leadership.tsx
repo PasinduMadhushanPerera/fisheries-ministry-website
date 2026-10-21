@@ -1,40 +1,111 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, UserRound } from "lucide-react"
 
-import { leadershipRoles } from "@/data/about"
+import { useLanguage } from "@/src/contexts/LanguageContext"
 import { Card } from "@/components/ui/card"
 import { Section } from "@/components/ui/section"
 import { SectionTitle } from "@/components/ui/section-title"
-import { ApiLeader, ApiSectionHeader } from "@/lib/api/about"
+import { ApiLeader, ApiSectionHeader, fetchAboutPageData } from "@/lib/api/about"
+
+const localizedDefaults = {
+  en: {
+    eyebrow: "Leadership",
+    title: "Ministry leadership",
+    description: "Executive leadership of the Ministry of Fisheries, Aquatic and Ocean Resources.",
+    buttonText: "View leadership profile",
+  },
+  si: {
+    eyebrow: "නායකත්වය",
+    title: "අමාත්‍යාංශ නායකත්වය",
+    description: "ධීවර, ජලජ සහ සාගර සම්පත් අමාත්‍යාංශයේ විධායක නායකත්වය.",
+    buttonText: "නායකත්ව පැතිකඩ බලන්න",
+  },
+  ta: {
+    eyebrow: "தலைமைத்துவம்",
+    title: "அமைச்சின் தலைமைத்துவம்",
+    description: "கடற்றொழில், நீரியல் மற்றும் கடல்சார் வளங்கள் அமைச்சின் நிறைவேற்று தலைமைத்துவம்.",
+    buttonText: "தலைமைத்துவ சுயவிவரத்தைப் பார்க்கவும்",
+  },
+}
 
 export function MinistryLeadership({
   initialHeader,
   initialLeaders,
+  lang,
 }: {
   initialHeader?: ApiSectionHeader
   initialLeaders?: ApiLeader[]
+  lang?: string
 }) {
-  const eyebrow = initialHeader?.eyebrow || "Leadership"
-  const title = initialHeader?.title || "Ministry leadership"
-  const description =
-    initialHeader?.description ||
-    "Executive leadership of the Ministry of Fisheries, Aquatic and Ocean Resources."
+  const { language } = useLanguage()
+  const [activeLang, setActiveLang] = useState<"en" | "si" | "ta">(
+    (lang as "en" | "si" | "ta") || (language as "en" | "si" | "ta") || "en"
+  )
+
+  useEffect(() => {
+    if (language) {
+      setActiveLang(language as "en" | "si" | "ta")
+    }
+  }, [language])
+
+  useEffect(() => {
+    if (lang) {
+      setActiveLang(lang as "en" | "si" | "ta")
+    }
+  }, [lang])
+
+  const defaults = localizedDefaults[activeLang] || localizedDefaults.en
+
+  const [header, setHeader] = useState<ApiSectionHeader | undefined>(initialHeader)
+  const [leadersData, setLeadersData] = useState<ApiLeader[]>(initialLeaders || [])
+
+  useEffect(() => {
+    if (initialHeader) setHeader(initialHeader)
+  }, [initialHeader])
+
+  useEffect(() => {
+    if (initialLeaders && initialLeaders.length > 0) setLeadersData(initialLeaders)
+  }, [initialLeaders])
+
+  // Sync client-side when language changes
+  useEffect(() => {
+    let isCancelled = false
+    fetchAboutPageData(language).then((data) => {
+      if (isCancelled || !data) return
+      if (data.leadership_header) {
+        setHeader(data.leadership_header)
+      }
+      const newLeaders = data.leaders || (data as any).leadership
+      if (newLeaders && newLeaders.length > 0) {
+        setLeadersData(newLeaders)
+      }
+    }).catch(() => {})
+
+    return () => {
+      isCancelled = true
+    }
+  }, [language])
+
+  const eyebrow = header?.eyebrow || defaults.eyebrow
+  const title = header?.title || defaults.title
+  const description = header?.description || defaults.description
+  const buttonText = defaults.buttonText
 
   const leaders =
-    initialLeaders && initialLeaders.length > 0
-      ? initialLeaders.map((l) => ({
+    leadersData && leadersData.length > 0
+      ? leadersData.map((l) => ({
           role: l.role_title,
           title: l.name,
           ministry: l.ministry_badge,
           description: l.short_description,
-          image: l.photo_url,
-          href: l.page_url,
+          image: l.photo_url || "/images/leadership/minister.jpg",
+          href: l.page_url || "#",
         }))
-      : leadershipRoles
+      : []
 
   return (
     <Section
@@ -51,8 +122,12 @@ export function MinistryLeadership({
       />
 
       <div className="mt-12 grid gap-6 lg:grid-cols-3 items-stretch">
-        {leaders.map((leader) => (
-          <LeadershipCardComponent key={leader.role + leader.title} leader={leader} />
+        {leaders.map((leader, idx) => (
+          <LeadershipCardComponent
+            key={leader.href || idx}
+            leader={leader}
+            buttonText={buttonText}
+          />
         ))}
       </div>
     </Section>
@@ -61,6 +136,7 @@ export function MinistryLeadership({
 
 function LeadershipCardComponent({
   leader,
+  buttonText,
 }: {
   leader: {
     role: string
@@ -70,6 +146,7 @@ function LeadershipCardComponent({
     image: string
     href: string
   }
+  buttonText: string
 }) {
   const [imageError, setImageError] = useState(false)
 
@@ -125,7 +202,9 @@ function LeadershipCardComponent({
             href={leader.href}
             className="inline-flex w-full items-center justify-between rounded-xl border border-[#256B29]/25 bg-emerald-50/60 px-4 py-2.5 text-sm font-bold text-[#256B29] transition-all duration-200 hover:bg-[#256B29] hover:text-white group-hover:bg-[#256B29] group-hover:text-white hover:border-[#256B29] group-hover:border-[#256B29] hover:shadow-sm group/btn"
           >
-            <span className="transition-colors group-hover:text-white group-hover/btn:text-white">View leadership profile</span>
+            <span className="transition-colors group-hover:text-white group-hover/btn:text-white">
+              {buttonText}
+            </span>
             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#256B29]/15 text-[#256B29] group-hover:bg-white/20 group-hover:text-white group-hover/btn:bg-white/20 group-hover/btn:text-white transition-colors">
               <ArrowRight
                 aria-hidden="true"

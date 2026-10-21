@@ -121,12 +121,16 @@ export type ApiAboutData = {
   overview: ApiAboutOverview
   vision_mission: ApiVisionMission
   objective_header: ApiSectionHeader
+  objectives_header?: ApiSectionHeader
   objectives: ApiObjective[]
   leadership_header: ApiSectionHeader
   leaders: ApiLeader[]
+  leadership?: ApiLeader[]
   structure: ApiStructure
+  organization_structure?: ApiStructure
   timeline_header: ApiSectionHeader
   timeline: ApiTimelineEvent[]
+  timeline_events?: ApiTimelineEvent[]
 }
 
 import { getApiBaseUrl } from "../utils"
@@ -140,7 +144,22 @@ export async function fetchAboutPageData(lang: string = "en"): Promise<ApiAboutD
       cache: "no-store",
     })
     if (!res.ok) return null
-    return await res.json()
+    const data = await res.json()
+    if (data) {
+      if (!data.leaders && data.leadership) {
+        data.leaders = data.leadership
+      }
+      if (!data.objective_header && data.objectives_header) {
+        data.objective_header = data.objectives_header
+      }
+      if (!data.structure && data.organization_structure) {
+        data.structure = data.organization_structure
+      }
+      if (!data.timeline && data.timeline_events) {
+        data.timeline = data.timeline_events
+      }
+    }
+    return data
   } catch (error) {
     console.error("Error fetching About page data:", error)
     return null

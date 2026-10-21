@@ -5,34 +5,39 @@ import { Scale, FileText, UserCheck, FolderOpen, ArrowRight } from "lucide-react
 import { Container } from "@/components/ui/container"
 import { useLanguage } from "@/src/contexts/LanguageContext"
 
-export function RtiQuickActions() {
+interface RtiQuickActionsProps {
+  lang?: string
+}
+
+export function RtiQuickActions({ lang }: RtiQuickActionsProps = {}) {
   const { language } = useLanguage()
+  const activeLang = (lang as "en" | "si" | "ta") || (language as "en" | "si" | "ta") || "en"
 
   const actions = [
     {
-      title: language === "si" ? "තොරතුරු පනත" : language === "ta" ? "தகவல் அறியும் சட்டம்" : "View RTI Act",
-      description: language === "si" ? "ප්‍රධාන පනත සහ ක්‍රියාපටිපාටිය" : language === "ta" ? "முதன்மைச் சட்டம் & நடைமுறைகள்" : "Principal legislation & procedures",
+      title: activeLang === "si" ? "තොරතුරු පනත" : activeLang === "ta" ? "தகவல் அறியும் சட்டம்" : "View RTI Act",
+      description: activeLang === "si" ? "ප්‍රධාන පනත සහ ක්‍රියාපටිපාටිය" : activeLang === "ta" ? "முதன்மைச் சட்டம் & நடைமுறைகள்" : "Principal legislation & procedures",
       href: "#rti-legal",
       icon: Scale,
       iconBg: "bg-emerald-50 text-[#256B29]",
     },
     {
-      title: language === "si" ? "තොරතුරු ඉල්ලුම් පත්‍ර" : language === "ta" ? "විண்ணப்பப் படிவங்கள்" : "Download RTI Forms",
-      description: language === "si" ? "ඉල්ලීම් (RTI 01) සහ අභියාචනා" : language === "ta" ? "கோரிக்கை (RTI 01) & மேல்முறையீடு" : "Request (RTI 01) & appeal forms",
+      title: activeLang === "si" ? "තොරතුරු ඉල්ලුම් පත්‍ර" : activeLang === "ta" ? "விண்ணப்பப் படிவங்கள்" : "Download RTI Forms",
+      description: activeLang === "si" ? "ඉල්ලීම් (RTI 01) සහ අභියාචනා" : activeLang === "ta" ? "கோரிக்கை (RTI 01) & மேல்முறையீடு" : "Request (RTI 01) & appeal forms",
       href: "#rti-library",
       icon: FileText,
       iconBg: "bg-blue-50 text-blue-600",
     },
     {
-      title: language === "si" ? "තොරතුරු නිලධාරීන්" : language === "ta" ? "தகவல் அதிகாரிகள்" : "Contact Information Officer",
-      description: language === "si" ? "නම්කළ සහ තොරතුරු නිලධාරීන්" : language === "ta" ? "நியமிக்கப்பட்ட & தகவல் அதிகாரிகள்" : "Designated & Information officers",
+      title: activeLang === "si" ? "තොරතුරු නිලධාරීන්" : activeLang === "ta" ? "தகவல் அதிகாரிகள்" : "Contact Information Officer",
+      description: activeLang === "si" ? "නම්කළ සහ තොරතුරු නිලධාරීන්" : activeLang === "ta" ? "நியமிக்கப்பட்ட & தகவல் அதிகாரிகள்" : "Designated & Information officers",
       href: "#rti-officers",
       icon: UserCheck,
       iconBg: "bg-amber-50 text-amber-600",
     },
     {
-      title: language === "si" ? "වාර්තා සහ ප්‍රකාශන" : language === "ta" ? "அறிக்கைகள்" : "Browse Reports",
-      description: language === "si" ? "අර්ධ වාර්ෂික වාර්තා" : language === "ta" ? "அரை ஆண்டு அறிக்கைகள்" : "Biannual reports & disclosures",
+      title: activeLang === "si" ? "වාර්තා සහ ප්‍රකාශන" : activeLang === "ta" ? "அறிக்கைகள்" : "Browse Reports",
+      description: activeLang === "si" ? "අර්ධ වාර්ෂික වාර්තා" : activeLang === "ta" ? "அரை ஆண்டு அறிக்கைகள்" : "Biannual reports & disclosures",
       href: "#rti-library",
       icon: FolderOpen,
       iconBg: "bg-teal-50 text-[#0B3D3A]",

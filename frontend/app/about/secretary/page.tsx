@@ -30,7 +30,7 @@ export default async function SecretaryPage({ searchParams }: SecretaryPageProps
 
   const [secData, headerFooterData] = await Promise.all([
     fetchSecretaryPageData(lang),
-    fetchHeaderFooterData(),
+    fetchHeaderFooterData(lang),
   ])
 
   const profile = secData?.profile

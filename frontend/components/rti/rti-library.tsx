@@ -25,16 +25,38 @@ import {
 } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
-import type { ApiRtiCategory, ApiRtiDocumentItem } from "@/lib/api/rti"
+import { useLanguage } from "@/src/contexts/LanguageContext"
+import type { ApiRtiCategory, ApiRtiDocumentItem, ApiRtiPageSettings } from "@/lib/api/rti"
 
 interface RtiLibraryProps {
   categories?: ApiRtiCategory[]
   documents?: ApiRtiDocumentItem[]
+  header?: ApiRtiPageSettings
+  lang?: string
 }
 
-export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps) {
+export function RtiLibrary({ categories = [], documents = [], header, lang }: RtiLibraryProps) {
+  const { language: contextLang } = useLanguage()
+  const language = (lang as "en" | "si" | "ta") || (contextLang as "en" | "si" | "ta") || "en"
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>("All categories")
+
+  const defaultTitle =
+    language === "si"
+      ? "තොරතුරු දැනගැනීමේ අයදුම්පත් සහ ස්වයංක්‍රීය තොරතුරු පුස්තකාලය"
+      : language === "ta"
+      ? "தகவல் அறியும் உரிமை படிவங்கள் மற்றும் தகவல்கள் நூலகம்"
+      : "RTI Forms & Proactive Disclosure Library"
+
+  const defaultDesc =
+    language === "si"
+      ? "නිල තොරතුරු ඉල්ලුම් පත්‍ර, ද්වි-වාර්ෂික වාර්තා, අයවැය ප්‍රතිපාදන, ව්‍යාපෘති ඇගයීම් සහ ප්‍රසම්පාදන දැන්වීම් පරිශීලනය කරන්න."
+      : language === "ta"
+      ? "உத்தியோகபூர்வ தகவல் கோரிக்கை படிவங்கள், அரையாண்டு அறிக்கைகள், வரவு செலவு ஒதுக்கீடுகள் மற்றும் கொள்முதல் அறிவிப்புகளைப் பார்வையிடவும்."
+      : "Browse official RTI request forms, biannual reports, budget allocations, project evaluations, and procurement notices."
+
+  const sectionTitle = header?.library_title || defaultTitle
+  const sectionDesc = header?.library_description || defaultDesc
 
   // Accordion state: Open first category or "biannual-reports" by default
   const defaultOpenCat = categories.find((c) => c.id === "biannual-reports")?.id || categories[0]?.id || "biannual-reports"
@@ -155,10 +177,10 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
         {/* Section Title */}
         <div className="mb-6">
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-            RTI Forms &amp; Proactive Disclosure Library
+            {sectionTitle}
           </h2>
           <p className="text-xs sm:text-sm text-slate-600">
-            Browse official RTI request forms, biannual reports, budget allocations, project evaluations, and procurement notices.
+            {sectionDesc}
           </p>
         </div>
 
@@ -169,7 +191,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
             {/* Search Input */}
             <div className="relative flex-1 max-w-md">
               <label htmlFor="search-rti-documents" className="sr-only">
-                Search RTI documents
+                {language === "si" ? "RTI ලේඛන සොයන්න" : language === "ta" ? "RTI ஆவணங்களைத் தேடுக" : "Search RTI documents"}
               </label>
               <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                 <Search className="h-4 w-4" aria-hidden="true" />
@@ -179,7 +201,13 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                 id="search-rti-documents"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search RTI documents..."
+                placeholder={
+                  language === "si"
+                    ? "RTI ලේඛන සොයන්න..."
+                    : language === "ta"
+                    ? "RTI ஆவணங்களைத் தேடுக..."
+                    : "Search RTI documents..."
+                }
                 className="w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-4 py-2 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#388E3C] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#388E3C]/20"
               />
             </div>
@@ -198,7 +226,9 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                 }}
                 className="rounded-xl border border-slate-200 bg-slate-50/70 px-3 py-2 text-xs font-bold text-slate-700 transition cursor-pointer focus:border-[#388E3C] focus:outline-none"
               >
-                <option value="All categories">All categories</option>
+                <option value="All categories">
+                  {language === "si" ? "සියලු වර්ගීකරණයන්" : language === "ta" ? "அனைத்து பிரிவுகளும்" : "All categories"}
+                </option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.title}
@@ -213,7 +243,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                   className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-semibold cursor-pointer ml-auto sm:ml-0"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden="true" />
-                  Reset
+                  <span>{language === "si" ? "නැවත සකසන්න" : language === "ta" ? "மீட்டமை" : "Reset"}</span>
                 </button>
               )}
             </div>
@@ -224,9 +254,15 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
         {filteredDocs.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center">
             <FolderSearch className="mx-auto h-12 w-12 text-slate-400 mb-3" aria-hidden="true" />
-            <h3 className="text-lg font-bold text-slate-900">No documents found</h3>
+            <h3 className="text-lg font-bold text-slate-900">
+              {language === "si" ? "ලේඛන කිසිවක් හමු නොවීය" : language === "ta" ? "ஆவணங்கள் எதுவும் காணப்படவில்லை" : "No documents found"}
+            </h3>
             <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mt-1 mb-4">
-              We couldn&apos;t find any RTI documents matching &quot;{searchQuery}&quot;. Try adjusting your keywords or clearing the active filters.
+              {language === "si"
+                ? `"${searchQuery}" සඳහා ගැළපෙන RTI ලේඛන හමු නොවීය. වෙනත් වචන යොදා උත්සාහ කරන්න හෝ පෙරහන් ඉවත් කරන්න.`
+                : language === "ta"
+                ? `"${searchQuery}" க்கு பொருத்தமான RTI ஆவணங்கள் எதுவும் காணப்படவில்லை.`
+                : `We couldn't find any RTI documents matching "${searchQuery}". Try adjusting your keywords or clearing the active filters.`}
             </p>
             <button
               type="button"
@@ -234,7 +270,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
               className="inline-flex items-center gap-2 rounded-xl bg-[#388E3C] px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-[#256B29] cursor-pointer"
             >
               <X className="h-4 w-4" aria-hidden="true" />
-              <span>Clear all filters</span>
+              <span>{language === "si" ? "සියලු පෙරහන් ඉවත් කරන්න" : language === "ta" ? "அனைத்து வடிப்பான்களையும் அழிக்கவும்" : "Clear all filters"}</span>
             </button>
           </div>
         ) : (
@@ -288,7 +324,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                           ? "bg-white text-[#1b5e20] border-emerald-300"
                           : "bg-white text-slate-700 border-slate-200"
                       }`}>
-                        {category.items.length} {category.items.length === 1 ? "document" : "documents"}
+                        {category.items.length} {language === "si" ? "ලේඛන" : language === "ta" ? "ஆவணங்கள்" : category.items.length === 1 ? "document" : "documents"}
                       </span>
                       <div
                         className={`flex h-8 w-8 items-center justify-center rounded-full border shadow-2xs transition-transform duration-200 ${
@@ -307,7 +343,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                     <div className="divide-y divide-slate-100">
                       {category.items.length === 0 ? (
                         <div className="p-8 text-center text-xs text-slate-500">
-                          No documents currently published under this category.
+                          {language === "si" ? "මෙම කාණ්ඩය යටතේ මේ වන විට ලේඛන ප්‍රකාශයට පත් කර නොමැත." : language === "ta" ? "இப்பிரிவின் கீழ் தற்போது ஆவணங்கள் எதுவும் வெளியிடப்படவில்லை." : "No documents currently published under this category."}
                         </div>
                       ) : (
                         (() => {
@@ -329,7 +365,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                                     {subheading}
                                   </span>
                                   <span className="ml-auto text-[11px] font-bold text-[#256B29] bg-white px-2 py-0.5 rounded-full border border-emerald-200 shadow-2xs">
-                                    {items.length} {items.length === 1 ? "file" : "files"}
+                                    {items.length} {language === "si" ? "ගොනු" : language === "ta" ? "கோப்புகள்" : items.length === 1 ? "file" : "files"}
                                   </span>
                                 </div>
                               )}
@@ -351,7 +387,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                                           </h4>
                                           {doc.featured && (
                                             <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700 border border-amber-200">
-                                              Featured
+                                              {language === "si" ? "විශේෂාංග" : language === "ta" ? "சிறப்பு" : "Featured"}
                                             </span>
                                           )}
                                         </div>
@@ -359,13 +395,13 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                                           {doc.description}
                                         </p>
                                         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 font-medium">
-                                          <span className="font-bold text-slate-700">Format: {doc.fileType}</span>
+                                          <span className="font-bold text-slate-700">{language === "si" ? "ආකෘතිය:" : language === "ta" ? "வடிவம்:" : "Format:"} {doc.fileType}</span>
                                           <span>•</span>
-                                          <span>Size: {doc.fileSize}</span>
+                                          <span>{language === "si" ? "ප්‍රමාණය:" : language === "ta" ? "அளவு:" : "Size:"} {doc.fileSize}</span>
                                           {doc.publishedDate && (
                                             <>
                                               <span>•</span>
-                                              <span>Date: {doc.publishedDate}</span>
+                                              <span>{language === "si" ? "දිනය:" : language === "ta" ? "திகதி:" : "Date:"} {doc.publishedDate}</span>
                                             </>
                                           )}
                                           {doc.availableLanguages && doc.availableLanguages.length > 0 && (
@@ -397,10 +433,10 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                                         type="button"
                                         onClick={() => setSelectedDoc(doc)}
                                         className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50 cursor-pointer shadow-2xs"
-                                        title="View document details"
+                                        title={language === "si" ? "ලේඛන විස්තර බලන්න" : language === "ta" ? "ஆவண விவரங்களைப் பார்க்கவும்" : "View document details"}
                                       >
                                         <Eye className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                                        <span>Details</span>
+                                        <span>{language === "si" ? "විස්තර" : language === "ta" ? "விவரங்கள்" : "Details"}</span>
                                       </button>
 
                                       <a
@@ -408,20 +444,20 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50 shadow-2xs"
-                                        title="Open file in new tab"
+                                        title={language === "si" ? "ගොනුව නව ටැබ් එකකින් විවෘත කරන්න" : language === "ta" ? "கோப்பை புதிய தாவலில் திறக்கவும்" : "Open file in new tab"}
                                       >
                                         <ExternalLink className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                                        <span>Open</span>
+                                        <span>{language === "si" ? "බලන්න" : language === "ta" ? "திறக்க" : "Open"}</span>
                                       </a>
 
                                       <a
                                         href={doc.downloadUrl || doc.fileUrl}
                                         download
                                         className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#388E3C] px-3.5 text-xs font-bold text-white transition hover:bg-[#256B29] shadow-2xs"
-                                        title="Download file"
+                                        title={language === "si" ? "ගොනුව බාගත කරන්න" : language === "ta" ? "கோப்பைப் பதிவிறக்கவும்" : "Download file"}
                                       >
                                         <Download className="h-3.5 w-3.5 !text-white" aria-hidden="true" />
-                                        <span className="!text-white">Download</span>
+                                        <span className="!text-white">{language === "si" ? "බාගන්න" : language === "ta" ? "பதிவிறக்க" : "Download"}</span>
                                       </a>
                                     </div>
                                   </div>
@@ -487,22 +523,22 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
 
               <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2 text-xs text-slate-700">
                 <div className="flex justify-between py-1 border-b border-slate-200/70">
-                  <span className="font-semibold text-slate-500">File Type:</span>
+                  <span className="font-semibold text-slate-500">{language === "si" ? "ගොනු ආකෘතිය:" : language === "ta" ? "கோப்பு வகை:" : "File Type:"}</span>
                   <span className="font-bold text-slate-900">{selectedDoc.fileType}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/70">
-                  <span className="font-semibold text-slate-500">File Size:</span>
+                  <span className="font-semibold text-slate-500">{language === "si" ? "ගොනු ප්‍රමාණය:" : language === "ta" ? "கோப்பின் அளவு:" : "File Size:"}</span>
                   <span className="font-bold text-slate-900">{selectedDoc.fileSize}</span>
                 </div>
                 {selectedDoc.year && (
                   <div className="flex justify-between py-1 border-b border-slate-200/70">
-                    <span className="font-semibold text-slate-500">Reference Year:</span>
+                    <span className="font-semibold text-slate-500">{language === "si" ? "අදාළ වර්ෂය:" : language === "ta" ? "குறிப்பு ஆண்டு:" : "Reference Year:"}</span>
                     <span className="font-bold text-slate-900">{selectedDoc.year}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-1">
-                  <span className="font-semibold text-slate-500">Publisher:</span>
-                  <span className="font-bold text-[#256B29]">Ministry of Fisheries, Sri Lanka</span>
+                  <span className="font-semibold text-slate-500">{language === "si" ? "ප්‍රකාශකයා:" : language === "ta" ? "வெளியீட்டாளர்:" : "Publisher:"}</span>
+                  <span className="font-bold text-[#256B29]">{language === "si" ? "ශ්‍රී ලංකා ධීවර අමාත්‍යාංශය" : language === "ta" ? "கடற்றொழில் அமைச்சு, இலங்கை" : "Ministry of Fisheries, Sri Lanka"}</span>
                 </div>
               </div>
 
@@ -510,7 +546,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
               {(selectedDoc.fileUrlEn || selectedDoc.fileUrlSi || selectedDoc.fileUrlTa) && (
                 <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 p-3.5">
                   <span className="block text-xs font-extrabold text-emerald-950 mb-2">
-                    📄 Available Language File Versions:
+                    {language === "si" ? "📄 පවතින භාෂා ගොනු අනුවාද:" : language === "ta" ? "📄 கிடைக்கக்கூடிய மொழி கோப்பு பதிப்புகள்:" : "📄 Available Language File Versions:"}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {selectedDoc.fileUrlEn && (
@@ -553,7 +589,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                   onClick={() => setSelectedDoc(null)}
                   className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
                 >
-                  Close
+                  {language === "si" ? "වසන්න" : language === "ta" ? "மூடுக" : "Close"}
                 </button>
                 <a
                   href={selectedDoc.fileUrl}
@@ -562,7 +598,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                   className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                 >
                   <ExternalLink className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                  <span>Open file</span>
+                  <span>{language === "si" ? "ගොනුව බලන්න" : language === "ta" ? "கோப்பைத் திறக்க" : "Open file"}</span>
                 </a>
                 <a
                   href={selectedDoc.downloadUrl || selectedDoc.fileUrl}
@@ -570,7 +606,7 @@ export function RtiLibrary({ categories = [], documents = [] }: RtiLibraryProps)
                   className="inline-flex items-center gap-1.5 rounded-xl bg-[#388E3C] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#256B29]"
                 >
                   <Download className="h-3.5 w-3.5 !text-white" aria-hidden="true" />
-                  <span className="!text-white">Download</span>
+                  <span className="!text-white">{language === "si" ? "බාගන්න" : language === "ta" ? "பதிவிறக்க" : "Download"}</span>
                 </a>
               </div>
             </div>

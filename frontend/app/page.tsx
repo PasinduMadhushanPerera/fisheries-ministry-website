@@ -23,7 +23,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   const [homeData, headerFooterData] = await Promise.all([
     fetchHomePageData(lang),
-    fetchHeaderFooterData(),
+    fetchHeaderFooterData(lang),
   ])
 
   return (

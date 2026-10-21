@@ -34,7 +34,7 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
 
   const [aboutData, headerFooterData] = await Promise.all([
     fetchAboutPageData(lang),
-    fetchHeaderFooterData(),
+    fetchHeaderFooterData(lang),
   ])
 
   return (
@@ -62,14 +62,15 @@ export default async function AboutPage({ searchParams }: AboutPageProps) {
 
         {/* 3 & 4. Policy Objectives (Header & Cards) */}
         <MinistryObjectives
-          initialHeader={aboutData?.objective_header}
+          initialHeader={aboutData?.objective_header || (aboutData as any)?.objectives_header}
           initialObjectives={aboutData?.objectives}
         />
 
         {/* 5 & 6. Ministry Leadership (Header & Cards) */}
         <MinistryLeadership
           initialHeader={aboutData?.leadership_header}
-          initialLeaders={aboutData?.leaders}
+          initialLeaders={aboutData?.leaders || (aboutData as any)?.leadership}
+          lang={lang}
         />
 
         {/* 7. Organizational Structure & Chart */}

@@ -57,7 +57,18 @@ export interface ApiRtiDocumentItem {
   order?: number
 }
 
+export interface ApiRtiPageSettings {
+  legislation_title: string
+  legislation_description: string
+  library_title: string
+  library_description: string
+  officers_title?: string
+  officers_description?: string
+}
+
 export interface ApiRtiPageData {
+  settings?: ApiRtiPageSettings
+  header?: ApiRtiPageSettings
   officers: ApiRtiOfficer[]
   legalDocuments: ApiRtiLegalDocument[]
   categories: ApiRtiCategory[]

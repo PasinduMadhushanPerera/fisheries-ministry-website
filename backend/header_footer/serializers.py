@@ -141,7 +141,25 @@ class FooterSettingSerializer(serializers.ModelSerializer):
     def get_hq_address(self, obj): return resolve_lang(obj, "hq_address", self.context)
     def get_copyright_text(self, obj): return resolve_lang(obj, "copyright_text", self.context)
     def get_developed_by_text(self, obj): return resolve_lang(obj, "developed_by_text", self.context)
-    def get_last_updated_text(self, obj): return resolve_lang(obj, "last_updated_text", self.context)
+    def get_last_updated_text(self, obj):
+        val = resolve_lang(obj, "last_updated_text", self.context)
+        lang = (self.context.get("lang") or "en").lower() if self.context else "en"
+        stale_markers = ["2026 අගෝස්තු 25", "25 ஆகஸ்ட் 2026", "25 August 2026"]
+        if lang in ["si", "ta"]:
+            if not val or val in stale_markers:
+                en_date = getattr(obj, "last_updated_text", "")
+                if en_date and en_date not in stale_markers:
+                    from .signals import get_multilingual_dates
+                    parts = en_date.strip().split()
+                    if len(parts) >= 3:
+                        try:
+                            from datetime import datetime
+                            dt = datetime.strptime(f"{parts[0]} {parts[1]} {parts[2]}", "%d %B %Y")
+                            _, si_str, ta_str = get_multilingual_dates(dt)
+                            return si_str if lang == "si" else ta_str
+                        except Exception:
+                            pass
+        return val
     def get_last_updated_prefix(self, obj): return resolve_lang(obj, "last_updated_prefix", self.context)
     def get_website_views_prefix(self, obj): return resolve_lang(obj, "website_views_prefix", self.context)
 

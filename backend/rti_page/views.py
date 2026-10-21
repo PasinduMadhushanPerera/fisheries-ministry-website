@@ -3,12 +3,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import (
+    RtiPageSettings,
     RtiOfficer,
     RtiLegalDocument,
     RtiCategory,
     RtiDocumentItem,
 )
 from .serializers import (
+    RtiPageSettingsSerializer,
     RtiOfficerSerializer,
     RtiLegalDocumentSerializer,
     RtiCategorySerializer,
@@ -19,6 +21,7 @@ from .serializers import (
 class RtiPageDataView(APIView):
     """
     Public API endpoint returning localized RTI Portal data:
+    - 00. Page Settings & Section Headers
     - 01. Designated & Information Officers
     - 02. Legal Framework & Acts
     - 03. RTI Information Categories (7 core sections)
@@ -34,6 +37,10 @@ class RtiPageDataView(APIView):
             "request": request,
             "language": lang,
         }
+
+        # 0. Page Settings & Headers
+        settings_obj, _ = RtiPageSettings.objects.get_or_create(id=1)
+        settings_data = RtiPageSettingsSerializer(settings_obj, context=serializer_context).data
 
         # 1. Officers
         officers_qs = RtiOfficer.objects.filter(is_active=True).order_by("order", "id")
@@ -55,6 +62,8 @@ class RtiPageDataView(APIView):
 
         return Response(
             {
+                "settings": settings_data,
+                "header": settings_data,
                 "officers": officers_data,
                 "legalDocuments": legal_data,
                 "categories": categories_data,

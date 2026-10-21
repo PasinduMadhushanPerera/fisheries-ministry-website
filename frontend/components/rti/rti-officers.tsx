@@ -15,14 +15,17 @@ import {
 
 import { Container } from "@/components/ui/container"
 import { useLanguage } from "@/src/contexts/LanguageContext"
-import type { ApiRtiOfficer } from "@/lib/api/rti"
+import type { ApiRtiOfficer, ApiRtiPageSettings } from "@/lib/api/rti"
 
 interface RtiOfficersProps {
   officers?: ApiRtiOfficer[]
+  header?: ApiRtiPageSettings
+  lang?: string
 }
 
-export function RtiOfficers({ officers = [] }: RtiOfficersProps) {
+export function RtiOfficers({ officers = [], header, lang }: RtiOfficersProps) {
   const { language } = useLanguage()
+  const activeLang = (lang as "en" | "si" | "ta") || (language as "en" | "si" | "ta") || "en"
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
 
   const copyToClipboard = (text: string, id: string) => {
@@ -36,6 +39,22 @@ export function RtiOfficers({ officers = [] }: RtiOfficersProps) {
     return null
   }
 
+  const sectionTitle =
+    header?.officers_title ||
+    (activeLang === "si"
+      ? "නම්කළ නිලධාරීන් සහ තොරතුරු නිලධාරීන්"
+      : activeLang === "ta"
+      ? "நியமிக்கப்பட்ட & தகவல் அதிகாரிகள்"
+      : "Designated & Information Officers")
+
+  const sectionDesc =
+    header?.officers_description ||
+    (activeLang === "si"
+      ? "තොරතුරු ලබාගැනීමේ පනත යටතේ ඉල්ලීම් සහ අභියාචනා ඉදිරිපත් කිරීම සඳහා නිල සම්බන්ධතා විස්තර."
+      : activeLang === "ta"
+      ? "தகவல் அறியும் உரிமைச் சட்டத்தின் கீழ் கோரிக்கைகள் அல்லது மேல்முறையீடுகளைச் சமர்ப்பிப்பதற்கான தொடர்பு விவரங்கள்."
+      : "Official contact details for submitting RTI requests or lodging appeals under the RTI Act.")
+
   return (
     <section id="rti-officers" className="py-12 bg-slate-50 border-b border-slate-200" aria-label="RTI Officers">
       <Container>
@@ -46,10 +65,10 @@ export function RtiOfficers({ officers = [] }: RtiOfficersProps) {
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              {language === "si" ? "නම්කළ නිලධාරීන් සහ තොරතුරු නිලධාරීන්" : language === "ta" ? "நியமிக்கப்பட்ட & தகவல் அதிகாரிகள்" : "Designated & Information Officers"}
+              {sectionTitle}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600">
-              {language === "si" ? "තොරතුරු ලබාගැනීමේ පනත යටතේ ඉල්ලීම් සහ අභියාචනා ඉදිරිපත් කිරීම සඳහා නිල සම්බන්ධතා විස්තර." : language === "ta" ? "தகவல் அறியும் உரிமைச் சட்டத்தின் கீழ் கோரிக்கைகள் அல்லது மேல்முறையீடுகளைச் சமர்ப்பிப்பதற்கான தொடர்பு விவரங்கள்." : "Official contact details for submitting RTI requests or lodging appeals under the RTI Act."}
+              {sectionDesc}
             </p>
           </div>
         </div>
@@ -91,7 +110,19 @@ export function RtiOfficers({ officers = [] }: RtiOfficersProps) {
                     }`}
                   >
                     <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                    <span>{officer.officerType}</span>
+                    <span>
+                      {officer.officerType === "Designated Officer"
+                        ? activeLang === "si"
+                          ? "නම්කළ නිලධාරී"
+                          : activeLang === "ta"
+                          ? "நியமிக்கப்பட்ட அதிகாரி"
+                          : "Designated Officer"
+                        : activeLang === "si"
+                        ? "තොරතුරු නිලධාරී"
+                        : activeLang === "ta"
+                        ? "தகவல் அதிகாரி"
+                        : "Information Officer"}
+                    </span>
                   </span>
                 </div>
 
@@ -116,7 +147,9 @@ export function RtiOfficers({ officers = [] }: RtiOfficersProps) {
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <Phone className="h-3.5 w-3.5 text-slate-400 shrink-0" aria-hidden="true" />
-                        <span className="font-semibold text-slate-500">Tel:</span>
+                        <span className="font-semibold text-slate-500">
+                          {activeLang === "si" ? "දුරකථන:" : activeLang === "ta" ? "தொலைபேசி:" : "Tel:"}
+                        </span>
                         <a
                           href={`tel:${officer.telephone.replace(/\s+/g, "")}`}
                           className="font-bold text-slate-900 hover:text-[#388E3C] transition-colors"
@@ -128,7 +161,7 @@ export function RtiOfficers({ officers = [] }: RtiOfficersProps) {
                         type="button"
                         onClick={() => copyToClipboard(officer.telephone, `${officer.id}-phone`)}
                         className="p-1 text-slate-400 hover:text-slate-600 rounded cursor-pointer"
-                        title="Copy telephone"
+                        title={activeLang === "si" ? "දුරකථන අංකය පිටපත් කරන්න" : activeLang === "ta" ? "தொலைபேசி எண்ணை நகலெடுக்கவும்" : "Copy telephone"}
                         aria-label="Copy telephone"
                       >
                         {copiedItem === `${officer.id}-phone` ? (
@@ -144,7 +177,9 @@ export function RtiOfficers({ officers = [] }: RtiOfficersProps) {
                   {officer.fax && (
                     <div className="flex items-center gap-2">
                       <Printer className="h-3.5 w-3.5 text-slate-400 shrink-0" aria-hidden="true" />
-                      <span className="font-semibold text-slate-500">Fax:</span>
+                      <span className="font-semibold text-slate-500">
+                        {activeLang === "si" ? "ෆැක්ස්:" : activeLang === "ta" ? "தொலைநகல்:" : "Fax:"}
+                      </span>
                       <span className="font-medium text-slate-800">{officer.fax}</span>
                     </div>
                   )}
@@ -161,7 +196,17 @@ export function RtiOfficers({ officers = [] }: RtiOfficersProps) {
                             <div className="flex items-center gap-2 truncate">
                               <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" aria-hidden="true" />
                               <span className="font-semibold text-slate-500 shrink-0">
-                                {idx === 0 ? "Email:" : "Email (Alt):"}
+                                {idx === 0
+                                  ? activeLang === "si"
+                                    ? "විද්‍යුත් තැපෑල:"
+                                    : activeLang === "ta"
+                                    ? "மின்னஞ்சல்:"
+                                    : "Email:"
+                                  : activeLang === "si"
+                                  ? "විකල්ප විද්‍යුත් තැපෑල:"
+                                  : activeLang === "ta"
+                                  ? "மாற்று மின்னஞ்சல்:"
+                                  : "Email (Alt):"}
                               </span>
                               <a
                                 href={`mailto:${cleanEmail}`}

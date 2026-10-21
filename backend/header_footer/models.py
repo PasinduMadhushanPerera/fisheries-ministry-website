@@ -52,7 +52,7 @@ class HeaderSetting(TimeStampedModel):
     )
     hotline_phone = models.CharField(
         max_length=50,
-        default="+94 112 327 060",
+        default="+94 112 446 183",
         help_text="Hotline phone displayed in top utility bar",
     )
     email = models.EmailField(

@@ -55,9 +55,45 @@ export function extractYouTubeId(urlOrId?: string | null): string {
 
 /**
  * Dynamically resolves the API base URL depending on whether code runs in browser or server.
- * On browser, adapts host automatically (localhost vs LAN IP).
+ * On browser in production (e.g. fisheries.gov.lk or https), uses window.location.origin.
+ * In local dev, adapts to localhost:8000 or LAN IP.
  */
 export function getApiBaseUrl(): string {
+  // 1. If running in browser:
+  if (typeof window !== "undefined" && window.location) {
+    const protocol = window.location.protocol || "http:"
+    const host = window.location.hostname
+
+    // In production (HTTPS, or on fisheries.gov.lk or any public domain):
+    // All API calls and media requests go through Nginx on port 443 / window.location.origin
+    if (
+      protocol === "https:" ||
+      host.includes("fisheries.gov.lk") ||
+      (!host.includes("localhost") && !host.includes("127.0.0.1") && !host.startsWith("192.168."))
+    ) {
+      return window.location.origin
+    }
+
+    // In local dev, check if environment variable is set
+    const envUrl =
+      process.env.NEXT_PUBLIC_API_URL ||
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      process.env.NEXT_PUBLIC_BACKEND_URL
+
+    if (envUrl && !envUrl.includes("fisheries.gov.lk")) {
+      return envUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
+    }
+
+    if (host === "127.0.0.1" || host === "localhost") {
+      return "http://127.0.0.1:8000"
+    }
+
+    if (host) {
+      return `http://${host}:8000`
+    }
+  }
+
+  // 2. If running on server (SSR in Node.js):
   const envUrl =
     process.env.NEXT_PUBLIC_API_URL ||
     process.env.NEXT_PUBLIC_API_BASE_URL ||
@@ -65,13 +101,6 @@ export function getApiBaseUrl(): string {
 
   if (envUrl) {
     return envUrl.replace(/\/api\/v1\/?$/, "").replace(/\/+$/, "")
-  }
-
-  if (typeof window !== "undefined" && window.location?.hostname) {
-    const host = window.location.hostname
-    if (host) {
-      return `http://${host}:8000`
-    }
   }
 
   return "http://127.0.0.1:8000"
@@ -85,9 +114,13 @@ export function getAbsoluteMediaUrl(url?: string | null): string {
   const backendBase = getApiBaseUrl()
 
   if (url.startsWith("http://") || url.startsWith("https://")) {
-    // If URL targets backend port 8000 (e.g. 127.0.0.1:8000 or localhost:8000), rewrite to active LAN host
+    // If URL targets backend port 8000 (e.g. 127.0.0.1:8000 or localhost:8000 or LAN IP), rewrite to backendBase
     if (url.includes(":8000/")) {
       return url.replace(/^https?:\/\/[^/]+:8000/, backendBase)
+    }
+    // If in production on HTTPS or fisheries.gov.lk, rewrite old insecure HTTP or 192.168 URLs to backendBase
+    if (backendBase.startsWith("https://") && (url.includes("192.168.") || url.includes("localhost") || url.includes("127.0.0.1"))) {
+      return url.replace(/^https?:\/\/[^/]+/, backendBase)
     }
     return url
   }

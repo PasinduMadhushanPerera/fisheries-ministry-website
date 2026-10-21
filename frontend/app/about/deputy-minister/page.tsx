@@ -30,7 +30,7 @@ export default async function HonDeputyMinisterPage({ searchParams }: HonDeputyM
 
   const [deputyData, headerFooterData] = await Promise.all([
     fetchDeputyMinisterPageData(lang),
-    fetchHeaderFooterData(),
+    fetchHeaderFooterData(lang),
   ])
 
   const profile = deputyData?.profile

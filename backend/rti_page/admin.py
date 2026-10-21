@@ -2,6 +2,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
+    RtiPageSettings,
     RtiOfficer,
     RtiLegalDocument,
     RtiCategory,
@@ -12,6 +13,70 @@ from .models import (
 # ==========================================================
 # Form Definitions
 # ==========================================================
+class RtiPageSettingsAdminForm(forms.ModelForm):
+    class Meta:
+        model = RtiPageSettings
+        fields = "__all__"
+        widgets = {
+            "legislation_description_en": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+            "legislation_description_si": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+            "legislation_description_ta": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+            "library_description_en": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+            "library_description_si": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+            "library_description_ta": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+            "officers_description_en": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+            "officers_description_si": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+            "officers_description_ta": forms.Textarea(attrs={"rows": 2, "class": "vLargeTextField"}),
+        }
+
+
+# ==========================================================
+# 00. RTI Page Settings & Section Headers Admin
+# ==========================================================
+@admin.register(RtiPageSettings)
+class RtiPageSettingsAdmin(admin.ModelAdmin):
+    form = RtiPageSettingsAdminForm
+    list_display = ["__str__", "updated_at"]
+
+    def has_add_permission(self, request):
+        if self.model.objects.exists():
+            return False
+        return super().has_add_permission(request)
+
+    fieldsets = (
+        ("⚖️ 01. Legislation & Regulations Section", {
+            "fields": (
+                "legislation_title_en",
+                "legislation_description_en",
+                "legislation_title_si",
+                "legislation_description_si",
+                "legislation_title_ta",
+                "legislation_description_ta",
+            ),
+        }),
+        ("📚 02. RTI Forms & Proactive Disclosure Library Section", {
+            "fields": (
+                "library_title_en",
+                "library_description_en",
+                "library_title_si",
+                "library_description_si",
+                "library_title_ta",
+                "library_description_ta",
+            ),
+        }),
+        ("👔 03. Designated & Information Officers Section", {
+            "fields": (
+                "officers_title_en",
+                "officers_description_en",
+                "officers_title_si",
+                "officers_description_si",
+                "officers_title_ta",
+                "officers_description_ta",
+            ),
+        }),
+    )
+
+
 class RtiOfficerAdminForm(forms.ModelForm):
     class Meta:
         model = RtiOfficer

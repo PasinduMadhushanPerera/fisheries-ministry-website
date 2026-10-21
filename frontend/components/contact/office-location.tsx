@@ -105,7 +105,7 @@ export function OfficeLocation({ settings }: OfficeLocationProps) {
                 href={directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-5 py-2.5 text-xs font-bold text-white transition hover:bg-[#256B29]"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#388E3C] px-5 py-2.5 text-xs font-bold !text-white transition hover:bg-[#256B29]"
               >
                 <Navigation className="h-4 w-4" aria-hidden="true" />
                 <span>Get Directions</span>

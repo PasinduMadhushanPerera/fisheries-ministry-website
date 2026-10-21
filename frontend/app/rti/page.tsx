@@ -5,8 +5,11 @@ import { SiteFooter } from "@/components/layout/site-footer"
 import { Breadcrumb } from "@/components/ui/breadcrumb"
 import { RtiPageContent } from "@/components/rti/rti-page-content"
 import { fetchRtiPageData } from "@/lib/api/rti"
+import { fetchHeaderFooterData } from "@/lib/api/header-footer"
+import { getServerLanguage } from "@/lib/get-server-language"
 
 export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 export const metadata: Metadata = {
   title: "Right to Information (RTI) - Ministry of Fisheries",
@@ -14,25 +17,41 @@ export const metadata: Metadata = {
     "Official Right to Information portal of the Ministry of Fisheries. Access legislation, RTI request forms, designated officers, biannual reports, and proactive disclosures.",
 }
 
-export default async function RTIPage() {
-  const initialData = await fetchRtiPageData("en")
+interface RTIPageProps {
+  searchParams: Promise<{ lang?: string }>
+}
+
+export default async function RTIPage({ searchParams }: RTIPageProps) {
+  const lang = await getServerLanguage(searchParams)
+
+  const [initialData, headerFooterData] = await Promise.all([
+    fetchRtiPageData(lang),
+    fetchHeaderFooterData(lang),
+  ])
 
   return (
     <>
-      <SiteHeader />
+      <SiteHeader initialHeader={headerFooterData?.header} />
 
       <main id="main-content" tabIndex={-1} className="outline-none">
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
-            { label: "Right to Information" },
+            {
+              label:
+                lang === "si"
+                  ? "තොරතුරු දැනගැනීමේ අයිතිය"
+                  : lang === "ta"
+                  ? "தகவல் அறியும் உரிமை"
+                  : "Right to Information",
+            },
           ]}
         />
 
-        <RtiPageContent initialData={initialData} />
+        <RtiPageContent initialData={initialData} lang={lang} />
       </main>
 
-      <SiteFooter />
+      <SiteFooter initialFooter={headerFooterData?.footer} />
     </>
   )
 }

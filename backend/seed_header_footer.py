@@ -19,7 +19,7 @@ def seed_header_footer_data():
             "tagline": "Sustainable fisheries, aquatic resources and public services",
             "logo_url_fallback": "/images/government/logo.jpg",
             "logo_alt": "Emblem of the Government of Sri Lanka",
-            "hotline_phone": "+94 112 327 060",
+            "hotline_phone": "+94 112 446 183",
             "email": "info@fisheries.gov.lk",
             "help_link_text": "Get help & contact",
             "help_link_url": "/contact",

@@ -1,10 +1,52 @@
 from rest_framework import serializers
 from .models import (
+    RtiPageSettings,
     RtiOfficer,
     RtiLegalDocument,
     RtiCategory,
     RtiDocumentItem,
 )
+
+
+class RtiPageSettingsSerializer(serializers.ModelSerializer):
+    legislation_title = serializers.SerializerMethodField()
+    legislation_description = serializers.SerializerMethodField()
+    library_title = serializers.SerializerMethodField()
+    library_description = serializers.SerializerMethodField()
+    officers_title = serializers.SerializerMethodField()
+    officers_description = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RtiPageSettings
+        fields = [
+            "legislation_title",
+            "legislation_description",
+            "library_title",
+            "library_description",
+            "officers_title",
+            "officers_description",
+        ]
+
+    def _get_lang(self):
+        return self.context.get("language", "en")
+
+    def get_legislation_title(self, obj):
+        return obj.get_field_lang("legislation_title", self._get_lang())
+
+    def get_legislation_description(self, obj):
+        return obj.get_field_lang("legislation_description", self._get_lang())
+
+    def get_library_title(self, obj):
+        return obj.get_field_lang("library_title", self._get_lang())
+
+    def get_library_description(self, obj):
+        return obj.get_field_lang("library_description", self._get_lang())
+
+    def get_officers_title(self, obj):
+        return obj.get_field_lang("officers_title", self._get_lang())
+
+    def get_officers_description(self, obj):
+        return obj.get_field_lang("officers_description", self._get_lang())
 
 
 class RtiOfficerSerializer(serializers.ModelSerializer):

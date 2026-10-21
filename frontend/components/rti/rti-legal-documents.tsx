@@ -4,14 +4,36 @@ import { useState, useEffect } from "react"
 import { Scale, FileText, ExternalLink, Download, Eye, X } from "lucide-react"
 
 import { Container } from "@/components/ui/container"
-import type { ApiRtiLegalDocument } from "@/lib/api/rti"
+import { useLanguage } from "@/src/contexts/LanguageContext"
+import type { ApiRtiLegalDocument, ApiRtiPageSettings } from "@/lib/api/rti"
 
 interface RtiLegalDocumentsProps {
   legalDocuments?: ApiRtiLegalDocument[]
+  header?: ApiRtiPageSettings
+  lang?: string
 }
 
-export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProps) {
+export function RtiLegalDocuments({ legalDocuments = [], header, lang }: RtiLegalDocumentsProps) {
+  const { language } = useLanguage()
+  const activeLang = (lang as "en" | "si" | "ta") || (language as "en" | "si" | "ta") || "en"
   const [selectedDoc, setSelectedDoc] = useState<ApiRtiLegalDocument | null>(null)
+
+  const defaultTitle =
+    activeLang === "si"
+      ? "තොරතුරු දැනගැනීමේ පනත හා රෙගුලාසි"
+      : activeLang === "ta"
+      ? "தகவல் அறியும் உரிமைச் சட்டம் மற்றும் ஒழுங்குவிதிகள்"
+      : "RTI Legislation & Regulations"
+
+  const defaultDesc =
+    activeLang === "si"
+      ? "පුරවැසි තොරතුරු අයිතිවාසිකම් සහ අමාත්‍යාංශ තොරතුරු හෙළිදරව් කිරීමේ ක්‍රියාපටිපාටිය පාලනය කරන නිල නීතිමය රාමුව."
+      : activeLang === "ta"
+      ? "பிரஜைகளின் தகவல் உரிமைகள் மற்றும் அமைச்சு வெளிப்படுத்தல் நடைமுறைகளை நிர்வகிக்கும் உத்தியோகபூர்வ சட்டக் கட்டமைப்பு."
+      : "Official legal framework governing citizen information rights and Ministry disclosure procedures."
+
+  const sectionTitle = header?.legislation_title || defaultTitle
+  const sectionDesc = header?.legislation_description || defaultDesc
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,10 +65,10 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-              RTI Legislation &amp; Regulations
+              {sectionTitle}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600">
-              Official legal framework governing citizen information rights and Ministry disclosure procedures.
+              {sectionDesc}
             </p>
           </div>
         </div>
@@ -117,7 +139,7 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                   className="flex-1 inline-flex min-h-[38px] items-center justify-center gap-1 rounded-xl border border-slate-300 bg-white px-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50 cursor-pointer"
                 >
                   <Eye className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                  <span>View details</span>
+                  <span>{activeLang === "si" ? "විස්තර" : activeLang === "ta" ? "விவரங்கள்" : "View details"}</span>
                 </button>
 
                 <a
@@ -127,7 +149,7 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                   className="flex-1 inline-flex min-h-[38px] items-center justify-center gap-1 rounded-xl border border-slate-300 bg-white px-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                 >
                   <ExternalLink className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                  <span>Open file</span>
+                  <span>{activeLang === "si" ? "ගොනුව බලන්න" : activeLang === "ta" ? "கோப்பைத் திறக்க" : "Open file"}</span>
                 </a>
 
                 <a
@@ -136,7 +158,7 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                   className="flex-1 inline-flex min-h-[38px] items-center justify-center gap-1 rounded-xl bg-[#388E3C] px-2 text-xs font-bold text-white transition hover:bg-[#256B29]"
                 >
                   <Download className="h-3.5 w-3.5 !text-white" aria-hidden="true" />
-                  <span className="text-white">Download</span>
+                  <span className="text-white">{activeLang === "si" ? "බාගන්න" : activeLang === "ta" ? "பதிவிறக்க" : "Download"}</span>
                 </a>
               </div>
             </div>
@@ -171,11 +193,11 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                 </div>
                 <div>
                   <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-[#256B29]">
-                    RTI Legal Document
+                    {activeLang === "si" ? "RTI නීතිමය ලේඛනය" : activeLang === "ta" ? "RTI சட்ட ஆவணம்" : "RTI Legal Document"}
                   </span>
                   {selectedDoc.publishedDate && (
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Enacted: {selectedDoc.publishedDate}
+                      {activeLang === "si" ? "බලාත්මක දිනය:" : activeLang === "ta" ? "நடைமுறைக்கு வந்த திகதி:" : "Enacted:"} {selectedDoc.publishedDate}
                     </p>
                   )}
                 </div>
@@ -191,16 +213,16 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
 
               <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2 text-xs text-slate-700">
                 <div className="flex justify-between py-1 border-b border-slate-200/70">
-                  <span className="font-semibold text-slate-500">File Type:</span>
+                  <span className="font-semibold text-slate-500">{activeLang === "si" ? "ගොනු ආකෘතිය:" : activeLang === "ta" ? "கோப்பு வகை:" : "File Type:"}</span>
                   <span className="font-bold text-slate-900">{selectedDoc.fileType}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/70">
-                  <span className="font-semibold text-slate-500">File Size:</span>
+                  <span className="font-semibold text-slate-500">{activeLang === "si" ? "ගොනු ප්‍රමාණය:" : activeLang === "ta" ? "கோப்பின் அளவு:" : "File Size:"}</span>
                   <span className="font-bold text-slate-900">{selectedDoc.fileSize}</span>
                 </div>
                 <div className="flex justify-between py-1">
-                  <span className="font-semibold text-slate-500">Authority:</span>
-                  <span className="font-bold text-[#256B29]">Parliament of Sri Lanka / Ministry of Fisheries</span>
+                  <span className="font-semibold text-slate-500">{activeLang === "si" ? "බලාත්මක ආයතනය:" : activeLang === "ta" ? "அதிகாரசபை:" : "Authority:"}</span>
+                  <span className="font-bold text-[#256B29]">{activeLang === "si" ? "ශ්‍රී ලංකා පාර්ලිමේන්තුව / ධීවර අමාත්‍යාංශය" : activeLang === "ta" ? "இலங்கை நாடாளுமன்றம் / கடற்றொழில் அமைச்சு" : "Parliament of Sri Lanka / Ministry of Fisheries"}</span>
                 </div>
               </div>
 
@@ -208,7 +230,7 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
               {(selectedDoc.fileUrlEn || selectedDoc.fileUrlSi || selectedDoc.fileUrlTa) && (
                 <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 p-3.5">
                   <span className="block text-xs font-extrabold text-emerald-950 mb-2">
-                    📄 Available Language File Versions:
+                    {activeLang === "si" ? "📄 පවතින භාෂා ගොනු අනුවාද:" : activeLang === "ta" ? "📄 கிடைக்கக்கூடிய மொழி கோப்பு பதிப்புகள்:" : "📄 Available Language File Versions:"}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {selectedDoc.fileUrlEn && (
@@ -251,7 +273,7 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                   onClick={() => setSelectedDoc(null)}
                   className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
                 >
-                  Close
+                  {activeLang === "si" ? "වසන්න" : activeLang === "ta" ? "மூடுக" : "Close"}
                 </button>
                 <a
                   href={selectedDoc.fileUrl}
@@ -260,7 +282,7 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                   className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 transition hover:bg-slate-50"
                 >
                   <ExternalLink className="h-3.5 w-3.5 text-slate-500" aria-hidden="true" />
-                  <span>Open file</span>
+                  <span>{activeLang === "si" ? "ගොනුව බලන්න" : activeLang === "ta" ? "கோப்பைத் திறக்க" : "Open file"}</span>
                 </a>
                 <a
                   href={selectedDoc.downloadUrl || selectedDoc.fileUrl}
@@ -268,7 +290,7 @@ export function RtiLegalDocuments({ legalDocuments = [] }: RtiLegalDocumentsProp
                   className="inline-flex items-center gap-1.5 rounded-xl bg-[#388E3C] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#256B29]"
                 >
                   <Download className="h-3.5 w-3.5 !text-white" aria-hidden="true" />
-                  <span className="text-white">Download</span>
+                  <span className="text-white">{activeLang === "si" ? "බාගන්න" : activeLang === "ta" ? "பதிவிறக்க" : "Download"}</span>
                 </a>
               </div>
             </div>

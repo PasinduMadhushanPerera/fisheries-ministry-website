@@ -57,6 +57,7 @@ class SubmitContactFormView(APIView):
     Handles user contact form submission.
     Saves the submission record to the database and emails the message to minfishit@gmail.com.
     """
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def post(self, request):

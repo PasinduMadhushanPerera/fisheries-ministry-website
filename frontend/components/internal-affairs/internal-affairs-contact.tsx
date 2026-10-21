@@ -81,7 +81,7 @@ export function InternalAffairsContact() {
                 href={googleMapsDirectionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold text-white transition hover:bg-[#1b4d1d]"
+                className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-[#256B29] px-5 text-xs font-extrabold !text-white transition hover:bg-[#1b4d1d]"
               >
                 <Navigation className="h-3.5 w-3.5" />
                 <span>Get Directions</span>
