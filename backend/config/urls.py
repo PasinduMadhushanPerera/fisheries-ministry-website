@@ -139,7 +139,22 @@ admin.site.get_app_list = custom_get_app_list
 from django.views.generic.base import RedirectView
 from header_footer.views import custom_admin_password_change_view
 
+from django.http import JsonResponse
+from django.db import connection
+
+def health_check_view(request):
+    try:
+        connection.ensure_connection()
+        db_ok = True
+    except Exception:
+        db_ok = False
+    status_code = 200 if db_ok else 503
+    return JsonResponse({"status": "healthy" if db_ok else "degraded", "database": db_ok}, status=status_code)
+
 urlpatterns = [
+    # Health Check Endpoint for Hosting & Monitoring
+    path("api/v1/health/", health_check_view, name="health_check"),
+
     # Custom Account Settings (Username & Password) View
     path("admin/password_change/", custom_admin_password_change_view, name="admin_password_change"),
 

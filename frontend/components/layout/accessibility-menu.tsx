@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import Link from "next/link"
 import {
   Accessibility,
   Check,
@@ -12,7 +11,6 @@ import {
   Eye,
   PauseCircle,
   MousePointer,
-  FileText,
   Palette,
 } from "lucide-react"
 
@@ -407,20 +405,8 @@ export function AccessibilityMenu() {
             </button>
           </div>
 
-          {/* 3. Footer Links & Reset */}
-          <div className="mt-4 border-t border-slate-200 pt-4 space-y-2">
-            <Link
-              href="/accessibility"
-              onClick={() => setIsOpen(false)}
-              className="flex min-h-[38px] w-full items-center justify-between rounded-lg bg-emerald-50/80 px-3 py-2 text-xs font-bold text-[#256B29] transition hover:bg-emerald-100 border border-emerald-200"
-            >
-              <span className="flex items-center gap-2">
-                <FileText aria-hidden="true" className="h-3.5 w-3.5" />
-                <span>Accessibility Statement</span>
-              </span>
-              <span>→</span>
-            </Link>
-
+          {/* 3. Reset Preferences */}
+          <div className="mt-4 border-t border-slate-200 pt-4">
             <button
               type="button"
               onClick={resetPreferences}
