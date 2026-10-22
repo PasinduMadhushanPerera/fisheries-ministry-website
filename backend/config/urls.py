@@ -162,6 +162,9 @@ urlpatterns = [
     path("admin/rti_page/rtiheader/<path:subpath>", RedirectView.as_view(url="/admin/rti_page/rtiofficer/", permanent=False)),
     path("admin/rti_page/rtiheader/", RedirectView.as_view(url="/admin/rti_page/rtiofficer/", permanent=False)),
 
+    # Redirect root to Frontend Web Portal
+    path("", RedirectView.as_view(url=settings.FRONTEND_URL, permanent=False)),
+
     path("admin/", admin.site.urls),
 
     # Global Header & Footer, Home Page & Core Content APIs
