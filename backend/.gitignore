@@ -5,13 +5,13 @@ __pycache__/
 
 # Virtual environment
 venv/
-.env
 
 # Database
 db.sqlite3
 
-# Media (optional)
-media/
+# Huge Zip files (>100MB exceeds GitHub hard limit)
+media.zip
+media_backup.zip
 
 # IDE
 .vscode/

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LGN Hosting Resource Requirements - Ministry of Fisheries</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --primary: #0d332c;
+      --primary-light: #155e51;
+      --accent: #256b29;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --bg: #ffffff;
+      --border: #cbd5e1;
+      --table-header: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans Sinhala', sans-serif;
+      color: var(--text);
+      background: #f8fafc;
+      line-height: 1.6;
+      font-size: 13.5px;
+      padding: 20px;
+    }
+
+    .document-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 45px 55px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .header-banner {
+      border-bottom: 3px double var(--primary);
+      padding-bottom: 20px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .emblem-placeholder {
+      width: 70px;
+      height: 70px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #0d332c 0%, #256b29 100%);
+      color: #fde047;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 32px;
+      box-shadow: 0 4px 10px rgba(13, 51, 44, 0.2);
+    }
+
+    .header-text h1 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.3;
+    }
+
+    .header-text h2 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 3px;
+    }
+
+    .header-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .meta-box {
+      background: #f1f5f9;
+      border-left: 4px solid var(--accent);
+      padding: 12px 18px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 25px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 20px;
+      font-size: 12px;
+    }
+
+    .meta-item strong {
+      color: var(--primary);
+    }
+
+    h3.section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 6px;
+      margin-top: 25px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3.section-title span.number {
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    p, li {
+      margin-bottom: 8px;
+      color: #334155;
+    }
+
+    ul, ol {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px 0;
+      font-size: 12.5px;
+    }
+
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--table-header);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .highlight-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #e8f5e9;
+      color: #1b5e20;
+      border: 1px solid #a5d6a7;
+    }
+
+    .notice-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin: 15px 0;
+      font-size: 12.5px;
+    }
+
+    .footer-sign {
+      margin-top: 40px;
+      padding-top: 25px;
+      border-top: 1px solid #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .sign-col {
+      width: 45%;
+    }
+
+    .sign-line {
+      margin-top: 45px;
+      border-bottom: 1px dotted #94a3b8;
+    }
+
+    .print-button-bar {
+      max-width: 900px;
+      margin: 0 auto 15px auto;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #256b29;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1b4d1d;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .document-container {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        max-width: 100%;
+      }
+      .print-button-bar {
+        display: none;
+      }
+      @page {
+        margin: 1.5cm;
+        size: A4;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-button-bar">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Save as PDF / Print Document (මුද්‍රණය කරන්න)</button>
+  </div>
+
+  <div class="document-container">
+    <!-- Header -->
+    <div class="header-banner">
+      <div class="emblem-placeholder">🇱🇰</div>
+      <div class="header-text">
+        <h1>ශ්‍රී ලංකා ධීවර, ජලජ හා සාගර සම්පත් අමාත්‍යාංශය</h1>
+        <h2>Ministry of Fisheries, Aquatic and Ocean Resources</h2>
+        <p>ලංකා රාජ්‍ය ජාලය (LGN / LGC) සත්කාරක සේවා සම්පත් අවශ්‍යතා ලේඛනය (Hosting Resource Specification)</p>
+      </div>
+    </div>
+
+    <!-- Meta Details Box -->
+    <div class="meta-box">
+      <div class="meta-item"><strong>ලේඛන අංකය:</strong> MOF/IT/LGN/HOST-2026/01</div>
+      <div class="meta-item"><strong>දිනය:</strong> 2026 ඔක්තෝබර් 13</div>
+      <div class="meta-item"><strong>ඉදිරිපත් කරන්නේ:</strong> ලංකා රාජ්‍ය ජාලය (LGN / LGC) / ICTA</div>
+      <div class="meta-item"><strong>අනුකූලතාව:</strong> Sri Lanka Digital Development Standards (SLDDS)</div>
+    </div>
+
+    <!-- Section 1 -->
+    <h3 class="section-title"><span class="number">01</span> විධායක සාරාංශය සහ අරමුණ (Executive Summary)</h3>
+    <p>
+      ධීවර, ජලජ හා සාගර සම්පත් අමාත්‍යාංශයේ නව නිල ත්‍රෛභාෂා වෙබ් අඩවිය සහ අමාත්‍යාංශ කාර්ය මණ්ඩල අන්තර්ගත කළමනාකරණ පද්ධතිය (Staff CMS) සාර්ථකව නිර්මාණය කර අවසන් කර ඇත. මෙම වෙබ් පද්ධතිය ශ්‍රී ලංකා ඩිජිටල් සංවර්ධන ප්‍රමිතීන්ට (SLDDS) අනුකූලව ගොඩනගා ඇති අතර, අමාත්‍යාංශ තොරතුරු, මහජන සේවා, සංඛ්‍යාලේඛන වාර්තා, ටෙන්ඩර්, රැකියා අවස්ථා සහ මාධ්‍ය නිවේදන 24/7 බාධාවකින් තොරව ජනතාව වෙත ලබා දීම සඳහා <strong>Lanka Government Cloud (LGC / LGN)</strong> යටිතල පහසුකම් මත සත්කාරකත්වය (Hosting) ලබා දෙන ලෙස ගෞරවයෙන් ඉල්ලා සිටිමු.
+    </p>
+
+    <!-- Section 2 -->
+    <h3 class="section-title"><span class="number">02</span> තාක්ෂණික ගෘහ නිර්මාණ ශිල්පය (Technology Architecture)</h3>
+    <p>පද්ධතිය නවීන, ස්ථර 3 කින් සමන්විත Decoupled Architecture ආකෘතියකින් නිමවා ඇත:</p>
+    <ul>
+      <li><strong>Frontend Web Tier:</strong> Next.js 15 (Node.js 20+ LTS runtime, React 19, TypeScript, Tailwind CSS). Server-Side Rendering (SSR) මඟින් අධිවේගී පිටු සැකසීම.</li>
+      <li><strong>Backend REST API & Staff CMS Tier:</strong> Python 3.11+ / Django 5.x, Django REST Framework (DRF), Gunicorn WSGI Application Server.</li>
+      <li><strong>Database Tier:</strong> MySQL Server 8.0+ (InnoDB Engine, <code>utf8mb4_unicode_ci</code> Trilingual Sinhala/Tamil/English Support).</li>
+      <li><strong>Reverse Proxy & Security:</strong> Nginx Web Server (SSL Termination, HTTP/2, Gzip/Brotli Compression, Micro-caching).</li>
+    </ul>
+
+    <!-- Section 3 -->
+    <h3 class="section-title"><span class="number">03</span> සර්වර් සහ පරිගණක සම්පත් අවශ්‍යතා (Virtual Machine Specs)</h3>
+    <p>පද්ධතියේ ආරක්ෂාව සහ කාර්යක්ෂමතාව මත පහත දැක්වෙන විකල්ප දෙකෙන් එකක් තෝරා දීමට කාරුණික වන්න:</p>
+
+    <div class="notice-box">
+      <strong>🌟 නිර්දේශිත ක්‍රමය (විකල්ප 1):</strong> App Server සහ Database Server වෙන්ව පවත්වා ගැනීම රාජ්‍ය මට්ටමේ ආරක්ෂාව සඳහා වඩාත් උචිත වේ.
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>පරාමිතිය (Specification)</th>
+          <th>විකල්ප 1: App Server (VM 1)</th>
+          <th>විකල්ප 1: DB Server (VM 2)</th>
+          <th>විකල්ප 2: Single All-in-One VM</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>කාර්යභාරය (Role)</strong></td>
+          <td>Next.js 15 + Django API + Nginx</td>
+          <td>MySQL 8.0 Database</td>
+          <td>Web + API + DB (All-in-one)</td>
+        </tr>
+        <tr>
+          <td><strong>ප්‍රොසෙසරය (vCPU)</strong></td>
+          <td><strong>4 Cores</strong> (Min) / <strong>8 Cores</strong></td>
+          <td><strong>4 Cores</strong></td>
+          <td><strong>8 vCPU Cores</strong></td>
+        </tr>
+        <tr>
+          <td><strong>මතකය (RAM)</strong></td>
+          <td><strong>8 GB</strong> (Min) / <strong>16 GB</strong></td>
+          <td><strong>8 GB</strong></td>
+          <td><strong>16 GB RAM</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ගබඩාව (System Storage)</strong></td>
+          <td>100 GB SSD (NVMe)</td>
+          <td>100 GB SSD (NVMe)</td>
+          <td><strong>250 GB - 300 GB SSD (NVMe)</strong></td>
+        </tr>
+        <tr>
+          <td><strong>මාධ්‍ය ගබඩාව (Media Disk)</strong></td>
+          <td>150 GB - 200 GB SSD Attached</td>
+          <td>-</td>
+          <td>(ඉහත පද්ධති ගබඩාව තුළම)</td>
+        </tr>
+        <tr>
+          <td><strong>මෙහෙයුම් පද්ධතිය (OS)</strong></td>
+          <td>Ubuntu Server 22.04 / 24.04 LTS</td>
+          <td>Ubuntu 22.04 / Rocky Linux 9</td>
+          <td>Ubuntu Server 22.04 / 24.04 LTS</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Section 4 -->
+    <h3 class="section-title"><span class="number">04</span> ජාලකරණ, ඩොමේන් සහ ෆයර්වෝල් අවශ්‍යතා (Network & Firewall Rules)</h3>
+    <ul>
+      <li><strong>මහජන ඩොමේනය (Domain):</strong> <code>fisheries.gov.lk</code> සහ <code>www.fisheries.gov.lk</code></li>
+      <li><strong>Static Public IP:</strong> 1 x Public IPv4 Address (LGN මඟින් වෙන් කෙරෙන).</li>
+      <li><strong>කලාප පළල (Bandwidth):</strong> 50 Mbps - 100 Mbps Burstable.</li>
+    </ul>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Port</th>
+          <th>Protocol</th>
+          <th>දිශාව (Direction)</th>
+          <th>කාර්යය (Purpose)</th>
+          <th>ප්‍රවේශය (Access Control)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>443</strong></td>
+          <td>TCP</td>
+          <td>Inbound</td>
+          <td>HTTPS Web Portal Traffic</td>
+          <td><span class="highlight-badge">Public Open</span></td>
+        </tr>
+        <tr>
+          <td><strong>80</strong></td>
+          <td>TCP</td>
+          <td>Inbound</td>
+          <td>HTTP (Redirect to HTTPS)</td>
+          <td><span class="highlight-badge">Public Open</span></td>
+        </tr>
+        <tr>
+          <td><strong>22</strong></td>
+          <td>TCP</td>
+          <td>Inbound</td>
+          <td>SSH Administration</td>
+          <td><strong>Restricted</strong> (Ministry IT IPs / LGN VPN Only)</td>
+        </tr>
+        <tr>
+          <td><strong>587 / 465</strong></td>
+          <td>TCP</td>
+          <td>Outbound</td>
+          <td>SMTP Email (Citizen Inquiries)</td>
+          <td>Government Mail / Gmail SMTP Relay</td>
+        </tr>
+        <tr>
+          <td><strong>80 / 443</strong></td>
+          <td>TCP</td>
+          <td>Outbound</td>
+          <td>OS & Security Updates / Gov APIs</td>
+          <td>Outbound Open</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Section 5 -->
+    <h3 class="section-title"><span class="number">05</span> උපස්ථ සහ ආපදා කළමනාකරණය (Backup & Disaster Recovery)</h3>
+    <ul>
+      <li><strong>දෛනික දත්ත සමුදාය උපස්ථය (Daily DB Backup):</strong> සෑම දිනකම මධ්‍යම රාත්‍රී 12:00 ට ස්වයංක්‍රීය MySQL Database Dump.</li>
+      <li><strong>දත්ත රඳවා ගැනීමේ ප්‍රතිපත්තිය (Retention Policy):</strong>
+        <ul>
+          <li>දිනපතා උපස්ථ (Daily Backups): දින 7ක්</li>
+          <li>සතිපතා උපස්ථ (Weekly Backups): සති 4ක්</li>
+          <li>මාසික උපස්ථ (Monthly Backups): මාස 12ක්</li>
+        </ul>
+      </li>
+      <li><strong>Media Files Backup:</strong> සතිපතා ලේඛන සහ ඡායාරූප වෙනම Cloud Storage එකකට පිටපත් කිරීම.</li>
+      <li><strong>RTO (Recovery Time Objective):</strong> පැය 2ක් ඇතුළත සේවාව යථා තත්ත්වයට පත් කිරීම.</li>
+      <li><strong>RPO (Recovery Point Objective):</strong> උපරිම පැය 24ක දත්ත සීමාව.</li>
+    </ul>
+
+    <!-- Signatures -->
+    <div class="footer-sign">
+      <div class="sign-col">
+        <p>සකස් කළේ:</p>
+        <div class="sign-line"></div>
+        <p style="margin-top: 5px;"><strong>තොරතුරු තාක්ෂණ නිලධාරී / පද්ධති ඉංජිනේරු</strong><br>ධීවර, ජලජ හා සාගර සම්පත් අමාත්‍යාංශය</p>
+      </div>
+      <div class="sign-col">
+        <p>නිර්දේශ සහ අනුමැතිය:</p>
+        <div class="sign-line"></div>
+        <p style="margin-top: 5px;"><strong>අධ්‍යක්ෂ (තොරතුරු තාක්ෂණ) / අතිරේක ලේකම්</strong><br>ධීවර, ජලජ හා සාගර සම්පත් අමාත්‍යාංශය</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
